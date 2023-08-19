@@ -23,18 +23,20 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService, JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
-
+import { ThrottlerGuard } from '@nestjs/throttler';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post(`password-recovery`)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   passwordRecovery(@Body() emailDto: EmailPasswordRecoveryDto) {
     return emailDto;
   }
 
   @Post(`new-password`)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   newPassword(
     @Body()
@@ -44,6 +46,7 @@ export class AuthController {
   }
 
   @Post(`login`)
+  @UseGuards(ThrottlerGuard)
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   async login(
@@ -56,13 +59,8 @@ export class AuthController {
       req.user,
       req.headers,
       ip,
+      response,
     );
-
-    response.cookie(`refreshToken`, jwtPair.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
-
     return {
       accessToken: jwtPair.accessToken,
     };
@@ -74,22 +72,13 @@ export class AuthController {
   async refreshToken(
     @Headers() headers: any,
     @Ip() ip: string,
-    @Request() req: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const jwtPair: JwrPairDto = await this.authService.login(
-      req.user,
-      headers,
-      ip,
-    );
-
-    response.cookie(`refreshToken`, jwtPair.refreshToken);
-    return {
-      accessToken: jwtPair.accessToken,
-    };
+    return this.authService.refreshToken(headers, ip, response);
   }
 
   @Post(`registration-confirmation`)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationConfirmation(
     @Body()
@@ -102,12 +91,14 @@ export class AuthController {
   }
 
   @Post(`registration`)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() userRegistrationDto: UserRegistrationDto) {
     return this.authService.registration(userRegistrationDto);
   }
 
   @Post(`registration-email-resending`)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(
     @Body()
@@ -119,14 +110,16 @@ export class AuthController {
   }
 
   @Post(`logout`)
+  @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  logout() {
-    return;
+  async logout(@Request() req: any) {
+    return this.authService.logout(req.headers.cookie.slice(13));
   }
 
   @Get(`me`)
+  @UseGuards(AuthGuard(`jwt`))
   @HttpCode(HttpStatus.OK)
-  me() {
-    return `me`;
+  async me(@Request() req: any) {
+    return await this.authService.getMeInfo(req.user.userId);
   }
 }

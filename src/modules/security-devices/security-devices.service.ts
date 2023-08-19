@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityDevicesRepository } from './security-devices.repository';
 import { JwrPairDto } from '../auth/auth.service';
@@ -20,5 +20,18 @@ export class SecurityDevicesService {
       headers[`user-agent`] || `someDevice`,
       ip,
     );
+  }
+  async logoutDeviceSession(sessionData: any) {
+    return this.securityDevicesRepository.deleteDeviceSession(sessionData);
+  }
+  async getDeviceSession(userId: string, deviceId: string) {
+    const foundSession = await this.securityDevicesRepository.findDeviceSession(
+      userId,
+      deviceId,
+    );
+    if (!foundSession) {
+      throw new UnauthorizedException();
+    }
+    return true;
   }
 }

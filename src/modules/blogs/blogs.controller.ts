@@ -21,7 +21,6 @@ import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { PostsService } from '../posts/posts.service';
 import { LikesQueryRepository } from '../likes/likes.query.repository';
 import { AuthGuard } from '../../helpers/auth.guard';
-import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
 import { CreatePostInBlogDto } from '../posts/dto/create-post.dto';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 @UseGuards(AuthGlobalGuard)

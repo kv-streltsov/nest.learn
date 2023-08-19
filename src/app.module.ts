@@ -47,14 +47,14 @@ import { config } from 'dotenv';
 import { LikesService } from './modules/likes/likes.service';
 import { LikesRepository } from './modules/likes/likes.repository';
 import { CustomValidator } from './helpers/custom-validators/custom.validator';
-import { ThrottlerModule } from "@nestjs/throttler";
+import { ThrottlerModule } from '@nestjs/throttler';
 config();
 
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+      ttl: 10,
+      limit: 5,
     }),
     MailerModule.forRoot({
       transport: {

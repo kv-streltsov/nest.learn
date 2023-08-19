@@ -26,6 +26,5 @@ export class AuthGlobalGuard implements CanActivate {
     } catch (err) {
       return true;
     }
-    return true;
   }
 }

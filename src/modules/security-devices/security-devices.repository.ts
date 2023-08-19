@@ -44,4 +44,16 @@ export class SecurityDevicesRepository {
     });
     return true;
   }
+  async deleteDeviceSession(sessionDate: any) {
+    return this.securityDevicesModel.deleteOne({
+      userId: sessionDate.userId,
+      deviceId: sessionDate.deviceId,
+    });
+  }
+  async findDeviceSession(userId: string, deviceId: string) {
+    return await this.securityDevicesModel.findOne({
+      userId,
+      deviceId,
+    });
+  }
 }
