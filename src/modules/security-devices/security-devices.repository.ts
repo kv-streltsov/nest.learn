@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SecurityDevices } from './security-devices.schena';
@@ -44,16 +48,30 @@ export class SecurityDevicesRepository {
     });
     return true;
   }
+
   async deleteDeviceSession(sessionDate: any) {
     return this.securityDevicesModel.deleteOne({
       userId: sessionDate.userId,
       deviceId: sessionDate.deviceId,
     });
   }
-  async findDeviceSession(userId: string, deviceId: string) {
-    return await this.securityDevicesModel.findOne({
-      userId,
-      deviceId,
+  async deleteDeviceSessionByDeviceId(deviceId: string, userId: string) {
+    const foundSession = await this.securityDevicesModel.findOne({ deviceId });
+    if (foundSession === null) {
+      throw new NotFoundException();
+    }
+    if (foundSession.userId !== userId) {
+      throw new ForbiddenException();
+    }
+    return this.securityDevicesModel.deleteOne({
+      deviceId: deviceId,
+    });
+  }
+
+  async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {
+    return this.securityDevicesModel.deleteMany({
+      deviceId: { $ne: deviceId },
+      userId: userId,
     });
   }
 }

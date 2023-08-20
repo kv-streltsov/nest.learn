@@ -48,6 +48,8 @@ import { LikesService } from './modules/likes/likes.service';
 import { LikesRepository } from './modules/likes/likes.repository';
 import { CustomValidator } from './helpers/custom-validators/custom.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { SecurityDevicesQueryRepositoryRepository } from './modules/security-devices/security-devices.query.repository';
+import { SecurityDevicesController } from './modules/security-devices/security-devices.controller';
 config();
 
 @Module({
@@ -90,6 +92,7 @@ config();
     PostsController,
     CommentsController,
     TestingController,
+    SecurityDevicesController,
   ],
   providers: [
     AppService,
@@ -112,6 +115,7 @@ config();
     BlogsQueryRepository,
     UsersQueryRepository,
     PostsQueryRepository,
+    SecurityDevicesQueryRepositoryRepository,
     CommentsQueryRepository,
     AccessTokenStrategy,
     RefreshTokenStrategy,

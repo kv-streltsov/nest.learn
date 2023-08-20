@@ -16,6 +16,7 @@ const userOne = {
   email: 'aaa@yandex.ru',
   id: null,
   accessToken: null,
+  refreshToken: `null`,
 };
 const userTwo = {
   login: 'qwertyb',
@@ -1023,5 +1024,120 @@ describe('AppController (e2e)', () => {
         ],
       },
     });
+  });
+  /////////////////////////////    DEVICES SESSION AND AUTH FLOW     /////////////////////////////////////////
+  it('LOGIN FIRST USER FROM 4 DIFFERENT DEVICES ', async () => {
+    // LOGIN USER 1
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .set('User-Agent', 'goggle home')
+      .send({
+        loginOrEmail: userOne.email,
+        password: userOne.password,
+      })
+      .expect(200);
+    userOne.refreshToken = response.headers['set-cookie'][0];
+    // LOGIN USER 1
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .set('User-Agent', 'iPhone')
+      .send({
+        loginOrEmail: userOne.email,
+        password: userOne.password,
+      })
+      .expect(200);
+
+    // LOGIN USER 1
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .set('User-Agent', 'FoxFire')
+      .send({
+        loginOrEmail: userOne.email,
+        password: userOne.password,
+      })
+      .expect(200);
+    userOne.accessToken = response.body.accessToken;
+  });
+  it(`ENDPOINT SECURITY DEVICES`, async () => {
+    // GET 4 DEVICES
+    let foundDevices = await request(app.getHttpServer())
+      .get('/security/devices')
+      .set('Cookie', userOne.refreshToken)
+      .expect(200);
+    expect(foundDevices.body).toEqual([
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'someDevice',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'goggle home',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'iPhone',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'FoxFire',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+    ]);
+    // DELETE DEVICES BY ID
+    await request(app.getHttpServer())
+      .delete(`/security/devices/${foundDevices.body[3].deviceId}`)
+      .set('Cookie', userOne.refreshToken)
+      .expect(204);
+    // GET 3 DEVICES
+    foundDevices = await request(app.getHttpServer())
+      .get('/security/devices')
+      .set('Cookie', userOne.refreshToken)
+      .expect(200);
+    expect(foundDevices.body).toEqual([
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'someDevice',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'goggle home',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+      {
+        ip: '::ffff:127.0.0.1',
+        title: 'iPhone',
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+    ]);
+    // DELETE ALL OTHER DEVICES
+    await request(app.getHttpServer())
+      .delete(`/security/devices`)
+      .set('Cookie', userOne.refreshToken)
+      .expect(204);
+    // GET 1 DEVICES
+    foundDevices = await request(app.getHttpServer())
+      .get('/security/devices')
+      .set('Cookie', userOne.refreshToken)
+      .expect(200);
+    console.log(`!!!`, foundDevices.body);
+    expect(foundDevices.body).toEqual([
+      {
+        ip: '::ffff:127.0.0.1',
+        title: expect.any(String),
+        deviceId: expect.any(String),
+        lastActiveDate: expect.any(String),
+      },
+    ]);
   });
 });

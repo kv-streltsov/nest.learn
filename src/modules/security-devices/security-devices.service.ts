@@ -2,12 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityDevicesRepository } from './security-devices.repository';
 import { JwrPairDto } from '../auth/auth.service';
+import { SecurityDevicesQueryRepositoryRepository } from './security-devices.query.repository';
 
 @Injectable()
 export class SecurityDevicesService {
   constructor(
     private jwtService: JwtService,
     private securityDevicesRepository: SecurityDevicesRepository,
+    private securityDevicesQueryRepositoryRepository: SecurityDevicesQueryRepositoryRepository,
   ) {}
 
   async createDeviceSession(jwtPair: JwrPairDto, headers: any, ip: string) {
@@ -24,11 +26,18 @@ export class SecurityDevicesService {
   async logoutDeviceSession(sessionData: any) {
     return this.securityDevicesRepository.deleteDeviceSession(sessionData);
   }
-  async getDeviceSession(userId: string, deviceId: string) {
-    const foundSession = await this.securityDevicesRepository.findDeviceSession(
-      userId,
-      deviceId,
+  async logoutAllDevicesExcludeCurrent(pyload: any) {
+    return this.securityDevicesRepository.deleteAllDeviceSessionExcludeCurrent(
+      pyload.userId,
+      pyload.deviceId,
     );
+  }
+  async getDeviceSession(userId: string, deviceId: string) {
+    const foundSession =
+      await this.securityDevicesQueryRepositoryRepository.findDeviceSession(
+        userId,
+        deviceId,
+      );
     if (!foundSession) {
       throw new UnauthorizedException();
     }
