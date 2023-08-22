@@ -18,24 +18,22 @@ export class SecurityDevicesRepository {
   async createDeviceSessions(jwtPayload: JwtPayloadDto, user: any) {
     const foundSession = await this.securityDevicesModel
       .find({
-        ip: user.ip,
-        userAgent: user.userAgent,
-        userId: jwtPayload.userId,
+        userId: user.userId,
+        deviceId: jwtPayload.deviceId,
       })
       .lean();
 
     if (foundSession.length) {
       await this.securityDevicesModel.updateOne(
         {
-          ip: user.ip,
-          userAgent: user.userAgent,
-          userId: jwtPayload.userId,
+          userId: user.userId,
+          deviceId: jwtPayload.deviceId,
         },
         {
           $set: {
             issued: jwtPayload.iat,
+            ip: user.ip,
             expiration: jwtPayload.exp,
-            deviceId: jwtPayload.deviceId,
             sessionId: jwtPayload.sessionId,
           },
         },
@@ -54,11 +52,49 @@ export class SecurityDevicesRepository {
     });
     return true;
   }
+  // async updateDeviceSessions(jwtPayload: JwtPayloadDto, user: any) {
+  //   const foundSession = await this.securityDevicesModel
+  //     .find({
+  //       deviceId: jwtPayload.deviceId,
+  //       ip: user.ip,
+  //       userAgent: user.userAgent,
+  //     })
+  //     .lean();
+  //
+  //   if (foundSession.length) {
+  //     await this.securityDevicesModel.updateOne(
+  //       {
+  //         deviceId: jwtPayload.userId,
+  //         userId: jwtPayload.userId,
+  //       },
+  //       {
+  //         $set: {
+  //           issued: jwtPayload.iat,
+  //           expiration: jwtPayload.exp,
+  //           // deviceId: jwtPayload.deviceId,
+  //           sessionId: jwtPayload.sessionId,
+  //         },
+  //       },
+  //     );
+  //     return true;
+  //   }
+  //
+  //   await this.securityDevicesModel.create({
+  //     issued: jwtPayload.iat,
+  //     sessionId: jwtPayload.sessionId,
+  //     expiration: jwtPayload.exp,
+  //     userId: jwtPayload.userId,
+  //     deviceId: jwtPayload.deviceId,
+  //     userAgent: user.userAgent,
+  //     ip: user.ip,
+  //   });
+  //   return true;
+  // }
 
-  async deleteDeviceSession(sessionDate: any) {
+  async deleteDeviceSession(user: any) {
     return this.securityDevicesModel.deleteOne({
-      userId: sessionDate.userId,
-      deviceId: sessionDate.deviceId,
+      userId: user.userId,
+      deviceId: user.deviceId,
     });
   }
   async deleteDeviceSessionByDeviceId(deviceId: string, userId: string) {

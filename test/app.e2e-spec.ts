@@ -1093,7 +1093,6 @@ describe('AppController (e2e)', () => {
     // second user login | FoxFire
     response = await request(app.getHttpServer())
       .post('/auth/login')
-      .set('User-Agent', 'FoxFire')
       .send({
         loginOrEmail: userTwo.email,
         password: userTwo.password,
@@ -1141,26 +1140,26 @@ describe('AppController (e2e)', () => {
     expect(foundDevices.body).toEqual([
       {
         ip: '::ffff:127.0.0.1',
-        title: 'FoxFire',
+        title: 'someDevice',
         deviceId: expect.any(String),
         lastActiveDate: expect.any(String),
       },
     ]);
   });
   it(`DELETE DEVICES`, async () => {
-    // GET 4 DEVICES
+    // GET 4 DEVICES | userOne
     let foundDevices = await request(app.getHttpServer())
       .get('/security/devices')
       .set('Cookie', userOne.refreshToken)
       .expect(200);
 
-    // DELETE DEVICES BY ID
+    // DELETE DEVICES BY ID | userOne
     await request(app.getHttpServer())
       .delete(`/security/devices/${foundDevices.body[3].deviceId}`)
       .set('Cookie', userOne.refreshToken)
       .expect(204);
 
-    // GET 3 DEVICES
+    // GET 3 DEVICES | userOne
     foundDevices = await request(app.getHttpServer())
       .get('/security/devices')
       .set('Cookie', userOne.refreshToken)
@@ -1185,12 +1184,12 @@ describe('AppController (e2e)', () => {
         lastActiveDate: expect.any(String),
       },
     ]);
-    // DELETE ALL OTHER DEVICES
+    // DELETE ALL OTHER DEVICES | userOne
     await request(app.getHttpServer())
       .delete(`/security/devices`)
       .set('Cookie', userOne.refreshToken)
       .expect(204);
-    // GET 1 DEVICES
+    // GET 1 DEVICES | userOne
     foundDevices = await request(app.getHttpServer())
       .get('/security/devices')
       .set('Cookie', userOne.refreshToken)
@@ -1205,5 +1204,27 @@ describe('AppController (e2e)', () => {
     ]);
   });
   /////////////////////////////    AUTH   ///////////////////////////////////////////////////
-  it('refresh token', async () => {});
+  it('REFRESH TOKEN AND LOGOUT', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/refresh-token')
+      .set('Cookie', userTwo.refreshToken)
+      .expect(200);
+    expect(
+      response.headers['set-cookie'][0] === userTwo.refreshToken,
+    ).toBeFalsy();
+
+    await request(app.getHttpServer())
+      .post('/auth/refresh-token')
+      .set('Cookie', userTwo.refreshToken)
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', response.headers['set-cookie'][0])
+      .expect(204);
+    await request(app.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', response.headers['set-cookie'][0])
+      .expect(401);
+  });
 });

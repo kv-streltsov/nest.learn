@@ -20,12 +20,9 @@ export class SecurityDevicesService {
 
     await this.securityDevicesRepository.createDeviceSessions(jwtPayload, user);
   }
-  async updateDeviceSession(jwtPayload: JwtPayloadDto, ip: string) {
-    await this.securityDevicesRepository.createDeviceSessions(jwtPayload, ip);
-  }
 
-  async logoutDeviceSession(sessionData: any) {
-    return this.securityDevicesRepository.deleteDeviceSession(sessionData);
+  async logoutDeviceSession(user: any) {
+    return this.securityDevicesRepository.deleteDeviceSession(user);
   }
   async logoutAllDevicesExcludeCurrent(pyload: any) {
     return this.securityDevicesRepository.deleteAllDeviceSessionExcludeCurrent(

@@ -51,8 +51,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
         payload.deviceId,
         payload.sessionId,
       );
-
-    if (foundUser === null || foundDevice === null) {
+    if (!foundUser || foundDevice === null) {
       throw new UnauthorizedException();
     }
 

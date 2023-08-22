@@ -60,16 +60,16 @@ export class AuthService {
       accessToken: jwtPair.accessToken,
     };
   }
-  async logout(refreshToken: string) {
-    const jwtDecode = await this.jwtService.decode(refreshToken);
-    return this.securityDevicesService.logoutDeviceSession(jwtDecode);
+  async logout(user: any) {
+    return this.securityDevicesService.logoutDeviceSession(user);
   }
   async registration(userRegistrationDto: UserRegistrationDto) {
     const createdUser = await this.usersService.createUser(userRegistrationDto);
-    return await this.emailService.sendMailRegistration(
+    this.emailService.sendMailRegistration(
       userRegistrationDto.email,
       createdUser.uuid,
     );
+    return;
   }
   async confirmationUser(code: string) {
     const foundUser: any =
@@ -95,7 +95,8 @@ export class AuthService {
     const uuid = randomUUID();
     await this.usersRepository.updateConfirmationCodeByEmail(email, uuid);
 
-    return await this.emailService.sendMailRegistration(foundUser.email, uuid);
+    this.emailService.sendMailRegistration(foundUser.email, uuid);
+    return;
   }
   async validateUser(loginOrEmail: string, password: string) {
     const foundUser = await this.usersQueryRepository.getUserByLoginOrEmail(

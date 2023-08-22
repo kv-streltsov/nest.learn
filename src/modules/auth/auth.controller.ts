@@ -44,8 +44,7 @@ export class AuthController {
   }
 
   @Post(`login`)
-  @UseGuards(ThrottlerGuard)
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(ThrottlerGuard, AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   async login(
     @Res({ passthrough: true }) response: Response,
@@ -102,14 +101,14 @@ export class AuthController {
   @Post(`logout`)
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@Request() req: any) {
-    return this.authService.logout(req.headers.cookie.slice(13));
+  async logout(@Request() request: any) {
+    return this.authService.logout(request.user);
   }
 
   @Get(`me`)
   @UseGuards(AuthGuard(`jwt`))
   @HttpCode(HttpStatus.OK)
-  async me(@Request() req: any) {
-    return await this.authService.getMeInfo(req.user.userId);
+  async me(@Request() request: any) {
+    return await this.authService.getMeInfo(request.user.userId);
   }
 }
