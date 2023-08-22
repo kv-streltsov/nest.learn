@@ -3,10 +3,8 @@ import {
   Controller,
   Get,
   Res,
-  Headers,
   HttpCode,
   HttpStatus,
-  Ip,
   Post,
   UseGuards,
   Request,
@@ -50,17 +48,10 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   async login(
-    @Headers() headers: any,
-    @Ip() ip: string,
     @Res({ passthrough: true }) response: Response,
-    @Request() req: any,
+    @Request() request: any,
   ) {
-    const jwtPair: JwrPairDto = await this.authService.login(
-      req.user,
-      req.headers,
-      ip,
-      response,
-    );
+    const jwtPair: JwrPairDto = await this.authService.login(request, response);
     return {
       accessToken: jwtPair.accessToken,
     };
@@ -70,11 +61,10 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   async refreshToken(
-    @Headers() headers: any,
-    @Ip() ip: string,
+    @Request() request: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return this.authService.refreshToken(headers, ip, response);
+    return this.authService.refreshToken(request, response);
   }
 
   @Post(`registration-confirmation`)

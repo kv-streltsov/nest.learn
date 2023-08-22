@@ -2,7 +2,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -25,10 +24,10 @@ export class SecurityDevicesController {
   @Get()
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async getAllDevicesForCurrentUser(@Request() req) {
+  async getAllDevicesForCurrentUser(@Request() request) {
     const foundSessions =
       await this.securityDevicesQueryRepositoryRepository.findDeviceSessions(
-        req.user.id,
+        request.user.userId,
       );
 
     return foundSessions.map((session) => {
@@ -44,19 +43,19 @@ export class SecurityDevicesController {
   @Delete()
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  terminateDevicesExcludeCurrent(@Request() req) {
+  terminateDevicesExcludeCurrent(@Request() request) {
     return this.securityDevicesService.logoutAllDevicesExcludeCurrent(
-      req.user.payload,
+      request.user,
     );
   }
 
   @Delete(`:id`)
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  terminateDeviceById(@Param(`id`) deviceId: string, @Request() req) {
+  terminateDeviceById(@Param(`id`) deviceId: string, @Request() request) {
     return this.securityDevicesRepository.deleteDeviceSessionByDeviceId(
       deviceId,
-      req.user.id,
+      request.user.userId,
     );
   }
 }

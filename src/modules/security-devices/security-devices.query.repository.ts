@@ -10,18 +10,20 @@ export class SecurityDevicesQueryRepositoryRepository {
     private securityDevicesModel: Model<SecurityDevices>,
   ) {}
 
-  async findDeviceSession(userId: string, deviceId: string) {
+  async findDeviceSession(userId: string, deviceId: string, sessionId: string) {
     return this.securityDevicesModel.findOne({
       userId,
       deviceId,
+      sessionId,
     });
   }
 
   async findDeviceSessions(userId: string) {
     return this.securityDevicesModel
       .find({
-        userId,
+        userId: userId,
       })
-      .select({ _id: 0, userId: 0, expiration: 0, __v: 0 });
+      .select({ _id: 0, userId: 0, expiration: 0, __v: 0 })
+      .lean();
   }
 }

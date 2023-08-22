@@ -17,6 +17,9 @@ export class SecurityDevices {
   deviceId: string;
 
   @Prop({ type: String, required: true })
+  sessionId: string;
+
+  @Prop({ type: String, required: true })
   userAgent: string;
 
   @Prop({ type: String, required: true })

@@ -6,6 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SecurityDevices } from './security-devices.schena';
+import { JwtPayloadDto } from '../auth/strategies/refreshToken.strategy';
 
 @Injectable()
 export class SecurityDevicesRepository {
@@ -14,24 +15,28 @@ export class SecurityDevicesRepository {
     private securityDevicesModel: Model<SecurityDevices>,
   ) {}
 
-  async createDeviceSessions(jwtPayload: any, userAgent: string, ip: string) {
-    const userId = jwtPayload.userId;
-    const result = await this.securityDevicesModel
+  async createDeviceSessions(jwtPayload: JwtPayloadDto, user: any) {
+    const foundSession = await this.securityDevicesModel
       .find({
-        ip,
-        userAgent,
-        userId,
+        ip: user.ip,
+        userAgent: user.userAgent,
+        userId: jwtPayload.userId,
       })
       .lean();
 
-    if (result.length) {
+    if (foundSession.length) {
       await this.securityDevicesModel.updateOne(
-        { userId },
+        {
+          ip: user.ip,
+          userAgent: user.userAgent,
+          userId: jwtPayload.userId,
+        },
         {
           $set: {
             issued: jwtPayload.iat,
             expiration: jwtPayload.exp,
             deviceId: jwtPayload.deviceId,
+            sessionId: jwtPayload.sessionId,
           },
         },
       );
@@ -40,11 +45,12 @@ export class SecurityDevicesRepository {
 
     await this.securityDevicesModel.create({
       issued: jwtPayload.iat,
+      sessionId: jwtPayload.sessionId,
       expiration: jwtPayload.exp,
       userId: jwtPayload.userId,
       deviceId: jwtPayload.deviceId,
-      userAgent,
-      ip,
+      userAgent: user.userAgent,
+      ip: user.ip,
     });
     return true;
   }
@@ -67,7 +73,6 @@ export class SecurityDevicesRepository {
       deviceId: deviceId,
     });
   }
-
   async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {
     return this.securityDevicesModel.deleteMany({
       deviceId: { $ne: deviceId },

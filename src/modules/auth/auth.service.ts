@@ -40,61 +40,29 @@ export class AuthService {
       userId,
     };
   }
-  async login(
-    user: any,
-    headers: any,
-    ip: string,
-    response: Response,
-  ): Promise<JwrPairDto> {
-    const jwtPair = {
-      refreshToken: await this.jwtService.signAsync(
-        {
-          userId: user.id,
-          login: user.login,
-          deviceId: randomUUID(),
-        },
-        {
-          expiresIn: '205s',
-        },
-      ),
-      accessToken: await this.jwtService.signAsync(
-        {
-          userId: user.id,
-          login: user.login,
-        },
-        {
-          expiresIn: '150s',
-        },
-      ),
-    };
-
-    response.cookie(`refreshToken`, jwtPair.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
-    await this.securityDevicesService.createDeviceSession(jwtPair, headers, ip);
+  async login(request: any, response: Response): Promise<JwrPairDto> {
+    const jwtPair = await this._createJwtPair(request, response);
+    await this.securityDevicesService.createDeviceSession(
+      jwtPair,
+      request.user,
+    );
     return jwtPair;
+  }
+  async refreshToken(request: any, response: Response) {
+    const jwtPair: JwrPairDto = await this._createJwtPair(request, response);
+
+    await this.securityDevicesService.createDeviceSession(
+      jwtPair,
+      request.user,
+    );
+
+    return {
+      accessToken: jwtPair.accessToken,
+    };
   }
   async logout(refreshToken: string) {
     const jwtDecode = await this.jwtService.decode(refreshToken);
     return this.securityDevicesService.logoutDeviceSession(jwtDecode);
-  }
-
-  async refreshToken(headers: any, ip: string, response: Response) {
-    const jwtDecode: any = this.jwtService.decode(headers.cookie.slice(13));
-    await this.securityDevicesService.getDeviceSession(
-      jwtDecode.userId,
-      jwtDecode.deviceId,
-    );
-    const jwtPair: JwrPairDto = await this.login(
-      { id: jwtDecode.userId, login: jwtDecode.login },
-      headers,
-      ip,
-      response,
-    );
-    return {
-      accessToken: jwtPair.accessToken,
-    };
   }
   async registration(userRegistrationDto: UserRegistrationDto) {
     const createdUser = await this.usersService.createUser(userRegistrationDto);
@@ -149,5 +117,36 @@ export class AuthService {
   }
   async _generateHash(password: string, salt: string) {
     return await bcrypt.hash(password, salt);
+  }
+  async _createJwtPair(request: any, response: Response) {
+    const jwtPair = {
+      refreshToken: await this.jwtService.signAsync(
+        {
+          userId: request.user.userId,
+          login: request.user.login,
+          sessionId: randomUUID(),
+          deviceId: request.user.deviceId || randomUUID(),
+        },
+        {
+          expiresIn: '20s',
+        },
+      ),
+      accessToken: await this.jwtService.signAsync(
+        {
+          userId: request.user.userId,
+          login: request.user.login,
+        },
+        {
+          expiresIn: '10s',
+        },
+      ),
+    };
+
+    response.cookie(`refreshToken`, jwtPair.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return jwtPair;
   }
 }

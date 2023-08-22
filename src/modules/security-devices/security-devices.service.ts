@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SecurityDevicesRepository } from './security-devices.repository';
 import { JwrPairDto } from '../auth/auth.service';
 import { SecurityDevicesQueryRepositoryRepository } from './security-devices.query.repository';
+import { JwtPayloadDto } from '../auth/strategies/refreshToken.strategy';
 
 @Injectable()
 export class SecurityDevicesService {
@@ -12,17 +13,17 @@ export class SecurityDevicesService {
     private securityDevicesQueryRepositoryRepository: SecurityDevicesQueryRepositoryRepository,
   ) {}
 
-  async createDeviceSession(jwtPair: JwrPairDto, headers: any, ip: string) {
+  async createDeviceSession(jwtPair: JwrPairDto, user: any) {
     const jwtPayload: any = this.jwtService.decode(jwtPair.refreshToken);
     jwtPayload.iat = new Date(jwtPayload.iat * 1000).toISOString();
     jwtPayload.exp = new Date(jwtPayload.exp * 1000).toISOString();
 
-    await this.securityDevicesRepository.createDeviceSessions(
-      jwtPayload,
-      headers[`user-agent`] || `someDevice`,
-      ip,
-    );
+    await this.securityDevicesRepository.createDeviceSessions(jwtPayload, user);
   }
+  async updateDeviceSession(jwtPayload: JwtPayloadDto, ip: string) {
+    await this.securityDevicesRepository.createDeviceSessions(jwtPayload, ip);
+  }
+
   async logoutDeviceSession(sessionData: any) {
     return this.securityDevicesRepository.deleteDeviceSession(sessionData);
   }
@@ -31,16 +32,5 @@ export class SecurityDevicesService {
       pyload.userId,
       pyload.deviceId,
     );
-  }
-  async getDeviceSession(userId: string, deviceId: string) {
-    const foundSession =
-      await this.securityDevicesQueryRepositoryRepository.findDeviceSession(
-        userId,
-        deviceId,
-      );
-    if (!foundSession) {
-      throw new UnauthorizedException();
-    }
-    return true;
   }
 }
