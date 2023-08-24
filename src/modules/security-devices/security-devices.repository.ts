@@ -52,44 +52,6 @@ export class SecurityDevicesRepository {
     });
     return true;
   }
-  // async updateDeviceSessions(jwtPayload: JwtPayloadDto, user: any) {
-  //   const foundSession = await this.securityDevicesModel
-  //     .find({
-  //       deviceId: jwtPayload.deviceId,
-  //       ip: user.ip,
-  //       userAgent: user.userAgent,
-  //     })
-  //     .lean();
-  //
-  //   if (foundSession.length) {
-  //     await this.securityDevicesModel.updateOne(
-  //       {
-  //         deviceId: jwtPayload.userId,
-  //         userId: jwtPayload.userId,
-  //       },
-  //       {
-  //         $set: {
-  //           issued: jwtPayload.iat,
-  //           expiration: jwtPayload.exp,
-  //           // deviceId: jwtPayload.deviceId,
-  //           sessionId: jwtPayload.sessionId,
-  //         },
-  //       },
-  //     );
-  //     return true;
-  //   }
-  //
-  //   await this.securityDevicesModel.create({
-  //     issued: jwtPayload.iat,
-  //     sessionId: jwtPayload.sessionId,
-  //     expiration: jwtPayload.exp,
-  //     userId: jwtPayload.userId,
-  //     deviceId: jwtPayload.deviceId,
-  //     userAgent: user.userAgent,
-  //     ip: user.ip,
-  //   });
-  //   return true;
-  // }
 
   async deleteDeviceSession(user: any) {
     return this.securityDevicesModel.deleteOne({

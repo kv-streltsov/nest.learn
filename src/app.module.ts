@@ -50,7 +50,10 @@ import { CustomValidator } from './helpers/custom-validators/custom.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SecurityDevicesQueryRepositoryRepository } from './modules/security-devices/security-devices.query.repository';
 import { SecurityDevicesController } from './modules/security-devices/security-devices.controller';
+import { LoginUseCase } from './modules/auth/use-cases/loginUseCase';
+import { CreateDeviceSessionUseCase } from './modules/security-devices/use-cases/createDeviceSessionUseCase';
 config();
+const useCases = [LoginUseCase, CreateDeviceSessionUseCase];
 
 @Module({
   imports: [
@@ -95,6 +98,7 @@ config();
     SecurityDevicesController,
   ],
   providers: [
+    ...useCases,
     AppService,
     AuthService,
     UsersService,

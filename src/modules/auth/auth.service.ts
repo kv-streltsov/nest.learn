@@ -40,16 +40,8 @@ export class AuthService {
       userId,
     };
   }
-  async login(request: any, response: Response): Promise<JwrPairDto> {
-    const jwtPair = await this._createJwtPair(request, response);
-    await this.securityDevicesService.createDeviceSession(
-      jwtPair,
-      request.user,
-    );
-    return jwtPair;
-  }
   async refreshToken(request: any, response: Response) {
-    const jwtPair: JwrPairDto = await this._createJwtPair(request, response);
+    const jwtPair: JwrPairDto = await this.createJwtPair(request, response);
 
     await this.securityDevicesService.createDeviceSession(
       jwtPair,
@@ -106,7 +98,7 @@ export class AuthService {
       return null;
     }
 
-    const passwordHash: string = await this._generateHash(
+    const passwordHash: string = await this.generateHash(
       password,
       foundUser.salt,
     );
@@ -116,10 +108,10 @@ export class AuthService {
     }
     return foundUser;
   }
-  async _generateHash(password: string, salt: string) {
+  private async generateHash(password: string, salt: string) {
     return await bcrypt.hash(password, salt);
   }
-  async _createJwtPair(request: any, response: Response) {
+  private async createJwtPair(request: any, response: Response) {
     const jwtPair = {
       refreshToken: await this.jwtService.signAsync(
         {

@@ -22,9 +22,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService, JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { LoginUseCase } from './use-cases/loginUseCase';
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private loginUseCase: LoginUseCase,
+  ) {}
 
   @Post(`password-recovery`)
   @UseGuards(ThrottlerGuard)
@@ -50,7 +54,11 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Request() request: any,
   ) {
-    const jwtPair: JwrPairDto = await this.authService.login(request, response);
+    const jwtPair: JwrPairDto = await this.loginUseCase.excecute(
+      request,
+      response,
+    );
+
     return {
       accessToken: jwtPair.accessToken,
     };
