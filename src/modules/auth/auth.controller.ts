@@ -19,7 +19,7 @@ import {
 } from './dto/create-auth.dto';
 
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService, JwrPairDto } from './auth.service';
+import { JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { LoginUseCase } from './use-cases/loginUseCase';
@@ -28,16 +28,17 @@ import { LogoutUseCase } from './use-cases/logoutUseCase';
 import { RegistrationUseCase } from './use-cases/registrationUseCase';
 import { GetMeInfoUseCase } from './use-cases/getMeInfoUseCase';
 import { ConfirmationUserUseCase } from './use-cases/confirmationUseCase';
+import { RegistrationEmailResendingUseCase } from './use-cases/registrationEmailResendingUseCase';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService,
     private loginUseCase: LoginUseCase,
     private logoutUseCase: LogoutUseCase,
     private refreshTokenUseCase: RefreshTokenUseCase,
     private registrationUseCase: RegistrationUseCase,
     private getMeInfoUseCase: GetMeInfoUseCase,
     private confirmationUserUseCase: ConfirmationUserUseCase,
+    private registrationEmailResendingUseCase: RegistrationEmailResendingUseCase,
   ) {}
 
   @Post(`password-recovery`)
@@ -111,7 +112,7 @@ export class AuthController {
     @Body()
     registrationEmailResendingDto: RegistrationEmailResendingDto,
   ) {
-    return await this.authService.registrationEmailResending(
+    return await this.registrationEmailResendingUseCase.execute(
       registrationEmailResendingDto.email,
     );
   }

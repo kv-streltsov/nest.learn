@@ -1,12 +1,12 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../auth.service';
 import { Request } from 'express';
+import { ValidateUserUseCase } from '../use-cases/validateUserUseCase';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(private validateUserUseCase: ValidateUserUseCase) {
     super({
       usernameField: 'loginOrEmail',
       passReqToCallback: true,
@@ -18,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<any> {
-    const foundUser = await this.authService.validateUser(
+    const foundUser = await this.validateUserUseCase.execute(
       loginOrEmail,
       password,
     );

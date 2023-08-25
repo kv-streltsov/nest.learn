@@ -60,6 +60,8 @@ import { LogoutAllDeviceSessionUseCase } from './modules/security-devices/use-ca
 import { GetMeInfoUseCase } from './modules/auth/use-cases/getMeInfoUseCase';
 import { ConfirmationUserUseCase } from './modules/auth/use-cases/confirmationUseCase';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RegistrationEmailResendingUseCase } from './modules/auth/use-cases/registrationEmailResendingUseCase';
+import { ValidateUserUseCase } from './modules/auth/use-cases/validateUserUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -71,6 +73,8 @@ const useCases = [
   RegistrationUseCase,
   GetMeInfoUseCase,
   ConfirmationUserUseCase,
+  RegistrationEmailResendingUseCase,
+  ValidateUserUseCase,
 ];
 
 @Module({
