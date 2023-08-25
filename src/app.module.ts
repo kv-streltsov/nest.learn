@@ -52,11 +52,30 @@ import { SecurityDevicesQueryRepositoryRepository } from './modules/security-dev
 import { SecurityDevicesController } from './modules/security-devices/security-devices.controller';
 import { LoginUseCase } from './modules/auth/use-cases/loginUseCase';
 import { CreateDeviceSessionUseCase } from './modules/security-devices/use-cases/createDeviceSessionUseCase';
+import { RefreshTokenUseCase } from './modules/auth/use-cases/refreshTokenUseCase';
+import { LogoutDeviceSessionUseCase } from './modules/security-devices/use-cases/logoutDeviceSessionUseCase';
+import { LogoutUseCase } from './modules/auth/use-cases/logoutUseCase';
+import { RegistrationUseCase } from './modules/auth/use-cases/registrationUseCase';
+import { LogoutAllDeviceSessionUseCase } from './modules/security-devices/use-cases/logoutAllDeviceSessionUseCase';
+import { GetMeInfoUseCase } from './modules/auth/use-cases/getMeInfoUseCase';
+import { ConfirmationUserUseCase } from './modules/auth/use-cases/confirmationUseCase';
+import { CqrsModule } from '@nestjs/cqrs';
 config();
-const useCases = [LoginUseCase, CreateDeviceSessionUseCase];
+const useCases = [
+  CreateDeviceSessionUseCase,
+  RefreshTokenUseCase,
+  LogoutAllDeviceSessionUseCase,
+  LogoutDeviceSessionUseCase,
+  LoginUseCase,
+  LogoutUseCase,
+  RegistrationUseCase,
+  GetMeInfoUseCase,
+  ConfirmationUserUseCase,
+];
 
 @Module({
   imports: [
+    CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
       limit: 5,

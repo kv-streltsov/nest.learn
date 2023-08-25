@@ -11,14 +11,21 @@ export type JwrPairDto = {
 };
 
 @Injectable()
-export class LoginUseCase {
+export class RefreshTokenUseCase {
   constructor(
     private createDeviceSessionUseCase: CreateDeviceSessionUseCase,
     private authService: AuthService,
   ) {}
-  async execute(request: any, response: Response): Promise<JwrPairDto> {
-    const jwtPair = await this.authService.createJwtPair(request, response);
+  async execute(request: any, response: Response) {
+    const jwtPair: JwrPairDto = await this.authService.createJwtPair(
+      request,
+      response,
+    );
+
     await this.createDeviceSessionUseCase.execute(jwtPair, request.user);
-    return jwtPair;
+
+    return {
+      accessToken: jwtPair.accessToken,
+    };
   }
 }

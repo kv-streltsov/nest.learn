@@ -10,7 +10,7 @@ export class CreateDeviceSessionUseCase {
     private securityDevicesRepository: SecurityDevicesRepository,
   ) {}
 
-  async excecute(jwtPair: JwrPairDto, user: any) {
+  async execute(jwtPair: JwrPairDto, user: any) {
     const jwtPayload: any = this.jwtService.decode(jwtPair.refreshToken);
     jwtPayload.iat = new Date(jwtPayload.iat * 1000).toISOString();
     jwtPayload.exp = new Date(jwtPayload.exp * 1000).toISOString();

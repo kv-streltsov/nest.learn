@@ -12,6 +12,7 @@ import { RefreshTokenGuard } from '../auth/strategies/refreshToken.guard';
 import { SecurityDevicesQueryRepositoryRepository } from './security-devices.query.repository';
 import { SecurityDevicesRepository } from './security-devices.repository';
 import { SecurityDevicesService } from './security-devices.service';
+import { LogoutAllDeviceSessionUseCase } from './use-cases/logoutAllDeviceSessionUseCase';
 
 @Controller('security/devices')
 export class SecurityDevicesController {
@@ -19,6 +20,7 @@ export class SecurityDevicesController {
     private securityDevicesQueryRepositoryRepository: SecurityDevicesQueryRepositoryRepository,
     private securityDevicesRepository: SecurityDevicesRepository,
     private securityDevicesService: SecurityDevicesService,
+    private logoutAllDeviceSessionUseCase: LogoutAllDeviceSessionUseCase,
   ) {}
 
   @Get()
@@ -44,9 +46,7 @@ export class SecurityDevicesController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   terminateDevicesExcludeCurrent(@Request() request) {
-    return this.securityDevicesService.logoutAllDevicesExcludeCurrent(
-      request.user,
-    );
+    return this.logoutAllDeviceSessionUseCase.execute(request.user);
   }
 
   @Delete(`:id`)

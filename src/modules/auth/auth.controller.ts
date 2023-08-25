@@ -23,11 +23,21 @@ import { AuthService, JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { LoginUseCase } from './use-cases/loginUseCase';
+import { RefreshTokenUseCase } from './use-cases/refreshTokenUseCase';
+import { LogoutUseCase } from './use-cases/logoutUseCase';
+import { RegistrationUseCase } from './use-cases/registrationUseCase';
+import { GetMeInfoUseCase } from './use-cases/getMeInfoUseCase';
+import { ConfirmationUserUseCase } from './use-cases/confirmationUseCase';
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private loginUseCase: LoginUseCase,
+    private logoutUseCase: LogoutUseCase,
+    private refreshTokenUseCase: RefreshTokenUseCase,
+    private registrationUseCase: RegistrationUseCase,
+    private getMeInfoUseCase: GetMeInfoUseCase,
+    private confirmationUserUseCase: ConfirmationUserUseCase,
   ) {}
 
   @Post(`password-recovery`)
@@ -54,7 +64,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Request() request: any,
   ) {
-    const jwtPair: JwrPairDto = await this.loginUseCase.excecute(
+    const jwtPair: JwrPairDto = await this.loginUseCase.execute(
       request,
       response,
     );
@@ -71,7 +81,7 @@ export class AuthController {
     @Request() request: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return this.authService.refreshToken(request, response);
+    return this.refreshTokenUseCase.execute(request, response);
   }
 
   @Post(`registration-confirmation`)
@@ -81,7 +91,7 @@ export class AuthController {
     @Body()
     registrationConfirmationCodeDto: RegistrationConfirmationCodeDto,
   ) {
-    await this.authService.confirmationUser(
+    await this.confirmationUserUseCase.execute(
       registrationConfirmationCodeDto.code,
     );
     return registrationConfirmationCodeDto;
@@ -91,7 +101,7 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() userRegistrationDto: UserRegistrationDto) {
-    return this.authService.registration(userRegistrationDto);
+    return this.registrationUseCase.execute(userRegistrationDto);
   }
 
   @Post(`registration-email-resending`)
@@ -110,13 +120,13 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() request: any) {
-    return this.authService.logout(request.user);
+    return this.logoutUseCase.execute(request.user);
   }
 
   @Get(`me`)
   @UseGuards(AuthGuard(`jwt`))
   @HttpCode(HttpStatus.OK)
   async me(@Request() request: any) {
-    return await this.authService.getMeInfo(request.user.userId);
+    return await this.getMeInfoUseCase.execute(request.user.userId);
   }
 }
