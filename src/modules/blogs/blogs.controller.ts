@@ -45,41 +45,42 @@ export class BlogsController {
     );
   }
 
-  @Get(`:id/posts`)
-  async getAllPostsByBlogId(
-    @Param(`id`) blogId: string,
-    @Query() query: any,
-    @Request() req,
-  ) {
-    const foundPosts = await this.postsQueryRepository.getAllPostsByBlogId(
-      blogId,
-      query?.pageNumber && Number(query.pageNumber),
-      query?.pageSize && Number(query.pageSize),
-      query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
-      query?.sortBy && query.sortBy,
-      query?.searchNameTerm && query.searchNameTerm,
-    );
-    if (foundPosts.items.length === 0) {
-      throw new NotFoundException('posts not found');
-    }
-
-    foundPosts.items = await Promise.all(
-      foundPosts.items.map(async (post: { id: string }): Promise<any> => {
-        const extendedLikesInfo =
-          await this.likesQueryRepository.getExtendedLikesInfo(
-            post.id,
-            req.headers.authGlobal === undefined
-              ? null
-              : req.headers.authGlobal.userId,
-          );
-        return {
-          ...post,
-          extendedLikesInfo,
-        };
-      }),
-    );
-    return foundPosts;
-  }
+  // @Get(`:id/posts`)
+  // async getAllPostsByBlogId(
+  //   @Param(`id`) blogId: string,
+  //   @Query() query: any,
+  //   @Request() req,
+  // ) {
+  //   const foundPosts = await this.postsQueryRepository.getAllPostsByBlogId(
+  //     blogId,
+  //     query?.pageNumber && Number(query.pageNumber),
+  //     query?.pageSize && Number(query.pageSize),
+  //     query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+  //     query?.sortBy && query.sortBy,
+  //     query?.searchNameTerm && query.searchNameTerm,
+  //
+  //   );
+  //   if (foundPosts.items.length === 0) {
+  //     throw new NotFoundException('posts not found');
+  //   }
+  //
+  //   foundPosts.items = await Promise.all(
+  //     foundPosts.items.map(async (post: { id: string }): Promise<any> => {
+  //       const extendedLikesInfo =
+  //         await this.likesQueryRepository.getExtendedLikesInfo(
+  //           post.id,
+  //           req.headers.authGlobal === undefined
+  //             ? null
+  //             : req.headers.authGlobal.userId,
+  //         );
+  //       return {
+  //         ...post,
+  //         extendedLikesInfo,
+  //       };
+  //     }),
+  //   );
+  //   return foundPosts;
+  // }
 
   @Get(`:id`)
   async getBlogById(@Param(`id`) blogId: string) {

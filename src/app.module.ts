@@ -62,6 +62,15 @@ import { ConfirmationUserUseCase } from './modules/auth/use-cases/confirmationUs
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegistrationEmailResendingUseCase } from './modules/auth/use-cases/registrationEmailResendingUseCase';
 import { ValidateUserUseCase } from './modules/auth/use-cases/validateUserUseCase';
+import { CreateBlogUseCase } from './modules/blogger/use-cases/createBlogUseCase';
+import { BloggerController } from './modules/blogger/blogger.controller';
+import { BloggerRepository } from './modules/blogger/blogger.repository';
+import { BloggerQueryRepository } from './modules/blogger/blogger.query.repository';
+import { BloggerService } from './modules/blogger/blogger.service';
+import { Bloggers, BloggersSchema } from './modules/blogger/blogger.schena';
+import { UpdateBlogUseCase } from './modules/blogger/use-cases/updateBlogUseCase';
+import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase';
+import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -75,6 +84,10 @@ const useCases = [
   ConfirmationUserUseCase,
   RegistrationEmailResendingUseCase,
   ValidateUserUseCase,
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  CreatePostByBlogIdUseCase,
 ];
 
 @Module({
@@ -105,6 +118,7 @@ const useCases = [
       { name: Users.name, schema: UsersSchema },
       { name: SecurityDevices.name, schema: SecurityDevicesSchema },
       { name: Blogs.name, schema: BlogsSchema },
+      { name: Bloggers.name, schema: BloggersSchema },
       { name: Posts.name, schema: PostsSchema },
       { name: Likes.name, schema: LikesSchema },
       { name: Comments.name, schema: CommentsSchema },
@@ -115,6 +129,7 @@ const useCases = [
     AppController,
     UsersController,
     BlogsController,
+    BloggerController,
     PostsController,
     CommentsController,
     TestingController,
@@ -130,16 +145,19 @@ const useCases = [
     EmailService,
     PostsService,
     LikesService,
+    BloggerService,
     SecurityDevicesService,
     AuthRepository,
     UsersRepository,
     BlogsRepository,
+    BloggerRepository,
     PostsRepository,
     LikesRepository,
     SecurityDevicesRepository,
     CommentsRepository,
     LikesQueryRepository,
     BlogsQueryRepository,
+    BloggerQueryRepository,
     UsersQueryRepository,
     PostsQueryRepository,
     SecurityDevicesQueryRepositoryRepository,

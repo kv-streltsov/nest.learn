@@ -7,6 +7,7 @@ import { Posts } from '../posts/posts.schena';
 import { Users } from '../users/users.schema';
 import { Likes } from '../likes/likes.schena';
 import { SecurityDevices } from '../security-devices/security-devices.schena';
+import { Bloggers } from '../blogger/blogger.schena';
 
 @Controller('testing')
 export class TestingController {
@@ -16,6 +17,7 @@ export class TestingController {
     @InjectModel(Posts.name) private postsModel: Model<Posts>,
     @InjectModel(Users.name) private userModel: Model<Users>,
     @InjectModel(Likes.name) private likesModel: Model<Likes>,
+    @InjectModel(Bloggers.name) private bloggersModel: Model<Bloggers>,
     @InjectModel(SecurityDevices.name)
     private securityDevicesModel: Model<SecurityDevices>,
   ) {}
@@ -29,6 +31,7 @@ export class TestingController {
     await this.commentsModel.deleteMany({});
     await this.likesModel.deleteMany({});
     await this.securityDevicesModel.deleteMany({});
+    await this.bloggersModel.deleteMany({});
     return;
   }
 }

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ICreateModifiedPostDto, CreatePostDto } from './dto/create-post.dto';
 import { randomUUID } from 'crypto';
 import { PostsRepository } from './posts.repository';
