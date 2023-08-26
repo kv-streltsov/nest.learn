@@ -48,11 +48,11 @@ export class PostsService {
     }
     return updatedPost;
   }
-  async deletePost(postId: string) {
-    const deletedPost = await this.postsRepository.deletePost(postId);
-    if (deletedPost.deletedCount === 0) {
-      return null;
-    }
-    return true;
-  }
+  // async deletePost(postId: string) {
+  //   const deletedPost = await this.postsRepository.deletePost(postId);
+  //   if (deletedPost.deletedCount === 0) {
+  //     return null;
+  //   }
+  //   return true;
+  // }
 }

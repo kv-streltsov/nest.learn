@@ -71,6 +71,8 @@ import { Bloggers, BloggersSchema } from './modules/blogger/blogger.schena';
 import { UpdateBlogUseCase } from './modules/blogger/use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase';
 import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
+import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePostByBlogIdUseCase';
+import { DeletePostByBlogIdUseCase } from './modules/posts/use-cases/deletePostByBlogIdUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -88,6 +90,8 @@ const useCases = [
   UpdateBlogUseCase,
   DeleteBlogUseCase,
   CreatePostByBlogIdUseCase,
+  UpdatePostByBlogIdUseCase,
+  DeletePostByBlogIdUseCase,
 ];
 
 @Module({

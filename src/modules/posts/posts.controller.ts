@@ -186,14 +186,14 @@ export class PostsController {
     );
   }
 
-  @UseGuards(AuthGuard)
-  @Delete(`:id`)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param(`id`) postId: string) {
-    const deletedPost = await this.postsService.deletePost(postId);
-    if (!deletedPost) {
-      throw new NotFoundException('post not found');
-    }
-    return;
-  }
+  // @UseGuards(AuthGuard)
+  // @Delete(`:id`)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // async deletePost(@Param(`id`) postId: string) {
+  //   const deletedPost = await this.postsService.deletePost(postId);
+  //   if (!deletedPost) {
+  //     throw new NotFoundException('post not found');
+  //   }
+  //   return;
+  // }
 }

@@ -28,6 +28,7 @@ const userTwo = {
 };
 let blogIdOwnUserOne: any;
 let blogIdOwnUserTwo: any;
+let postIdOwnUserOne: any;
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
@@ -409,6 +410,7 @@ describe('AppController (e2e)', () => {
         content: 'firstPost content',
       })
       .expect(201);
+    postIdOwnUserOne = newPost.body.id;
     expect(newPost.body).toEqual({
       id: expect.any(String),
       blogId: blogIdOwnUserOne,
@@ -574,6 +576,229 @@ describe('AppController (e2e)', () => {
     await request(app.getHttpServer())
       .get(`/blogger/blogs/${123}/posts`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(404);
+  });
+  it('PUT POST BY BLOG ID', async () => {
+    // UPDATE FIRST BLOG USER ONE
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(204);
+
+    // GET THREE POSTS USER ONE
+    const foundPosts = await request(app.getHttpServer())
+      .get(`/blogger/blogs/${blogIdOwnUserOne}/posts`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(200);
+    // TO EQUAL FIRST BLOG
+    expect(foundPosts.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 3,
+      items: [
+        {
+          id: expect.any(String),
+          blogId: blogIdOwnUserOne,
+          blogName: 'updateBlog',
+          title: 'thirdPost title',
+          shortDescription: 'thirdPost Description',
+          createdAt: expect.any(String),
+          content: 'thirdPost content',
+          extendedLikesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+          },
+        },
+        {
+          id: expect.any(String),
+          blogId: blogIdOwnUserOne,
+          blogName: 'updateBlog',
+          title: 'secondPost title',
+          shortDescription: 'secondPost Description',
+          createdAt: expect.any(String),
+          content: 'secondPost content',
+          extendedLikesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+          },
+        },
+        {
+          id: expect.any(String),
+          blogId: blogIdOwnUserOne,
+          blogName: 'updateBlog',
+          title: 'stri1ng',
+          shortDescription: 'string',
+          createdAt: expect.any(String),
+          content:
+            'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+          extendedLikesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+          },
+        },
+      ],
+    });
+    // ERRORS
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .expect(401);
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .expect(403);
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${123}/posts/${postIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .expect(404);
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${blogIdOwnUserOne}/posts/${123}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .expect(404);
+  });
+  it('DELETE POST BY BLOG ID', async () => {
+    // DELETE FIRST POST USER ONE
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(204);
+
+    // GET TWO POSTS USER ONE
+    const foundPosts = await request(app.getHttpServer())
+      .get(`/blogger/blogs/${blogIdOwnUserOne}/posts`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(200);
+    // TO EQUAL FIRST BLOG
+    expect(foundPosts.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 2,
+      items: [
+        {
+          id: expect.any(String),
+          blogId: blogIdOwnUserOne,
+          blogName: 'updateBlog',
+          title: 'thirdPost title',
+          shortDescription: 'thirdPost Description',
+          createdAt: expect.any(String),
+          content: 'thirdPost content',
+          extendedLikesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+          },
+        },
+        {
+          id: expect.any(String),
+          blogId: blogIdOwnUserOne,
+          blogName: 'updateBlog',
+          title: 'secondPost title',
+          shortDescription: 'secondPost Description',
+          createdAt: expect.any(String),
+          content: 'secondPost content',
+          extendedLikesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+          },
+        },
+      ],
+    });
+
+    // ERROR
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .expect(401);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${blogIdOwnUserOne}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(403);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${404}/posts/${postIdOwnUserOne}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${blogIdOwnUserOne}/posts/${404}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${404}/posts/${404}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
       .expect(404);
   });
 });

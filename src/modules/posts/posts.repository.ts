@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ICreateModifiedPostDto, CreatePostDto } from './dto/create-post.dto';
+import {
+  ICreateModifiedPostDto,
+  CreatePostInBlogDto,
+} from './dto/create-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Posts } from './posts.schena';
@@ -10,7 +13,7 @@ export class PostsRepository {
   createPost(createPostDto: ICreateModifiedPostDto) {
     return this.postsModel.create(createPostDto);
   }
-  updatePost(postId: string, updatePostDto: CreatePostDto) {
+  updatePost(postId: string, updatePostDto: CreatePostInBlogDto) {
     return this.postsModel.updateOne(
       { id: postId },
       {
@@ -18,12 +21,11 @@ export class PostsRepository {
           title: updatePostDto.title,
           shortDescription: updatePostDto.shortDescription,
           content: updatePostDto.content,
-          blogId: updatePostDto.blogId,
         },
       },
     );
   }
-  deletePost(postId: string) {
-    return this.postsModel.deleteOne({ id: postId });
+  deletePost(postId: string, blogId: string) {
+    return this.postsModel.deleteOne({ id: postId, blogId });
   }
 }
