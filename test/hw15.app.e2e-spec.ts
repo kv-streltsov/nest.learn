@@ -70,15 +70,26 @@ describe('AppController (e2e)', () => {
   it('CREATE TWO USERS', async () => {
     // USER 1
     let response = await request(app.getHttpServer())
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty')
       .send(userOne)
       .expect(201);
     userOne.id = response.body.id;
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      login: userOne.login,
+      email: userOne.email,
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
 
     // USER 2
     response = await request(app.getHttpServer())
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty')
       .send(userTwo)
       .expect(201);
@@ -874,6 +885,69 @@ describe('AppController (e2e)', () => {
         description: 'userTwoSecondBlog test description',
         websiteUrl: 'https://www.youtube.com/userTwoSecondBlog',
       })
+      .expect(401);
+  });
+  it('CREATE AND DELETE USER', async () => {
+    // CREATE USER
+    const createdUser = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'testUser',
+        password: 'testUser',
+        email: 'testUser@gg.com',
+      })
+      .expect(201);
+    expect(createdUser.body).toEqual({
+      id: expect.any(String),
+      login: 'testUser',
+      email: 'testUser@gg.com',
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
+    // ERRORS CREATE
+    const errorsMessages = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'testUser',
+        password: 'testUser',
+        email: 'testUser@gg.com',
+      })
+      .expect(400);
+    expect(errorsMessages.body).toEqual({
+      errorsMessages: [
+        { message: 'login exist', filed: 'login' },
+        { message: 'email exist', filed: 'email' },
+      ],
+    });
+
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .send({
+        login: 'testUser',
+        password: 'testUser',
+        email: 'testUser@gg.com',
+      })
+      .expect(401);
+
+    // DELETE USER
+    await request(app.getHttpServer())
+      .delete(`/sa/users/${createdUser.body.id}`)
+      .auth('admin', 'qwerty')
+      .expect(204);
+
+    // ERRORS DELETE
+    await request(app.getHttpServer())
+      .delete(`/sa/users/${createdUser.body.id}`)
+      .auth('admin', 'qwerty')
+      .expect(404);
+    await request(app.getHttpServer())
+      .delete(`/sa/users/${createdUser.body.id}`)
       .expect(401);
   });
 });

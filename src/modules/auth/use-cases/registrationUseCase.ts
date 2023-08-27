@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { UserRegistrationDto } from '../dto/create-auth.dto';
-import { UsersService } from '../../users/users.service';
 import { EmailService } from '../../email/email.service';
+import { CreateUserUseCase } from '../../users/use-cases/createUserUseCase';
 
 @Injectable()
 export class RegistrationUseCase {
   constructor(
-    private usersService: UsersService,
     private emailService: EmailService,
+    private createUserUseCase: CreateUserUseCase,
   ) {}
   async execute(userRegistrationDto: UserRegistrationDto) {
-    const createdUser = await this.usersService.createUser(userRegistrationDto);
+    const createdUser = await this.createUserUseCase.execute(
+      userRegistrationDto,
+    );
     this.emailService.sendMailRegistration(
       userRegistrationDto.email,
       createdUser.uuid,

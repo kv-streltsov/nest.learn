@@ -75,6 +75,8 @@ import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePos
 import { DeletePostByBlogIdUseCase } from './modules/posts/use-cases/deletePostByBlogIdUseCase';
 import { SuperAdminController } from './modules/super-admin/super-admin.controller';
 import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
+import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
+import { DeleteUserUseCase } from './modules/users/use-cases/deleteUserUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -95,6 +97,8 @@ const useCases = [
   UpdatePostByBlogIdUseCase,
   DeletePostByBlogIdUseCase,
   BindBlogWithUserUseCase,
+  CreateUserUseCase,
+  DeleteUserUseCase,
 ];
 
 @Module({

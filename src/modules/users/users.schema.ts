@@ -25,6 +25,9 @@ export class Users {
 
   @Prop({ type: Object, required: true })
   confirmation: string;
+
+  @Prop({ type: Object, required: true })
+  banInfo: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

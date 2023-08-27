@@ -17,12 +17,16 @@ import { BindBlogWithUserUseCase } from './use-cases/bindBlogWithUserUseCase';
 import { CreateUserDto } from '../users/dto/create-users.dto';
 import { BloggerQueryRepository } from '../blogger/blogger.query.repository';
 import { SortType } from '../users/users.interface';
+import { CreateUserUseCase } from '../users/use-cases/createUserUseCase';
+import { DeleteUserUseCase } from '../users/use-cases/deleteUserUseCase';
 
 @Controller('sa')
 export class SuperAdminController {
   constructor(
     private bindBlogWithUserUseCase: BindBlogWithUserUseCase,
     private bloggerQueryRepository: BloggerQueryRepository,
+    private createUserUseCase: CreateUserUseCase,
+    private deleteUserUseCase: DeleteUserUseCase,
   ) {}
 
   // BLOGS
@@ -63,14 +67,15 @@ export class SuperAdminController {
 
   @Post(`/users`)
   @UseGuards(AuthGuard)
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return createUserDto;
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    const createdUser = await this.createUserUseCase.execute(createUserDto);
+    return createdUser.createdUser;
   }
 
   @Delete(`/users/:userId`)
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteUser(@Param(`userId`) userId: string) {
-    return userId;
+    return this.deleteUserUseCase.execute(userId);
   }
 }
