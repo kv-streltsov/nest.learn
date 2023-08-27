@@ -73,6 +73,8 @@ import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase
 import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePostByBlogIdUseCase';
 import { DeletePostByBlogIdUseCase } from './modules/posts/use-cases/deletePostByBlogIdUseCase';
+import { SuperAdminController } from './modules/super-admin/super-admin.controller';
+import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -92,6 +94,7 @@ const useCases = [
   CreatePostByBlogIdUseCase,
   UpdatePostByBlogIdUseCase,
   DeletePostByBlogIdUseCase,
+  BindBlogWithUserUseCase,
 ];
 
 @Module({
@@ -129,6 +132,7 @@ const useCases = [
     ]),
   ],
   controllers: [
+    SuperAdminController,
     AuthController,
     AppController,
     UsersController,

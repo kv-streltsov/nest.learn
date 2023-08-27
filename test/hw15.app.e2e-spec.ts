@@ -801,4 +801,79 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${userOne.accessToken}`)
       .expect(404);
   });
+  /////////////////////////////    SUPER ADMIN     /////////////////////////////
+  it('GET BLOG', async () => {
+    // GET ALL BLOGS
+    const foundBlogs = await request(app.getHttpServer())
+      .get(`/sa/blogs`)
+      .auth('admin', 'qwerty')
+      .expect(200);
+    // TO EQUAL FIRST BLOG
+    expect(foundBlogs.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 4,
+      items: [
+        {
+          id: expect.any(String),
+          name: 'userTwoSecond',
+          description: 'userTwoSecondBlog test description',
+          websiteUrl: 'https://www.youtube.com/userTwoSecondBlog',
+          createdAt: expect.any(String),
+          isMembership: false,
+          blogOwnerInfo: {
+            userId: expect.any(String),
+            userLogin: 'qwertyb',
+          },
+        },
+        {
+          id: expect.any(String),
+          name: 'thirdBlog',
+          description: 'thirdBlog description',
+          websiteUrl: 'https://www.youtube.com/thirdBlog',
+          createdAt: expect.any(String),
+          isMembership: false,
+          blogOwnerInfo: {
+            userId: expect.any(String),
+            userLogin: 'qwertya',
+          },
+        },
+        {
+          id: expect.any(String),
+          name: 'secondBlog',
+          description: 'secondBlog description',
+          websiteUrl: 'https://www.youtube.com/secondBlog',
+          createdAt: expect.any(String),
+          isMembership: false,
+          blogOwnerInfo: {
+            userId: expect.any(String),
+            userLogin: 'qwertya',
+          },
+        },
+        {
+          id: expect.any(String),
+          name: 'updateBlog',
+          description: 'updateBlog description',
+          websiteUrl: 'https://www.youtube.com/updateBlog',
+          createdAt: expect.any(String),
+          isMembership: false,
+          blogOwnerInfo: {
+            userId: expect.any(String),
+            userLogin: 'qwertya',
+          },
+        },
+      ],
+    });
+
+    // ERROR
+    await request(app.getHttpServer())
+      .get(`/sa/blogs`)
+      .send({
+        name: 'userTwoSecond',
+        description: 'userTwoSecondBlog test description',
+        websiteUrl: 'https://www.youtube.com/userTwoSecondBlog',
+      })
+      .expect(401);
+  });
 });

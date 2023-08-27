@@ -2,24 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Bloggers } from './blogger.schena';
 import { Model } from 'mongoose';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Injectable()
 export class BloggerQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
-  private PROJECTION = { _id: 0, __v: 0, ownerId: 0 };
+  private PROJECTION: any = { _id: 0, __v: 0 };
   constructor(
     @InjectModel(Bloggers.name) private bloggerModel: Model<Bloggers>,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
   getBlogById(blogId: string) {
     return this.bloggerModel.findOne({ id: blogId }); //.select(this.PROJECTION);
   }
-  async getAllBlogsCurrentUser(
+  async getAllBlogs(
     pageNumber = 1,
     pageSize = 10,
     sortDirection: number,
     sortBy: string = this.DEFAULT_SORT_FIELD,
     searchNameTerm: string | null = null,
-    userId: string,
+    userId: string | null = null,
   ) {
     const { countItems, sortField } = this.paginationHandler(
       pageNumber,
@@ -27,9 +29,16 @@ export class BloggerQueryRepository {
       sortBy,
       sortDirection,
     );
-    const findNameTerm = searchNameTerm
-      ? { ownerId: userId, name: { $regex: searchNameTerm, $options: 'i' } }
-      : { ownerId: userId };
+
+    const findNameTerm: any = searchNameTerm
+      ? { name: { $regex: searchNameTerm, $options: 'i' } }
+      : {};
+
+    // if this case call super admin then userId = null
+    if (userId) {
+      findNameTerm.ownerId = userId;
+      this.PROJECTION.ownerId = 0;
+    }
 
     const count: number = await this.bloggerModel.countDocuments(findNameTerm);
     const blogs = await this.bloggerModel
@@ -40,14 +49,54 @@ export class BloggerQueryRepository {
       .limit(pageSize)
       .lean();
 
-    return {
-      pagesCount: Math.ceil(count / pageSize),
-      page: pageNumber,
-      pageSize,
-      totalCount: count,
-      items: blogs,
-    };
+    // if this case call super admin then userId = null
+    if (!userId) {
+      const adminBlogs = await Promise.all(
+        blogs.map(async (blog) => {
+          const foundUser = await this.usersQueryRepository.getUserById(
+            blog.ownerId,
+          );
+
+          const blogOwnerInfo = foundUser
+            ? {
+                userId: foundUser.id,
+                userLogin: foundUser.login,
+              }
+            : {
+                userId: `not found owner`,
+                userLogin: `not found owner`,
+              };
+
+          return {
+            id: blog.id,
+            name: blog.name,
+            description: blog.description,
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership,
+            blogOwnerInfo,
+          };
+        }),
+      );
+      return {
+        pagesCount: Math.ceil(count / pageSize),
+        page: pageNumber,
+        pageSize,
+        totalCount: count,
+        items: adminBlogs,
+      };
+    }
+    if (userId) {
+      return {
+        pagesCount: Math.ceil(count / pageSize),
+        page: pageNumber,
+        pageSize,
+        totalCount: count,
+        items: blogs,
+      };
+    }
   }
+
   async getBlogNameById(blogId: string) {
     const foundNameBlog = await this.bloggerModel
       .findOne({ id: blogId })
@@ -66,7 +115,7 @@ export class BloggerQueryRepository {
     return foundNameBlog.name;
   }
 
-  paginationHandler(
+  private paginationHandler(
     pageNumber: number,
     pageSize: number,
     sortBy: string,

@@ -76,7 +76,7 @@ export class BloggerController {
   @Get()
   @UseGuards(AccessTokenGuard)
   async getAllBlogs(@Query() query: any, @Request() request: any) {
-    return this.bloggerQueryRepository.getAllBlogsCurrentUser(
+    return this.bloggerQueryRepository.getAllBlogs(
       query?.pageNumber && Number(query.pageNumber),
       query?.pageSize && Number(query.pageSize),
       query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,

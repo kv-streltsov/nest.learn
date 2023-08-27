@@ -12,7 +12,16 @@ export class BloggerRepository {
   createBlog(createBlogDto: ICreateBlogModifiedDto) {
     return this.bloggersModel.create(createBlogDto);
   }
-
+  bindBlogWithUser(blogId: string, userId: string) {
+    return this.bloggersModel.updateOne(
+      { id: blogId },
+      {
+        $set: {
+          ownerId: userId,
+        },
+      },
+    );
+  }
   updateBlog(blogId: string, updateBlogDto: CreateBlogDto, ownerId: string) {
     return this.bloggersModel.updateOne(
       { id: blogId, ownerId },
