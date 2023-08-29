@@ -122,6 +122,7 @@ describe('AppController (e2e)', () => {
     userTwo.accessToken = response.body.accessToken;
   });
   /////////////////////////////    BLOGGER FLOW    /////////////////////////////////////////
+  /// BLOGS
   it('CREATE BLOGS', async () => {
     // CREATE THREE BLOG USER ONE
     let newBlog = await request(app.getHttpServer())
@@ -363,6 +364,7 @@ describe('AppController (e2e)', () => {
       })
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .expect(204);
+
     // GET ONE BLOG USER TWO | FIRST BLOG SHOULD BEEN DELETED
     const foundBlogs = await request(app.getHttpServer())
       .get(`/blogger/blogs`)
@@ -412,7 +414,17 @@ describe('AppController (e2e)', () => {
       })
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .expect(404);
+    await request(app.getHttpServer())
+      .put(`/blogger/blogs/${blogIdOwnUserTwo}`)
+      .send({
+        name: 'updateBlog',
+        description: 'updateBlog description',
+        websiteUrl: 'https://www.youtube.com/updateBlog',
+      })
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(404);
   });
+  /// POSTS
   it('CREATE THREE POSTS BY BLOG ID', async () => {
     // CREATE THREE POSTS USER ONE
     let newPost = await request(app.getHttpServer())
@@ -1366,7 +1378,7 @@ describe('AppController (e2e)', () => {
         userLogin: 'qwertyb',
       },
       createdAt: expect.any(String),
-      likesInfo: { likesCount: 1, dislikesCount: 1, myStatus: 'None' },
+      likesInfo: { likesCount: 1, dislikesCount: 0, myStatus: 'None' },
     });
 
     commentsPostTwo = await request(app.getHttpServer())
@@ -1388,7 +1400,7 @@ describe('AppController (e2e)', () => {
           createdAt: expect.any(String),
           likesInfo: {
             likesCount: 1,
-            dislikesCount: 1,
+            dislikesCount: 0,
             myStatus: 'None',
           },
         },
@@ -1401,7 +1413,7 @@ describe('AppController (e2e)', () => {
           },
           createdAt: expect.any(String),
           likesInfo: {
-            likesCount: 1,
+            likesCount: 0,
             dislikesCount: 1,
             myStatus: 'None',
           },

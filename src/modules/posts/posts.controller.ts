@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -26,7 +25,6 @@ import { LikesService } from '../likes/likes.service';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CommentInputDto } from '../comments/dto/create-comment.dto';
 import { CommentsService } from '../comments/comments.service';
-import { isLogLevelEnabled } from '@nestjs/common/services/utils';
 @UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {

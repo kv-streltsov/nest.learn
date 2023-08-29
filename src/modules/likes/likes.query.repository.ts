@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Likes } from './likes.schena';
@@ -81,7 +81,7 @@ export class LikesQueryRepository {
   async getLike(entityId: string, userId: string) {
     return this.likesModel.findOne({ entityId, userId }).lean();
   }
-  async getLikeCount(entityId: string) {
+  private async getLikeCount(entityId: string) {
     const likeCountInfo = {
       like: 0,
       dislike: 0,

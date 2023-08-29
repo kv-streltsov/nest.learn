@@ -21,7 +21,6 @@ import { CreatePostInBlogDto } from '../posts/dto/create-post.dto';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CreateBlogUseCase } from './use-cases/createBlogUseCase';
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
-import { Request as RequestExpress } from 'express';
 import { UpdateBlogUseCase } from './use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './use-cases/deleteBlogUseCase';
 import { CreatePostByBlogIdUseCase } from '../posts/use-cases/createPostByBlogIdUseCase';

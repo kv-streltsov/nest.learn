@@ -9,6 +9,8 @@ export class BlogsQueryRepository {
   private PROJECTION = { _id: 0, __v: 0 };
   constructor(@InjectModel(Blogs.name) private blogsModel: Model<Blogs>) {}
   getBlogById(blogId: string) {
+    console.log(`blog query`);
+    console.log(blogId);
     return this.blogsModel.findOne({ id: blogId }).select(this.PROJECTION);
   }
   async getAllBlogs(

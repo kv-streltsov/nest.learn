@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Posts } from './posts.schena';
 import { BloggerQueryRepository } from '../blogger/blogger.query.repository';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -15,12 +16,15 @@ export class PostsQueryRepository {
   constructor(
     @InjectModel(Posts.name) private postsModel: Model<Posts>,
     private bloggerQueryRepository: BloggerQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
   async getPostById(postId: string) {
-    return this.postsModel
+    const foundPost = await this.postsModel
       .findOne({ id: postId })
       .select({ _id: 0, __v: 0 })
       .lean();
+
+    return this.banFilter(foundPost);
   }
   async getAllPosts(
     pageNumber = 1,
@@ -40,7 +44,6 @@ export class PostsQueryRepository {
       ? { name: { $regex: searchNameTerm, $options: 'i' } }
       : {};
 
-    const count: number = await this.postsModel.countDocuments(findNameTerm);
     const posts = await this.postsModel
       .find(findNameTerm)
       .select(this.PROJECTION)
@@ -49,12 +52,19 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const filteredPosts = await Promise.all(
+      posts.map(async (post) => {
+        return await this.banFilter(post);
+      }),
+    );
+    const count: number = filteredPosts.filter(Boolean).length;
+
     return {
       pagesCount: Math.ceil(count / pageSize),
       page: pageNumber,
       pageSize,
       totalCount: count,
-      items: posts,
+      items: filteredPosts.filter(Boolean),
     };
   }
   async getAllPostsByBlogId(
@@ -80,7 +90,6 @@ export class PostsQueryRepository {
       ? { blogId: blogId, name: { $regex: searchNameTerm, $options: 'i' } }
       : { blogId: blogId };
 
-    const count: number = await this.postsModel.countDocuments(findNameTerm);
     const posts = await this.postsModel
       .find(findNameTerm)
       .select(this.PROJECTION)
@@ -89,6 +98,13 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const filteredPosts = await Promise.all(
+      posts.map(async (post) => {
+        return await this.banFilter(post);
+      }),
+    );
+    const count: number = filteredPosts.filter(Boolean).length;
+
     return {
       pagesCount: Math.ceil(count / pageSize),
       page: pageNumber,
@@ -96,6 +112,19 @@ export class PostsQueryRepository {
       totalCount: count,
       items: posts,
     };
+  }
+  async banFilter(post: any) {
+    if (post) {
+      const foundBlog = await this.bloggerQueryRepository.getBlogById(
+        post.blogId,
+      );
+      const foundUser = await this.usersQueryRepository.getUserById(
+        foundBlog!.ownerId,
+      );
+      // @ts-ignore
+      if (foundUser.banInfo.isBanned) return null;
+      return post;
+    }
   }
 
   paginationHandler(
