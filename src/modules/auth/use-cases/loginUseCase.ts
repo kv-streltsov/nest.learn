@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { CreateDeviceSessionUseCase } from '../../security-devices/use-cases/createDeviceSessionUseCase';
 import { AuthService } from '../auth.service';

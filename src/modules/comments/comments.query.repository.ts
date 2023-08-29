@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comments } from './comments.schena';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -9,9 +10,20 @@ export class CommentsQueryRepository {
   private PROJECTION = { _id: 0, __v: 0 };
   constructor(
     @InjectModel(Comments.name) private commentsModel: Model<Comments>,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
-  getCommentById(commentId: string) {
-    return this.commentsModel.findOne({ id: commentId });
+  async getCommentById(commentId: string) {
+    const foundComment = await this.commentsModel.findOne({ id: commentId });
+    if (!foundComment) throw new NotFoundException();
+
+    const foundUser = await this.usersQueryRepository.getUserById(
+      foundComment.commentatorInfo.userId,
+    );
+    // @ts-ignore
+    if (!foundUser!.banInfo.isBanned) {
+      return foundComment;
+    }
+    throw new NotFoundException();
   }
   async getCommentsByPostId(
     postId: string,
@@ -20,7 +32,7 @@ export class CommentsQueryRepository {
     sortDirection: number,
     sortBy: string = this.DEFAULT_SORT_FIELD,
   ) {
-    const count: number = await this.commentsModel.countDocuments({
+    let count: number = await this.commentsModel.countDocuments({
       entityId: postId,
     });
     if (count === 0) throw new NotFoundException();
@@ -45,12 +57,28 @@ export class CommentsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const commentsWithoutBanUser = (
+      await Promise.all(
+        comments.map(async (comment): Promise<any> => {
+          const foundUser = await this.usersQueryRepository.getUserById(
+            comment.commentatorInfo.userId,
+          );
+          // @ts-ignore
+          if (!foundUser!.banInfo.isBanned) {
+            return comment;
+          }
+          return null;
+        }),
+      )
+    ).filter(Boolean);
+    count = commentsWithoutBanUser.length;
+
     return {
       pagesCount: Math.ceil(count / pageSize),
       page: pageNumber,
       pageSize,
       totalCount: count,
-      items: comments,
+      items: commentsWithoutBanUser,
     };
   }
 

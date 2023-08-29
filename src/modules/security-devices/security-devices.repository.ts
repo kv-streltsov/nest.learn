@@ -52,7 +52,6 @@ export class SecurityDevicesRepository {
     });
     return true;
   }
-
   async deleteDeviceSession(user: any) {
     return this.securityDevicesModel.deleteOne({
       userId: user.userId,
@@ -69,6 +68,11 @@ export class SecurityDevicesRepository {
     }
     return this.securityDevicesModel.deleteOne({
       deviceId: deviceId,
+    });
+  }
+  async deleteAllDeviceSession(userId: string) {
+    return this.securityDevicesModel.deleteMany({
+      userId: userId,
     });
   }
   async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {

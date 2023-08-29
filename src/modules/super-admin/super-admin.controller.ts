@@ -19,14 +19,19 @@ import { BloggerQueryRepository } from '../blogger/blogger.query.repository';
 import { SortType } from '../users/users.interface';
 import { CreateUserUseCase } from '../users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from '../users/use-cases/deleteUserUseCase';
+import { UsersQueryRepository } from '../users/users.query.repository';
+import { BanUserDto } from '../security-devices/dto/ban-user.dto';
+import { BanUserUseCase } from './use-cases/banUserUseCase';
 
 @Controller('sa')
 export class SuperAdminController {
   constructor(
     private bindBlogWithUserUseCase: BindBlogWithUserUseCase,
     private bloggerQueryRepository: BloggerQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
     private createUserUseCase: CreateUserUseCase,
     private deleteUserUseCase: DeleteUserUseCase,
+    private banUserUseCase: BanUserUseCase,
   ) {}
 
   // BLOGS
@@ -51,18 +56,26 @@ export class SuperAdminController {
       query?.searchNameTerm && query.searchNameTerm,
     );
   }
+
   // USERS
   @Put(`/users/:userId/ban`)
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  banUser(@Param(`userId`) userId: string) {
-    return userId;
+  banUser(@Param(`userId`) userId: string, @Body() banUserDto: BanUserDto) {
+    return this.banUserUseCase.execute(userId, banUserDto);
   }
 
   @Get(`/users`)
   @UseGuards(AuthGuard)
-  getAllUsers() {
-    return `all blogs`;
+  getAllUsers(@Query() query: any) {
+    return this.usersQueryRepository.getAllUsers(
+      query.pageSize && Number(query.pageSize),
+      query.pageNumber && Number(query.pageNumber),
+      query.sortBy,
+      query.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+      query.searchEmailTerm,
+      query.searchLoginTerm,
+    );
   }
 
   @Post(`/users`)

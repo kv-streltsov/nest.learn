@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Likes } from './likes.schena';
 import { UsersQueryRepository } from '../users/users.query.repository';
+import { LikeStatusEnum } from './dto/create-like.dto';
 
 @Injectable()
 export class LikesQueryRepository {
@@ -16,14 +17,9 @@ export class LikesQueryRepository {
     userId: string | null = null,
     newestLike = true,
   ) {
-    const like: number = await this.likesModel
-      .countDocuments({ entityId: entityId, status: 'Like' })
-      .lean();
+    const likesCount = await this.getLikeCount(entityId);
 
-    const dislike = await this.likesModel
-      .countDocuments({ entityId: entityId, status: 'Dislike' })
-      .lean();
-
+    // TODO: не всегда нужны новейшие лайки
     const newestLikes = await this.likesModel
       .find({ entityId: entityId, status: `Like` })
       .sort({ addedAt: -1 })
@@ -49,33 +45,65 @@ export class LikesQueryRepository {
       .lean();
 
     const newLikes = await Promise.all(
-      newestLikes.map(async (like: any) => {
-        const findUser = await this.usersQueryRepository.getUserById(
-          like.userId,
-        );
-        const login = findUser!.login;
-        return {
-          userId: like.userId,
-          addedAt: like.addedAt,
-          login: login,
-        };
-      }),
+      newestLikes
+        .map(async (like: any) => {
+          const foundUser = await this.usersQueryRepository.getUserById(
+            like.userId,
+          );
+          // @ts-ignore
+          if (foundUser!.banInfo.isBanned) {
+            return null;
+          }
+
+          return {
+            userId: like.userId,
+            addedAt: like.addedAt,
+            login: foundUser!.login,
+          };
+        })
+        .filter(Boolean),
     );
+
     if (newestLike) {
       return {
-        likesCount: like,
-        dislikesCount: dislike,
+        likesCount: likesCount.like,
+        dislikesCount: likesCount.dislike,
         myStatus: likeStatus === null ? `None` : likeStatus.status,
         newestLikes: newLikes,
       };
     }
     return {
-      likesCount: like,
-      dislikesCount: dislike,
+      likesCount: likesCount.like,
+      dislikesCount: likesCount.dislike,
       myStatus: likeStatus === null ? `None` : likeStatus.status,
     };
   }
   async getLike(entityId: string, userId: string) {
     return this.likesModel.findOne({ entityId, userId }).lean();
+  }
+  async getLikeCount(entityId: string) {
+    const likeCountInfo = {
+      like: 0,
+      dislike: 0,
+    };
+    const likes = await this.likesModel.find({
+      entityId: entityId,
+    });
+    await Promise.all(
+      likes.map(async (like) => {
+        const foundUser = await this.usersQueryRepository.getUserById(
+          like.userId,
+        );
+        if (!foundUser) return null;
+        // @ts-ignore
+        if (!foundUser.banInfo.isBanned) {
+          if (like.status === LikeStatusEnum.Like) likeCountInfo.like += 1;
+          if (like.status === LikeStatusEnum.Dislike)
+            likeCountInfo.dislike += 1;
+        }
+      }),
+    );
+
+    return likeCountInfo;
   }
 }

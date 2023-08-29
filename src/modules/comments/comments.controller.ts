@@ -33,12 +33,13 @@ export class CommentsController {
   @Get(`:id`)
   @HttpCode(HttpStatus.OK)
   async getCommentById(@Param(`id`) commentId: string, @Request() req) {
-    const finedComment = await this.commentsQueryRepository.getCommentById(
+    const foundComment = await this.commentsQueryRepository.getCommentById(
       commentId,
     );
-    if (!finedComment) {
+    if (!foundComment) {
       throw new NotFoundException(`comment not found`);
     }
+
     const likeStatus = await this.likesQueryRepository.getExtendedLikesInfo(
       commentId,
       req.headers.authGlobal === undefined
@@ -46,13 +47,13 @@ export class CommentsController {
         : req.headers.authGlobal.userId,
     );
     return {
-      id: finedComment.id,
-      content: finedComment.content,
+      id: foundComment.id,
+      content: foundComment.content,
       commentatorInfo: {
-        userId: finedComment.commentatorInfo.userId,
-        userLogin: finedComment.commentatorInfo.userLogin,
+        userId: foundComment.commentatorInfo.userId,
+        userLogin: foundComment.commentatorInfo.userLogin,
       },
-      createdAt: finedComment.createdAt,
+      createdAt: foundComment.createdAt,
       likesInfo: {
         likesCount: likeStatus.likesCount,
         dislikesCount: likeStatus.dislikesCount,

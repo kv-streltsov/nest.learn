@@ -81,16 +81,16 @@ export class PostsController {
         query?.sortBy && query.sortBy,
       );
     foundComments.items = await Promise.all(
-      foundComments.items.map(async (post: { id: string }): Promise<any> => {
+      foundComments.items.map(async (comment: { id: string }): Promise<any> => {
         const likesInfo = await this.likesQueryRepository.getExtendedLikesInfo(
-          post.id,
+          comment.id,
           req.headers.authGlobal === undefined
             ? null
             : req.headers.authGlobal.userId,
           false,
         );
         return {
-          ...post,
+          ...comment,
           likesInfo,
         };
       }),

@@ -12,6 +12,7 @@ export class TestExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
     const errorResponse: any = exception.getResponse();
+
     if (errorResponse.message === `Unexpected end of JSON input`) {
       // @ts-ignore
       response.status(status).json({

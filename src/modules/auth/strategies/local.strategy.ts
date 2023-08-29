@@ -25,6 +25,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!foundUser) {
       throw new UnauthorizedException();
     }
+    // @ts-ignore
+    if (foundUser.banInfo.isBanned == true) {
+      throw new UnauthorizedException();
+    }
 
     return {
       login: foundUser.login,

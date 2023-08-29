@@ -77,6 +77,7 @@ import { SuperAdminController } from './modules/super-admin/super-admin.controll
 import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
 import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from './modules/users/use-cases/deleteUserUseCase';
+import { BanUserUseCase } from './modules/super-admin/use-cases/banUserUseCase';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -99,6 +100,7 @@ const useCases = [
   BindBlogWithUserUseCase,
   CreateUserUseCase,
   DeleteUserUseCase,
+  BanUserUseCase,
 ];
 
 @Module({
