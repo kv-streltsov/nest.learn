@@ -1574,9 +1574,45 @@ describe('AppController (e2e)', () => {
   });
   it('BAN USER', async () => {
     // GET POST1 WITH LIKES
-    const foundPost = await request(app.getHttpServer())
+    let foundPost = await request(app.getHttpServer())
       .get(`/posts/${secondPostIdOwnUserOne}`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(200);
+    expect(foundPost.body).toEqual({
+      id: expect.any(String),
+      blogId: expect.any(String),
+      blogName: 'updateBlog',
+      title: 'secondPost title',
+      shortDescription: 'secondPost Description',
+      createdAt: expect.any(String),
+      content: 'secondPost content',
+      extendedLikesInfo: {
+        likesCount: 3,
+        dislikesCount: 1,
+        myStatus: 'Like',
+        newestLikes: [
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
+            login: 'qwe',
+          },
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
+            login: 'qwertyb',
+          },
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
+            login: 'qwertya',
+          },
+        ],
+      },
+    });
+    // GET POST2 WITH LIKES
+    foundPost = await request(app.getHttpServer())
+      .get(`/posts/${postIdOwnerUserTwo}`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .expect(200);
     expect(foundPost.body).toEqual({
       id: expect.any(String),
@@ -1589,7 +1625,7 @@ describe('AppController (e2e)', () => {
       extendedLikesInfo: {
         likesCount: 3,
         dislikesCount: 1,
-        myStatus: 'None',
+        myStatus: 'Like',
         newestLikes: [
           {
             userId: expect.any(String),
@@ -1599,12 +1635,50 @@ describe('AppController (e2e)', () => {
           {
             userId: expect.any(String),
             addedAt: expect.any(String),
+            login: 'qwertyb',
+          },
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
+            login: 'qwertya',
+          },
+        ],
+      },
+    });
+
+    // GET ALL POSTS WITH LIKES
+    foundPost = await request(app.getHttpServer())
+      .get(`/posts`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(200);
+    console.log(foundPost.body);
+    expect(foundPost.body).toEqual({
+      id: expect.any(String),
+      blogId: expect.any(String),
+      blogName: 'userTwoSecond',
+      title: 'firstPost title',
+      shortDescription: 'firstPost Description',
+      createdAt: expect.any(String),
+      content: 'firstPost content',
+      extendedLikesInfo: {
+        likesCount: 3,
+        dislikesCount: 1,
+        myStatus: 'Like',
+        newestLikes: [
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
             login: 'qwe',
           },
           {
             userId: expect.any(String),
             addedAt: expect.any(String),
             login: 'qwertyb',
+          },
+          {
+            userId: expect.any(String),
+            addedAt: expect.any(String),
+            login: 'qwertya',
           },
         ],
       },

@@ -69,7 +69,7 @@ export class LikesQueryRepository {
         likesCount: likesCount.like,
         dislikesCount: likesCount.dislike,
         myStatus: likeStatus === null ? `None` : likeStatus.status,
-        newestLikes: newLikes,
+        newestLikes: newLikes.filter(Boolean),
       };
     }
     return {
