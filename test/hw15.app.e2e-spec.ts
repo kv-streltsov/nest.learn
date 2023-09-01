@@ -26,12 +26,37 @@ const userTwo = {
   accessToken: null,
   refreshToken: `null`,
 };
+const userThree = {
+  login: 'qwe',
+  password: 'leqweqweqweqwq',
+  email: 'somdffailq@qewfee.com',
+  id: null,
+  accessToken: null,
+  refreshToken: `null`,
+};
+const userFour = {
+  login: 'sad',
+  password: 'leqweqweqweqwq',
+  email: 'asd@qewfee.com',
+  id: null,
+  accessToken: null,
+  refreshToken: `null`,
+};
+
 let blogIdOwnUserOne: any;
 let blogIdOwnUserTwo: any;
-let secondBlogIdOwnUserTwo: any;
+
 let postIdOwnUserOne: any;
+let secondBlogIdOwnUserTwo: any;
+
 let secondPostIdOwnUserOne: any;
 let postIdOwnerUserTwo: any;
+
+let com1ownerUser1: any;
+let com2ownerUser1: any;
+let com3ownerUser2: any;
+let com4ownerUser2: any;
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
@@ -70,7 +95,7 @@ describe('AppController (e2e)', () => {
   it('DELETE ALL DATA', async () => {
     await request(app.getHttpServer()).delete('/testing/all-data').expect(204);
   }, 100000);
-  it('CREATE TWO USERS', async () => {
+  it('CREATE FOUR USERS', async () => {
     // USER 1
     let response = await request(app.getHttpServer())
       .post('/sa/users')
@@ -97,8 +122,25 @@ describe('AppController (e2e)', () => {
       .send(userTwo)
       .expect(201);
     userTwo.id = response.body.id;
+
+    // USER 3
+    response = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send(userThree)
+      .expect(201);
+    userThree.id = response.body.id;
+
+    // USER 4
+    response = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send(userFour)
+      .expect(201);
+    userFour.id = response.body.id;
   });
-  it('LOGIN TWO USERS | should return JWT Pair ', async () => {
+
+  it('LOGIN FOUR USERS | should return JWT Pair ', async () => {
     /// LOGIN USER ///
 
     // LOGIN USER 1
@@ -120,8 +162,27 @@ describe('AppController (e2e)', () => {
       })
       .expect(200);
     userTwo.accessToken = response.body.accessToken;
+    // LOGIN USER 3
+    response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: userThree.email,
+        password: userThree.password,
+      })
+      .expect(200);
+    userThree.accessToken = response.body.accessToken;
+    // LOGIN USER 4
+    response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: userFour.email,
+        password: userFour.password,
+      })
+      .expect(200);
+    userFour.accessToken = response.body.accessToken;
   });
   /////////////////////////////    BLOGGER FLOW    /////////////////////////////////////////
+
   /// BLOGS
   it('CREATE BLOGS', async () => {
     // CREATE THREE BLOG USER ONE
@@ -254,6 +315,20 @@ describe('AppController (e2e)', () => {
           isMembership: false,
         },
       ],
+    });
+    // GET THREE BLOG USER ONE
+    const foundBlog = await request(app.getHttpServer())
+      .get(`/blogs/${blogIdOwnUserTwo}`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .expect(200);
+    // TO EQUAL FIRST BLOG
+    expect(foundBlog.body).toEqual({
+      id: expect.any(String),
+      name: 'userTwoFirst',
+      description: 'userTwoFirstBlog test description',
+      websiteUrl: 'https://www.youtube.com/userTwoFirstBlog',
+      createdAt: expect.any(String),
+      isMembership: false,
     });
 
     // ERROR
@@ -424,6 +499,7 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .expect(404);
   });
+
   /// POSTS
   it('CREATE THREE POSTS BY BLOG ID', async () => {
     // CREATE THREE POSTS USER ONE
@@ -827,6 +903,55 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${userOne.accessToken}`)
       .expect(404);
   });
+  it('POST BLOG -> POST POST -> GET -> DELETE POSTS -> DELETE BLOG', async () => {
+    // CREATE THREE BLOG USER ONE
+    const newBlog = await request(app.getHttpServer())
+      .post(`/blogger/blogs`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        name: 'firstBlog',
+        description: 'firstBlog description',
+        websiteUrl: 'https://www.youtube.com/firstBlog',
+      })
+      .expect(201);
+    const newPost = await request(app.getHttpServer())
+      .post(`/blogger/blogs/${newBlog.body.id}/posts`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        title: 'firstPost title',
+        shortDescription: 'firstPost Description',
+        content: 'firstPost content',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .get(`/posts/${newPost.body.id}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(200);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${newBlog.body.id}/posts/${newPost.body.id}`)
+      .send({
+        title: 'stri1ng',
+        shortDescription: 'string',
+        content:
+          'https://www.youtube.com/watch?v=92DnDZ_Lp9A&ab_channel=%E1%95%88S%C9%8ESUB',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(204);
+    await request(app.getHttpServer())
+      .get(`/posts/${newPost.body.id}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .delete(`/blogger/blogs/${newBlog.body.id}`)
+      .send({
+        name: 'updateBlog',
+        description: 'updateBlog description',
+        websiteUrl: 'https://www.youtube.com/updateBlog',
+      })
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(204);
+  });
+
   /////////////////////////////    SUPER ADMIN     /////////////////////////////
   it('GET BLOG', async () => {
     // GET ALL BLOGS
@@ -958,9 +1083,9 @@ describe('AppController (e2e)', () => {
       .delete(`/sa/users/${createdUser.body.id}`)
       .expect(401);
   });
-  it('GET USERS', async () => {
+  it('CREATE 10 USERS | GET USERS WITH PAGINATOR', async () => {
     // GET ALL USERS
-    const foundUsers = await request(app.getHttpServer())
+    let foundUsers = await request(app.getHttpServer())
       .get(`/sa/users`)
       .auth('admin', 'qwerty')
       .expect(200);
@@ -969,8 +1094,30 @@ describe('AppController (e2e)', () => {
       pagesCount: 1,
       page: 1,
       pageSize: 10,
-      totalCount: 2,
+      totalCount: 4,
       items: [
+        {
+          id: expect.any(String),
+          login: 'sad',
+          email: 'asd@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'qwe',
+          email: 'somdffailq@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
         {
           id: expect.any(String),
           login: 'qwertyb',
@@ -996,12 +1143,263 @@ describe('AppController (e2e)', () => {
       ],
     });
 
-    // ERROR
-    await request(app.getHttpServer()).get(`/sa/blogs`).expect(401);
+    //create + 8 users (sum 12)
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'zxc',
+        password: 'leqweqweqweqwq',
+        email: 'zxc@qewfee.com',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'xcv',
+        password: 'leqweqweqweqwq',
+        email: 'xcv@qewfee.com',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'vbn',
+        password: 'leqweqweqweqwq',
+        email: 'vbn@qewfee.com',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'rty',
+        password: 'leqweqweqweqwq',
+        email: 'rty@qewfee.com',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'ewrg',
+        password: 'leqweqweqweqwq',
+        email: 'werg@qewfee.com',
+      })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'asdb',
+        password: 'leqweqweqweqwq',
+        email: 'asdbdbs@qewfee.com',
+      })
+      .expect(201);
+    const user9 = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'qzxcbwe',
+        password: 'leqweqweqweqwq',
+        email: 'zxcb@qewfee.com',
+      })
+      .expect(201);
+    const user10 = await request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send({
+        login: 'zxcbzxcb',
+        password: 'leqweqweqweqwq',
+        email: 'zxcbzxcb@qewfee.com',
+      })
+      .expect(201);
+
+    // GET ALL USERS
+    foundUsers = await request(app.getHttpServer())
+      .get(`/sa/users`)
+      .auth('admin', 'qwerty')
+      .expect(200);
+
+    expect(foundUsers.body).toEqual({
+      pagesCount: 2,
+      page: 1,
+      pageSize: 10,
+      totalCount: 12,
+      items: [
+        {
+          id: expect.any(String),
+          login: 'zxcbzxcb',
+          email: 'zxcbzxcb@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'qzxcbwe',
+          email: 'zxcb@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'asdb',
+          email: 'asdbdbs@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'ewrg',
+          email: 'werg@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'rty',
+          email: 'rty@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'vbn',
+          email: 'vbn@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'xcv',
+          email: 'xcv@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'zxc',
+          email: 'zxc@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'sad',
+          email: 'asd@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'qwe',
+          email: 'somdffailq@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
+        },
+      ],
+    });
+
+    // BAN 9 and 10 USERS
+    await request(app.getHttpServer())
+      .put(`/sa/users/${user9.body.id}/ban`)
+      .send({
+        isBanned: true,
+        banReason: 'stringstringstringst',
+      })
+      .auth('admin', 'qwerty')
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/sa/users/${user10.body.id}/ban`)
+      .send({
+        isBanned: true,
+        banReason: 'stringstringstringst',
+      })
+      .auth('admin', 'qwerty')
+      .expect(204);
+
+    // GET ALL USERS
+    foundUsers = await request(app.getHttpServer())
+      .get(`/sa/users?pageSize=15&banStatus=banned`)
+      .auth('admin', 'qwerty')
+      .expect(200);
+
+    expect(foundUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 15,
+      totalCount: 2,
+      items: [
+        {
+          id: expect.any(String),
+          login: 'zxcbzxcb',
+          email: 'zxcbzxcb@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: true,
+            banReason: 'stringstringstringst',
+            banDate: expect.any(String),
+          },
+        },
+        {
+          id: expect.any(String),
+          login: 'qzxcbwe',
+          email: 'zxcb@qewfee.com',
+          createdAt: expect.any(String),
+          banInfo: {
+            isBanned: true,
+            banReason: 'stringstringstringst',
+            banDate: expect.any(String),
+          },
+        },
+      ],
+    });
   });
-  it('||| REPARATION ||| CREATE COMMENTS AND LIKES', async () => {
+  it('||| REPARATION ||| CREATE COMMENTS AND PUT LIKES  FOR POSTS AND COMMENTS', async () => {
     // user 2 create post
-    const postOwnerUserTwo = await request(app.getHttpServer())
+    postIdOwnerUserTwo = await request(app.getHttpServer())
       .post(`/blogger/blogs/${secondBlogIdOwnUserTwo}/posts`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .send({
@@ -1010,351 +1408,207 @@ describe('AppController (e2e)', () => {
         content: 'firstPost content',
       })
       .expect(201);
-    postIdOwnerUserTwo = postOwnerUserTwo.body.id;
+    postIdOwnerUserTwo = postIdOwnerUserTwo.body.id;
     /////CREATE COMMENTS////
-    // User one create 2 comments in second post
-    const com1 = await request(app.getHttpServer())
+    // User one create 2 comments [POST1 (OWN USER1) AND POST2 (OWN USER2)]
+    com1ownerUser1 = await request(app.getHttpServer())
       .post(`/posts/${secondPostIdOwnUserOne}/comments`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ content: 'user one first comment' })
+      .send({ content: 'user one com1 comment' })
       .expect(201);
-    const com2 = await request(app.getHttpServer())
-      .post(`/posts/${secondPostIdOwnUserOne}/comments`)
+    com2ownerUser1 = await request(app.getHttpServer())
+      .post(`/posts/${postIdOwnerUserTwo}/comments`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ content: 'user one second Comment' })
+      .send({ content: 'user one com2 comment' })
       .expect(201);
-    // user two create two comment in second post
-    const com3 = await request(app.getHttpServer())
+    // user two create two comment [POST1 (OWN USER1) AND POST2 (OWN USER2)]
+    com3ownerUser2 = await request(app.getHttpServer())
       .post(`/posts/${secondPostIdOwnUserOne}/comments`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ content: 'user two first comment' })
+      .send({ content: 'user two com3 comment' })
       .expect(201);
-    const com4 = await request(app.getHttpServer())
-      .post(`/posts/${secondPostIdOwnUserOne}/comments`)
+    com4ownerUser2 = await request(app.getHttpServer())
+      .post(`/posts/${postIdOwnerUserTwo}/comments`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ content: 'user two second comment' })
+      .send({ content: 'user two com4 comment' })
       .expect(201);
 
-    // User one create two comments in 2 post
-    const com5 = await request(app.getHttpServer())
-      .post(`/posts/${postOwnerUserTwo.body.id}/comments`)
+    // LIKE/DISLIKE POSTS
+    // user 1 [LIKE POST1 and POST2]
+    await request(app.getHttpServer())
+      .put(`/posts/${secondPostIdOwnUserOne}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ content: 'user one first comment' })
-      .expect(201);
-    const com6 = await request(app.getHttpServer())
-      .post(`/posts/${postOwnerUserTwo.body.id}/comments`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/posts/${postIdOwnerUserTwo}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ content: 'user one second Comment' })
-      .expect(201);
-    // user two create two comment in second post
-    const com7 = await request(app.getHttpServer())
-      .post(`/posts/${postOwnerUserTwo.body.id}/comments`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ content: 'user two first comment' })
-      .expect(201);
-    const com8 = await request(app.getHttpServer())
-      .post(`/posts/${postOwnerUserTwo.body.id}/comments`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ content: 'user two second comment' })
-      .expect(201);
+      .send({ likeStatus: 'Like' })
+      .expect(204);
 
-    /////CREATE LIKES////
+    // user 2 [LIKE POST1 and POST2]
+    await request(app.getHttpServer())
+      .put(`/posts/${secondPostIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/posts/${postIdOwnerUserTwo}/like-status`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+
+    // user 3 [LIKE POST1 and POST2]
+    await request(app.getHttpServer())
+      .put(`/posts/${secondPostIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/posts/${postIdOwnerUserTwo}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+
+    // user 4 [LIKE POST1 and POST2]
+    await request(app.getHttpServer())
+      .put(`/posts/${secondPostIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
+      .send({ likeStatus: 'Dislike' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/posts/${postIdOwnerUserTwo}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
+      .send({ likeStatus: 'Dislike' })
+      .expect(204);
+
+    // LIKE/DISLIKE COMMENTS
     // LIKE/DISLIKE 1 POST
-    // user 1
+    // user 1 [LIKE COMMENTS1-COMMENTS4]
     await request(app.getHttpServer())
-      .put(`/comments/${com1.body.id}/like-status`)
+      .put(`/comments/${com1ownerUser1.body.id}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com2.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
-      .expect(204);
-    await request(app.getHttpServer())
-      .put(`/comments/${com3.body.id}/like-status`)
+      .put(`/comments/${com2ownerUser1.body.id}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com4.body.id}/like-status`)
+      .put(`/comments/${com3ownerUser2.body.id}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
-      .expect(204);
-    // user 2
-    await request(app.getHttpServer())
-      .put(`/comments/${com1.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
+      .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com2.body.id}/like-status`)
+      .put(`/comments/${com4ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+
+    // user 2 [LIKE COMMENTS1-COMMENTS4]
+    await request(app.getHttpServer())
+      .put(`/comments/${com1ownerUser1.body.id}/like-status`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com3.body.id}/like-status`)
+      .put(`/comments/${com2ownerUser1.body.id}/like-status`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
+      .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com4.body.id}/like-status`)
+      .put(`/comments/${com3ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/comments/${com4ownerUser2.body.id}/like-status`)
       .set('Authorization', `Bearer ${userTwo.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
 
-    // LIKE/DISLIKE 2 POST
-    // user 1
+    // user 3 [LIKE COMMENTS1-COMMENTS4]
     await request(app.getHttpServer())
-      .put(`/comments/${com5.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .put(`/comments/${com1ownerUser1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com6.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
-      .expect(204);
-    await request(app.getHttpServer())
-      .put(`/comments/${com7.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .put(`/comments/${com2ownerUser1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com8.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userOne.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
-      .expect(204);
-    // user 2
-    await request(app.getHttpServer())
-      .put(`/comments/${com5.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ likeStatus: 'Dislike' })
-      .expect(204);
-    await request(app.getHttpServer())
-      .put(`/comments/${com6.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .put(`/comments/${com3ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
       .send({ likeStatus: 'Like' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com7.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
+      .put(`/comments/${com4ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userThree.accessToken}`)
+      .send({ likeStatus: 'Like' })
+      .expect(204);
+
+    // user 4 [DISLIKE COMMENTS1-COMMENTS4]
+    await request(app.getHttpServer())
+      .put(`/comments/${com1ownerUser1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
       .send({ likeStatus: 'Dislike' })
       .expect(204);
     await request(app.getHttpServer())
-      .put(`/comments/${com8.body.id}/like-status`)
-      .set('Authorization', `Bearer ${userTwo.accessToken}`)
-      .send({ likeStatus: 'Like' })
+      .put(`/comments/${com2ownerUser1.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
+      .send({ likeStatus: 'Dislike' })
       .expect(204);
-  });
-  it('||| REPARATION ||| GET COMMENTS AND LIKES', async () => {
-    const commentsPostOne = await request(app.getHttpServer())
-      .get(`/posts/${secondPostIdOwnUserOne}/comments`)
-      .expect(200);
-    expect(commentsPostOne.body).toEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 4,
-      items: [
-        {
-          id: expect.any(String),
-          content: 'user two second comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user two first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one second Comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertya',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertya',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-      ],
-    });
-    const commentsPostTwo = await request(app.getHttpServer())
-      .get(`/posts/${postIdOwnerUserTwo}/comments`)
-      .expect(200);
-    expect(commentsPostTwo.body).toEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 4,
-      items: [
-        {
-          id: expect.any(String),
-          content: 'user two second comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user two first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one second Comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertya',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertya',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-      ],
-    });
+    await request(app.getHttpServer())
+      .put(`/comments/${com3ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
+      .send({ likeStatus: 'Dislike' })
+      .expect(204);
+    await request(app.getHttpServer())
+      .put(`/comments/${com4ownerUser2.body.id}/like-status`)
+      .set('Authorization', `Bearer ${userFour.accessToken}`)
+      .send({ likeStatus: 'Dislike' })
+      .expect(204);
   });
   it('BAN USER', async () => {
-    let commentsPostTwo = await request(app.getHttpServer())
-      .get(`/posts/${postIdOwnerUserTwo}/comments`)
+    // GET POST1 WITH LIKES
+    const foundPost = await request(app.getHttpServer())
+      .get(`/posts/${secondPostIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
       .expect(200);
-    expect(commentsPostTwo.body).toEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 4,
-      items: [
-        {
-          id: expect.any(String),
-          content: 'user two second comment',
-          commentatorInfo: {
+    expect(foundPost.body).toEqual({
+      id: expect.any(String),
+      blogId: expect.any(String),
+      blogName: 'userTwoSecond',
+      title: 'firstPost title',
+      shortDescription: 'firstPost Description',
+      createdAt: expect.any(String),
+      content: 'firstPost content',
+      extendedLikesInfo: {
+        likesCount: 3,
+        dislikesCount: 1,
+        myStatus: 'None',
+        newestLikes: [
+          {
             userId: expect.any(String),
-            userLogin: 'qwertyb',
+            addedAt: expect.any(String),
+            login: 'qwe',
           },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user two first comment',
-          commentatorInfo: {
+          {
             userId: expect.any(String),
-            userLogin: 'qwertyb',
+            addedAt: expect.any(String),
+            login: 'qwe',
           },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one second Comment',
-          commentatorInfo: {
+          {
             userId: expect.any(String),
-            userLogin: 'qwertya',
+            addedAt: expect.any(String),
+            login: 'qwertyb',
           },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user one first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertya',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-      ],
+        ],
+      },
     });
-    const com1Id = commentsPostTwo.body.items[0].id;
-    const com2Id = commentsPostTwo.body.items[1].id;
-    const com3Id = commentsPostTwo.body.items[2].id;
-    const com4Id = commentsPostTwo.body.items[3].id;
 
     // BAN ONE USER
     await request(app.getHttpServer())
@@ -1365,69 +1619,5 @@ describe('AppController (e2e)', () => {
       })
       .auth('admin', 'qwerty')
       .expect(204);
-
-    await request(app.getHttpServer()).get(`/comments/${com3Id}`).expect(404);
-    const foundComment = await request(app.getHttpServer())
-      .get(`/comments/${com1Id}`)
-      .expect(200);
-    expect(foundComment.body).toEqual({
-      id: expect.any(String),
-      content: 'user two second comment',
-      commentatorInfo: {
-        userId: expect.any(String),
-        userLogin: 'qwertyb',
-      },
-      createdAt: expect.any(String),
-      likesInfo: { likesCount: 1, dislikesCount: 0, myStatus: 'None' },
-    });
-
-    commentsPostTwo = await request(app.getHttpServer())
-      .get(`/posts/${postIdOwnerUserTwo}/comments`)
-      .expect(200);
-    expect(commentsPostTwo.body).toEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 2,
-      items: [
-        {
-          id: expect.any(String),
-          content: 'user two second comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 1,
-            dislikesCount: 0,
-            myStatus: 'None',
-          },
-        },
-        {
-          id: expect.any(String),
-          content: 'user two first comment',
-          commentatorInfo: {
-            userId: expect.any(String),
-            userLogin: 'qwertyb',
-          },
-          createdAt: expect.any(String),
-          likesInfo: {
-            likesCount: 0,
-            dislikesCount: 1,
-            myStatus: 'None',
-          },
-        },
-      ],
-    });
-
-    // ERROR
-    await request(app.getHttpServer())
-      .put(`/sa/users/${userOne.id}/ban`)
-      .send({
-        isBanned: true,
-        banReason: 'stringstringstringst',
-      })
-      .expect(401);
   });
 });

@@ -8,6 +8,9 @@ export class Blogs {
   id: string;
 
   @Prop({ type: String, required: true })
+  ownerId: string;
+
+  @Prop({ type: String, required: true })
   name: string;
 
   @Prop({ type: String, required: true })

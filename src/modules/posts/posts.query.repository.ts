@@ -23,6 +23,7 @@ export class PostsQueryRepository {
       .findOne({ id: postId })
       .select({ _id: 0, __v: 0 })
       .lean();
+    if (!foundPost) return foundPost;
 
     return this.banFilter(foundPost);
   }

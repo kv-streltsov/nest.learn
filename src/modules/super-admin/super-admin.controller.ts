@@ -69,6 +69,7 @@ export class SuperAdminController {
   @UseGuards(AuthGuard)
   getAllUsers(@Query() query: any) {
     return this.usersQueryRepository.getAllUsers(
+      query.banStatus,
       query.pageSize && Number(query.pageSize),
       query.pageNumber && Number(query.pageNumber),
       query.sortBy,

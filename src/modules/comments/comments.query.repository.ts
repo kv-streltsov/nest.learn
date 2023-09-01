@@ -14,7 +14,7 @@ export class CommentsQueryRepository {
   ) {}
   async getCommentById(commentId: string) {
     const foundComment = await this.commentsModel.findOne({ id: commentId });
-    if (!foundComment) throw new NotFoundException();
+    if (!foundComment) return null;
 
     const foundUser = await this.usersQueryRepository.getUserById(
       foundComment.commentatorInfo.userId,

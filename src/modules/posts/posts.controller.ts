@@ -25,6 +25,7 @@ import { LikesService } from '../likes/likes.service';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CommentInputDto } from '../comments/dto/create-comment.dto';
 import { CommentsService } from '../comments/comments.service';
+import { isLogLevelEnabled } from '@nestjs/common/services/utils';
 @UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
@@ -183,15 +184,4 @@ export class PostsController {
       likeStatus.likeStatus,
     );
   }
-
-  // @UseGuards(AuthGuard)
-  // @Delete(`:id`)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async deletePost(@Param(`id`) postId: string) {
-  //   const deletedPost = await this.postsService.deletePost(postId);
-  //   if (!deletedPost) {
-  //     throw new NotFoundException('post not found');
-  //   }
-  //   return;
-  // }
 }

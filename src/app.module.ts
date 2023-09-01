@@ -67,7 +67,6 @@ import { BloggerController } from './modules/blogger/blogger.controller';
 import { BloggerRepository } from './modules/blogger/blogger.repository';
 import { BloggerQueryRepository } from './modules/blogger/blogger.query.repository';
 import { BloggerService } from './modules/blogger/blogger.service';
-import { Bloggers, BloggersSchema } from './modules/blogger/blogger.schena';
 import { UpdateBlogUseCase } from './modules/blogger/use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase';
 import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
@@ -131,7 +130,6 @@ const useCases = [
       { name: Users.name, schema: UsersSchema },
       { name: SecurityDevices.name, schema: SecurityDevicesSchema },
       { name: Blogs.name, schema: BlogsSchema },
-      { name: Bloggers.name, schema: BloggersSchema },
       { name: Posts.name, schema: PostsSchema },
       { name: Likes.name, schema: LikesSchema },
       { name: Comments.name, schema: CommentsSchema },

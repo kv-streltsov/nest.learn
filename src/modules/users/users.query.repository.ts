@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Users } from './users.schema';
 import { Model } from 'mongoose';
+import { SortBanStatus } from './users.interface';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -10,6 +11,7 @@ export class UsersQueryRepository {
   constructor(@InjectModel(Users.name) private usersModel: Model<Users>) {}
 
   async getAllUsers(
+    banStatus = `all`,
     pageSize = 10,
     pageNumber = 1,
     sortBy: string = this.DEFAULT_SORT_FIELD,
@@ -17,16 +19,17 @@ export class UsersQueryRepository {
     searchEmailTerm: string | null = null,
     searchLoginTerm: string | null = null,
   ): Promise<any> {
-    const { countItems, sortField, searchTerm } = this.paginationHandler(
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-      searchEmailTerm,
-      searchLoginTerm,
-    );
-
-    const count: number = await this.usersModel.countDocuments(searchTerm);
+    const { countItems, sortField, searchTerm, count } =
+      await this.paginationHandler(
+        banStatus,
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+        searchEmailTerm,
+        searchLoginTerm,
+      );
+    //const count: number = await this.usersModel.countDocuments({});
 
     const users = await this.usersModel
       .find(searchTerm)
@@ -55,8 +58,25 @@ export class UsersQueryRepository {
   async getUserByConfirmationCode(code: string) {
     return this.usersModel.findOne({ 'confirmation.code': code }).lean();
   }
-
-  paginationHandler(
+  private async banFilter(banStatus: string, users: any) {
+    if (banStatus === SortBanStatus.banned) {
+      return users.filter((user) => {
+        if (user.banInfo.isBanned) {
+          return user;
+        }
+      });
+    }
+    if (banStatus === SortBanStatus.notBanned) {
+      return users.filter((user) => {
+        if (!user.banInfo.isBanned) {
+          return user;
+        }
+      });
+    }
+    return users;
+  }
+  private async paginationHandler(
+    banStatus: string,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
@@ -84,11 +104,19 @@ export class UsersQueryRepository {
         ],
       };
     }
+    if (banStatus === SortBanStatus.banned) {
+      searchTerm[`banInfo.isBanned`] = true;
+    }
+    if (banStatus === SortBanStatus.notBanned) {
+      searchTerm[`banInfo.isBanned`] = false;
+    }
+    const count = await this.usersModel.countDocuments(searchTerm);
 
     return {
       countItems,
       sortField,
       searchTerm,
+      count,
     };
   }
 }

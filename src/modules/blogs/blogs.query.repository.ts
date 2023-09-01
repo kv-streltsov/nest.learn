@@ -6,11 +6,9 @@ import { Model } from 'mongoose';
 @Injectable()
 export class BlogsQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
-  private PROJECTION = { _id: 0, __v: 0 };
+  private PROJECTION = { _id: 0, __v: 0, ownerId: 0 };
   constructor(@InjectModel(Blogs.name) private blogsModel: Model<Blogs>) {}
   getBlogById(blogId: string) {
-    console.log(`blog query`);
-    console.log(blogId);
     return this.blogsModel.findOne({ id: blogId }).select(this.PROJECTION);
   }
   async getAllBlogs(

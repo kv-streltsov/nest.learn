@@ -22,3 +22,8 @@ export enum SortType {
   asc = 1,
   desc = -1,
 }
+export enum SortBanStatus {
+  all = ` all`,
+  banned = `banned`,
+  notBanned = `notBanned`,
+}
