@@ -110,7 +110,6 @@ export class PostsController {
           ? null
           : req.headers.authGlobal.userId,
       );
-    console.log(extendedLikesInfo);
     return {
       ...foundPost,
       extendedLikesInfo,
