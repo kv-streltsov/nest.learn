@@ -15,7 +15,7 @@ export class LikesQueryRepository {
   async getExtendedLikesInfo(
     entityId: string,
     userId: string | null = null,
-    newestLike = true,
+    newestLikeFlag = true,
   ) {
     const likesCount = await this.getLikeCount(entityId);
 
@@ -44,32 +44,44 @@ export class LikesQueryRepository {
       })
       .lean();
 
-    const newLikes = await Promise.all(
-      newestLikes
-        .map(async (like: any) => {
-          const foundUser = await this.usersQueryRepository.getUserById(
-            like.userId,
-          );
-          // @ts-ignore
-          if (foundUser!.banInfo.isBanned) {
-            return null;
-          }
-
-          return {
-            userId: like.userId,
-            addedAt: like.addedAt,
-            login: foundUser!.login,
-          };
-        })
-        .filter(Boolean),
+    // BAN FLOW //
+    // const newLikes = await Promise.all(
+    //   newestLikes
+    //     .map(async (like: any) => {
+    //       const foundUser = await this.usersQueryRepository.getUserById(
+    //         like.userId,
+    //       );
+    //       // @ts-ignore
+    //       if (foundUser!.banInfo.isBanned) {
+    //         return null;
+    //       }
+    //
+    //       return {
+    //         userId: like.userId,
+    //         addedAt: like.addedAt,
+    //         login: foundUser!.login,
+    //       };
+    //     })
+    //     .filter(Boolean),
+    // );
+    const newestLikesWithLogin = await Promise.all(
+      newestLikes.map(async (like) => {
+        const foundUser = await this.usersQueryRepository.getUserById(
+          like.userId,
+        );
+        return {
+          login: foundUser!.login,
+          userId: like.userId,
+          addedAt: like.addedAt,
+        };
+      }),
     );
-
-    if (newestLike) {
+    if (newestLikeFlag) {
       return {
         likesCount: likesCount.like,
         dislikesCount: likesCount.dislike,
         myStatus: likeStatus === null ? `None` : likeStatus.status,
-        newestLikes: newLikes.filter(Boolean),
+        newestLikes: newestLikesWithLogin,
       };
     }
     return {
@@ -95,12 +107,10 @@ export class LikesQueryRepository {
           like.userId,
         );
         if (!foundUser) return null;
-        // @ts-ignore
-        if (!foundUser.banInfo.isBanned) {
-          if (like.status === LikeStatusEnum.Like) likeCountInfo.like += 1;
-          if (like.status === LikeStatusEnum.Dislike)
-            likeCountInfo.dislike += 1;
-        }
+        // ban flow
+        //if (!foundUser.banInfo.isBanned) {}
+        if (like.status === LikeStatusEnum.Like) likeCountInfo.like += 1;
+        if (like.status === LikeStatusEnum.Dislike) likeCountInfo.dislike += 1;
       }),
     );
 

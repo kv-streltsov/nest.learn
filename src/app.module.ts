@@ -71,7 +71,7 @@ import { UpdateBlogUseCase } from './modules/blogger/use-cases/updateBlogUseCase
 import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase';
 import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePostByBlogIdUseCase';
-import { DeletePostByBlogIdUseCase } from './modules/posts/use-cases/deletePostByBlogIdUseCase';
+import { DeletePostByIdUseCase } from './modules/posts/use-cases/delete-post-by-id-use-case.service';
 import { SuperAdminController } from './modules/super-admin/super-admin.controller';
 import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
 import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
@@ -95,7 +95,7 @@ const useCases = [
   DeleteBlogUseCase,
   CreatePostByBlogIdUseCase,
   UpdatePostByBlogIdUseCase,
-  DeletePostByBlogIdUseCase,
+  DeletePostByIdUseCase,
   BindBlogWithUserUseCase,
   CreateUserUseCase,
   DeleteUserUseCase,

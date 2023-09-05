@@ -25,7 +25,7 @@ import { UpdateBlogUseCase } from './use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './use-cases/deleteBlogUseCase';
 import { CreatePostByBlogIdUseCase } from '../posts/use-cases/createPostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './use-cases/updatePostByBlogIdUseCase';
-import { DeletePostByBlogIdUseCase } from '../posts/use-cases/deletePostByBlogIdUseCase';
+import { DeletePostByIdUseCase } from '../posts/use-cases/delete-post-by-id-use-case.service';
 @UseGuards(AuthGlobalGuard)
 @Controller('blogger/blogs')
 export class BloggerController {
@@ -38,7 +38,6 @@ export class BloggerController {
     private deleteBlogUseCase: DeleteBlogUseCase,
     private createPostByBlogIdUseCase: CreatePostByBlogIdUseCase,
     private updatePostByBlogIdUseCase: UpdatePostByBlogIdUseCase,
-    private deletePostByBlogIdUseCase: DeletePostByBlogIdUseCase,
   ) {}
 
   @Put(`:id`)
@@ -119,7 +118,7 @@ export class BloggerController {
       query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
       query?.sortBy && query.sortBy,
       query?.searchNameTerm && query.searchNameTerm,
-      request.user.userId,
+      // request.user.userId,
     );
 
     foundPosts.items = await Promise.all(
@@ -153,21 +152,6 @@ export class BloggerController {
       blogId,
       postId,
       updatePostDto,
-      request.user.userId,
-    );
-  }
-
-  @Delete(`:blogId/posts/:postId`)
-  @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePostByBlogId(
-    @Param(`blogId`) blogId: string,
-    @Param(`postId`) postId: string,
-    @Request() request: any,
-  ) {
-    return await this.deletePostByBlogIdUseCase.execute(
-      blogId,
-      postId,
       request.user.userId,
     );
   }

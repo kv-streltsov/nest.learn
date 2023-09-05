@@ -8,18 +8,14 @@ import { BloggerQueryRepository } from '../../blogger/blogger.query.repository';
 import { PostsRepository } from '../posts.repository';
 
 @Injectable()
-export class DeletePostByBlogIdUseCase {
+export class DeletePostByIdUseCase {
   constructor(
     private bloggerQueryRepository: BloggerQueryRepository,
     private postsRepository: PostsRepository,
   ) {}
-  async execute(blogId: string, postId: string, ownerId: string) {
-    const foundBlog = await this.bloggerQueryRepository.getBlogById(blogId);
-    if (!foundBlog) throw new NotFoundException();
-    if (foundBlog.ownerId !== ownerId) throw new ForbiddenException();
-
-    const deletedBlog = await this.postsRepository.deletePost(postId, blogId);
-    if (deletedBlog.deletedCount === 0) {
+  async execute(postId: string) {
+    const deletedPost = await this.postsRepository.deletePost(postId);
+    if (deletedPost.deletedCount === 0) {
       throw new NotFoundException();
     }
     return true;

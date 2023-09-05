@@ -32,11 +32,11 @@ export class CreateUserUseCase {
         code: confirmAdmin ? null : uuid,
         isConfirm: confirmAdmin,
       },
-      banInfo: {
-        isBanned: false,
-        banDate: null,
-        banReason: null,
-      },
+      // banInfo: {
+      //   isBanned: false,
+      //   banDate: null,
+      //   banReason: null,
+      // },
     };
 
     const createdUser = await this.usersRepository.createUser(createUserData);

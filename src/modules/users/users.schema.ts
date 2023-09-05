@@ -26,7 +26,7 @@ export class Users {
   @Prop({ type: Object, required: true })
   confirmation: string;
 
-  @Prop({ type: Object, required: true })
+  @Prop({ type: Object, required: false })
   banInfo: string;
 }
 

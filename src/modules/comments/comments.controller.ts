@@ -36,6 +36,7 @@ export class CommentsController {
     const foundComment = await this.commentsQueryRepository.getCommentById(
       commentId,
     );
+
     if (!foundComment) {
       throw new NotFoundException(`comment not found`);
     }

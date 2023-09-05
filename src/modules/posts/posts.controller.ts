@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -25,6 +26,7 @@ import { LikesService } from '../likes/likes.service';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CommentInputDto } from '../comments/dto/create-comment.dto';
 import { CommentsService } from '../comments/comments.service';
+import { DeletePostByIdUseCase } from './use-cases/delete-post-by-id-use-case.service';
 @UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
@@ -35,6 +37,7 @@ export class PostsController {
     private likesQueryRepository: LikesQueryRepository,
     private likesService: LikesService,
     private commentsService: CommentsService,
+    private deletePostByBlogIdUseCase: DeletePostByIdUseCase,
   ) {}
 
   @Get()
@@ -68,7 +71,7 @@ export class PostsController {
   async getCommentsByPostId(
     @Param(`id`) postId: string,
     @Query() query: any,
-    @Request() req,
+    @Request() request: any,
   ) {
     const foundComments =
       await this.commentsQueryRepository.getCommentsByPostId(
@@ -82,9 +85,9 @@ export class PostsController {
       foundComments.items.map(async (comment: { id: string }): Promise<any> => {
         const likesInfo = await this.likesQueryRepository.getExtendedLikesInfo(
           comment.id,
-          req.headers.authGlobal === undefined
+          request.headers.authGlobal === undefined
             ? null
-            : req.headers.authGlobal.userId,
+            : request.headers.authGlobal.userId,
           false,
         );
         return {
@@ -116,8 +119,8 @@ export class PostsController {
     };
   }
 
-  @UseGuards(AuthGuard)
   @Post()
+  @UseGuards(AuthGuard)
   async createPost(@Body() createPostDto: CreatePostDto) {
     const createdPost = await this.postsService.createPost(createPostDto);
     const extendedLikesInfo =
@@ -132,12 +135,12 @@ export class PostsController {
     };
   }
 
-  @UseGuards(AccessTokenGuard)
   @Post(`:id/comments`)
+  @UseGuards(AccessTokenGuard)
   async createCommentInPost(
     @Param(`id`) postId: string,
     @Body() commentInputDto: CommentInputDto,
-    @Request() req,
+    @Request() request: any,
   ) {
     //TODO: не могу перенести логику поиска блога в сервис
     const foundPost = await this.postsQueryRepository.getPostById(postId);
@@ -147,12 +150,12 @@ export class PostsController {
     return this.commentsService.createCommentInPost(
       commentInputDto,
       postId,
-      req.user,
+      request.user,
     );
   }
 
-  @UseGuards(AuthGuard)
   @Put(`:id`)
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Body() updatePostDto: CreatePostDto,
@@ -168,8 +171,8 @@ export class PostsController {
     return;
   }
 
-  @UseGuards(AccessTokenGuard)
   @Put(`:postId/like-status`)
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusByPostId(
     @Body() likeStatus: LikeInputDto,
@@ -181,5 +184,12 @@ export class PostsController {
       req.user.userId,
       likeStatus.likeStatus,
     );
+  }
+
+  @Delete(`:postId`)
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostByBlogId(@Param(`postId`) postId: string) {
+    return await this.deletePostByBlogIdUseCase.execute(postId);
   }
 }

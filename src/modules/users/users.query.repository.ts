@@ -29,11 +29,17 @@ export class UsersQueryRepository {
         searchEmailTerm,
         searchLoginTerm,
       );
-    //const count: number = await this.usersModel.countDocuments({});
 
     const users = await this.usersModel
       .find(searchTerm)
-      .select({ _id: 0, password: 0, salt: 0, confirmation: 0, __v: 0 })
+      .select({
+        _id: 0,
+        password: 0,
+        salt: 0,
+        confirmation: 0,
+        __v: 0,
+        banInfo: 0,
+      })
       .sort(sortField)
       .skip(countItems)
       .limit(pageSize)

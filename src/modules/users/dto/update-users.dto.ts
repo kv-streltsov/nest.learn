@@ -16,9 +16,9 @@ export class ModifiedUserDto extends PartialType(CreateUserDto) {
     code: string | null;
     isConfirm: boolean;
   };
-  readonly banInfo: {
-    isBanned: boolean;
-    banDate: string | null;
-    banReason: string | null;
-  };
+  // readonly banInfo: {
+  //   isBanned: boolean;
+  //   banDate: string | null;
+  //   banReason: string | null;
+  // };
 }

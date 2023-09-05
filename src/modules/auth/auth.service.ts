@@ -21,7 +21,7 @@ export class AuthService {
           deviceId: request.user.deviceId || randomUUID(),
         },
         {
-          expiresIn: '100m',
+          expiresIn: '20s',
         },
       ),
       accessToken: await this.jwtService.signAsync(
@@ -30,7 +30,7 @@ export class AuthService {
           login: request.user.login,
         },
         {
-          expiresIn: '50m',
+          expiresIn: '10s',
         },
       ),
     };

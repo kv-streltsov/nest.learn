@@ -24,7 +24,6 @@ export class PostsQueryRepository {
       .select({ _id: 0, __v: 0 })
       .lean();
     if (!foundPost) return foundPost;
-
     return this.banFilter(foundPost);
   }
   async getAllPosts(
@@ -75,11 +74,10 @@ export class PostsQueryRepository {
     sortDirection: number,
     sortBy: string = this.DEFAULT_SORT_FIELD,
     searchNameTerm: string | null = null,
-    ownerId: string,
   ) {
     const foundBlog = await this.bloggerQueryRepository.getBlogById(blogId);
     if (!foundBlog) throw new NotFoundException();
-    if (foundBlog.ownerId !== ownerId) throw new ForbiddenException();
+    // if (foundBlog.ownerId !== ownerId) throw new ForbiddenException();
 
     const { countItems, sortField } = this.paginationHandler(
       pageNumber,
@@ -115,17 +113,18 @@ export class PostsQueryRepository {
     };
   }
   async banFilter(post: any) {
-    if (post) {
-      const foundBlog = await this.bloggerQueryRepository.getBlogById(
-        post.blogId,
-      );
-      const foundUser = await this.usersQueryRepository.getUserById(
-        foundBlog!.ownerId,
-      );
-      // @ts-ignore
-      if (foundUser.banInfo.isBanned) return null;
-      return post;
-    }
+    return post;
+    // if (post) {
+    //   const foundBlog = await this.bloggerQueryRepository.getBlogById(
+    //     post.blogId,
+    //   );
+    //   const foundUser = await this.usersQueryRepository.getUserById(
+    //     foundBlog!.ownerId,
+    //   );
+    //   // @ts-ignore
+    //   if (foundUser.banInfo.isBanned) return null;
+    //   return post;
+    // }
   }
 
   paginationHandler(

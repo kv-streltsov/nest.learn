@@ -25,7 +25,7 @@ export class PostsRepository {
       },
     );
   }
-  deletePost(postId: string, blogId: string) {
-    return this.postsModel.deleteOne({ id: postId, blogId });
+  deletePost(postId: string) {
+    return this.postsModel.deleteOne({ id: postId });
   }
 }
