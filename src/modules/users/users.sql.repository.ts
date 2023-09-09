@@ -25,4 +25,11 @@ export class UsersSqlRepository {
       ],
     );
   }
+  deleteUser(userId: string) {
+    return this.userSqlRepository.query(
+      `DELETE FROM public.users
+            WHERE "id"=$1;`,
+      [userId],
+    );
+  }
 }

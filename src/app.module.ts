@@ -83,9 +83,11 @@ import { UserEntity } from './modules/users/user.entity';
 import { CreateUserSqlUseCase } from './modules/users/use-cases/createUserSqlUseCase';
 import { UsersSqlService } from './modules/users/users.sql.service';
 import { UsersSqlQueryRepository } from './modules/users/users.sql.query.repository';
+import { DeleteUserSqlUseCase } from './modules/users/use-cases/deleteUserSqlUseCase';
 config();
 const useCases = [
   CreateUserSqlUseCase,
+  DeleteUserSqlUseCase,
   CreateDeviceSessionUseCase,
   RefreshTokenUseCase,
   LogoutAllDeviceSessionUseCase,

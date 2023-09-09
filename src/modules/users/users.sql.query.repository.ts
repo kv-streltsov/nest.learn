@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Users } from './users.schema';
 import { Model } from 'mongoose';
-import { SortBanStatus } from './users.interface';
+import { SortBanStatus, SortType } from './users.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
@@ -14,11 +14,10 @@ export class UsersSqlQueryRepository {
   constructor(
     @InjectModel(Users.name) private usersModel: Model<Users>,
     @InjectRepository(UserEntity)
-    private readonly userSqlRepository: Repository<UserEntity>,
+    private readonly usersSqlRepository: Repository<UserEntity>,
   ) {}
 
   async getAllUsers(
-    banStatus = `all`,
     pageSize = 10,
     pageNumber = 1,
     sortBy: string = this.DEFAULT_SORT_FIELD,
@@ -26,45 +25,36 @@ export class UsersSqlQueryRepository {
     searchEmailTerm: string | null = null,
     searchLoginTerm: string | null = null,
   ): Promise<any> {
-    const { countItems, sortField, searchTerm, count } =
+    const { countItems, sortDirectionString, searchTerm } =
       await this.paginationHandler(
-        banStatus,
         pageNumber,
         pageSize,
-        sortBy,
         sortDirection,
         searchEmailTerm,
         searchLoginTerm,
       );
+    const foundUsers = await this.usersSqlRepository.query(
+      `SELECT id, login, email,  "createdAt"
+                FROM public.users
+                ${searchTerm}
+                ORDER BY "${sortBy}" ${sortDirectionString}`,
+    );
 
-    const users = await this.usersModel
-      .find(searchTerm)
-      .select({
-        _id: 0,
-        password: 0,
-        salt: 0,
-        confirmation: 0,
-        __v: 0,
-        banInfo: 0,
-      })
-      .sort(sortField)
-      .skip(countItems)
-      .limit(pageSize)
-      .lean();
+    const count = foundUsers.length;
 
     return {
       pagesCount: Math.ceil(count / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: count,
-      items: users,
+      items: foundUsers,
     };
   }
   async getUserById(userId: string) {
     return this.usersModel.findOne({ id: userId }).lean();
   }
   async getUserByLoginOrEmail(loginOrEmail: string) {
-    const foundUser = await this.userSqlRepository.query(
+    const foundUser = await this.usersSqlRepository.query(
       `SELECT id, login, email, password, "createdAt", salt, confirmation
                 FROM public.users
                 WHERE login = $1 or email = $1;`,
@@ -76,65 +66,32 @@ export class UsersSqlQueryRepository {
   async getUserByConfirmationCode(code: string) {
     return this.usersModel.findOne({ 'confirmation.code': code }).lean();
   }
-  private async banFilter(banStatus: string, users: any) {
-    if (banStatus === SortBanStatus.banned) {
-      return users.filter((user) => {
-        if (user.banInfo.isBanned) {
-          return user;
-        }
-      });
-    }
-    if (banStatus === SortBanStatus.notBanned) {
-      return users.filter((user) => {
-        if (!user.banInfo.isBanned) {
-          return user;
-        }
-      });
-    }
-    return users;
-  }
   private async paginationHandler(
-    banStatus: string,
     pageNumber: number,
     pageSize: number,
-    sortBy: string,
     sortDirection: number,
     searchEmailTerm: string | null,
     searchLoginTerm: string | null,
   ) {
     const countItems = (pageNumber - 1) * pageSize;
 
-    const sortField: any = {};
-    sortField[sortBy] = sortDirection;
+    const sortDirectionString = SortType[sortDirection];
 
     let searchTerm = {};
     if (searchEmailTerm === null && searchLoginTerm === null) {
-      searchTerm = {};
+      searchTerm = '';
     } else if (searchLoginTerm === null && searchEmailTerm !== null) {
-      searchTerm = { email: { $regex: searchEmailTerm, $options: 'i' } };
+      searchTerm = `WHERE "email" LIKE '%${searchEmailTerm}%'`;
     } else if (searchEmailTerm === null && searchLoginTerm !== null) {
-      searchTerm = { login: { $regex: searchLoginTerm, $options: 'i' } };
+      searchTerm = `WHERE "login" LIKE '%${searchLoginTerm}%'`;
     } else if (searchEmailTerm !== null && searchLoginTerm !== null) {
-      searchTerm = {
-        $or: [
-          { email: { $regex: searchEmailTerm, $options: 'i' } },
-          { login: { $regex: searchLoginTerm, $options: 'i' } },
-        ],
-      };
+      searchTerm = `WHERE "login" LIKE '%${searchLoginTerm}%' OR WHERE "email" LIKE '%${searchEmailTerm}%'`;
     }
-    if (banStatus === SortBanStatus.banned) {
-      searchTerm[`banInfo.isBanned`] = true;
-    }
-    if (banStatus === SortBanStatus.notBanned) {
-      searchTerm[`banInfo.isBanned`] = false;
-    }
-    const count = await this.usersModel.countDocuments(searchTerm);
 
     return {
       countItems,
-      sortField,
+      sortDirectionString,
       searchTerm,
-      count,
     };
   }
 }

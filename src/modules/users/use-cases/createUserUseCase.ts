@@ -5,11 +5,13 @@ import { randomUUID } from 'crypto';
 import { ModifiedUserDto } from '../dto/update-users.dto';
 import { UsersRepository } from '../users.repository';
 import { UsersService } from '../users.service';
+import { UsersSqlRepository } from '../users.sql.repository';
 
 @Injectable()
 export class CreateUserUseCase {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly usersSqlRepository: UsersSqlRepository,
     private usersService: UsersService,
   ) {}
   async execute(createUserDto: CreateUserDto, confirmAdmin = false) {
@@ -32,6 +34,11 @@ export class CreateUserUseCase {
         code: confirmAdmin ? null : uuid,
         isConfirm: confirmAdmin,
       },
+      // banInfo: {
+      //   isBanned: false,
+      //   banDate: null,
+      //   banReason: null,
+      // },
     };
 
     const createdUser = await this.usersRepository.createUser(createUserData);

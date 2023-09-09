@@ -6,19 +6,20 @@ import { ModifiedUserDto } from '../dto/update-users.dto';
 import { UsersService } from '../users.service';
 import { UsersSqlRepository } from '../users.sql.repository';
 import { UsersSqlService } from '../users.sql.service';
+import { UsersSqlQueryRepository } from '../users.sql.query.repository';
 
 @Injectable()
 export class CreateUserSqlUseCase {
   constructor(
-    private readonly usersSqlRepository: UsersSqlRepository,
+    private usersSqlRepository: UsersSqlRepository,
     private usersSqlService: UsersSqlService,
-    private usersService: UsersService,
+    private usersSqlQueryRepository: UsersSqlQueryRepository,
   ) {}
   async execute(createUserDto: CreateUserDto, confirmAdmin = false) {
     await this.usersSqlService.checkUserExist(createUserDto);
 
     const salt: string = await bcrypt.genSalt(10);
-    const passwordHash: string = await this.usersService.generateHash(
+    const passwordHash: string = await this.usersSqlService.generateHash(
       createUserDto.password,
       salt,
     );
@@ -36,6 +37,15 @@ export class CreateUserSqlUseCase {
       },
     };
 
-    return this.usersSqlRepository.createUser(createUserData);
+    await this.usersSqlRepository.createUser(createUserData);
+    const foundUser = await this.usersSqlQueryRepository.getUserByLoginOrEmail(
+      createUserData.login,
+    );
+    return {
+      id: foundUser[0].id,
+      login: foundUser[0].login,
+      email: foundUser[0].email,
+      createdAt: foundUser[0].createdAt,
+    };
   }
 }

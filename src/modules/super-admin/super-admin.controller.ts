@@ -11,27 +11,25 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../helpers/auth.guard';
-import { BindBlogWithUserUseCase } from './use-cases/bindBlogWithUserUseCase';
 import { CreateUserDto } from '../users/dto/create-users.dto';
 import { SortType } from '../users/users.interface';
-import { CreateUserUseCase } from '../users/use-cases/createUserUseCase';
-import { DeleteUserUseCase } from '../users/use-cases/deleteUserUseCase';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserSqlUseCase } from '../users/use-cases/createUserSqlUseCase';
+import { DeleteUserSqlUseCase } from '../users/use-cases/deleteUserSqlUseCase';
+import { UsersSqlQueryRepository } from '../users/users.sql.query.repository';
 
 @Controller('sa')
 export class SuperAdminController {
   constructor(
-    private usersQueryRepository: UsersQueryRepository,
     private createUserSqlUseCase: CreateUserSqlUseCase,
-    private deleteUserUseCase: DeleteUserUseCase,
+    private deleteUserSqlUseCase: DeleteUserSqlUseCase,
+    private usersSqlQueryRepository: UsersSqlQueryRepository,
   ) {}
 
   @Get(`/users`)
   @UseGuards(AuthGuard)
   getAllUsers(@Query() query: any) {
-    return this.usersQueryRepository.getAllUsers(
-      query.banStatus,
+    return this.usersSqlQueryRepository.getAllUsers(
       query.pageSize && Number(query.pageSize),
       query.pageNumber && Number(query.pageNumber),
       query.sortBy,
@@ -51,7 +49,7 @@ export class SuperAdminController {
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteUser(@Param(`userId`) userId: string) {
-    return this.deleteUserUseCase.execute(userId);
+    return this.deleteUserSqlUseCase.execute(userId);
   }
 
   // // BLOGS
