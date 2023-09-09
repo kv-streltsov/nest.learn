@@ -1,10 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { ModifiedUserDto } from './dto/update-users.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './user.entity';
 
 @Injectable()
-export class UsersRepository {
-  constructor() {}
-  createUser(userDto: ModifiedUserDto) {
-    return `this.userModel.create(userDto);`;
+export class UsersSqlRepository {
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userSqlRepository: Repository<UserEntity>,
+  ) {}
+  async createUser(userDto: ModifiedUserDto) {
+    return this.userSqlRepository.query(
+      `INSERT INTO public.users(
+             "login", "email", "password", "createdAt", "salt", "confirmation")
+              VALUES ($1, $2, $3, $4, $5, $6); `,
+      [
+        userDto.login,
+        userDto.email,
+        userDto.password,
+        userDto.createdAt,
+        userDto.salt,
+        userDto.confirmation,
+      ],
+    );
   }
 }

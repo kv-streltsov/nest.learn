@@ -3,17 +3,19 @@ import { CreateUserDto } from '../dto/create-users.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { ModifiedUserDto } from '../dto/update-users.dto';
-import { UsersRepository } from '../users.repository';
 import { UsersService } from '../users.service';
+import { UsersSqlRepository } from '../users.sql.repository';
+import { UsersSqlService } from '../users.sql.service';
 
 @Injectable()
-export class CreateUserUseCase {
+export class CreateUserSqlUseCase {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersSqlRepository: UsersSqlRepository,
+    private usersSqlService: UsersSqlService,
     private usersService: UsersService,
   ) {}
   async execute(createUserDto: CreateUserDto, confirmAdmin = false) {
-    await this.usersService.checkUserExist(createUserDto);
+    await this.usersSqlService.checkUserExist(createUserDto);
 
     const salt: string = await bcrypt.genSalt(10);
     const passwordHash: string = await this.usersService.generateHash(
@@ -34,16 +36,6 @@ export class CreateUserUseCase {
       },
     };
 
-    const createdUser = await this.usersRepository.createUser(createUserData);
-    return {
-      createdUser: {
-        id: createdUser.id,
-        login: createdUser.login,
-        email: createdUser.email,
-        createdAt: createdUser.createdAt,
-        banInfo: createdUser.banInfo,
-      },
-      uuid,
-    };
+    return this.usersSqlRepository.createUser(createUserData);
   }
 }

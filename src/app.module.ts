@@ -78,8 +78,14 @@ import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from './modules/users/use-cases/deleteUserUseCase';
 import { BanUserUseCase } from './modules/super-admin/use-cases/banUserUseCase';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersSqlRepository } from './modules/users/users.sql.repository';
+import { UserEntity } from './modules/users/user.entity';
+import { CreateUserSqlUseCase } from './modules/users/use-cases/createUserSqlUseCase';
+import { UsersSqlService } from './modules/users/users.sql.service';
+import { UsersSqlQueryRepository } from './modules/users/users.sql.query.repository';
 config();
 const useCases = [
+  CreateUserSqlUseCase,
   CreateDeviceSessionUseCase,
   RefreshTokenUseCase,
   LogoutAllDeviceSessionUseCase,
@@ -115,6 +121,7 @@ const useCases = [
       autoLoadEntities: false,
       synchronize: false,
     }),
+    TypeOrmModule.forFeature([UserEntity]),
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
@@ -162,7 +169,6 @@ const useCases = [
     ...useCases,
     AppService,
     AuthService,
-    UsersService,
     BlogsService,
     CommentsService,
     EmailService,
@@ -171,7 +177,12 @@ const useCases = [
     BloggerService,
     SecurityDevicesService,
     AuthRepository,
+    UsersService,
+    UsersQueryRepository,
     UsersRepository,
+    UsersSqlService,
+    UsersSqlQueryRepository,
+    UsersSqlRepository,
     BlogsRepository,
     BloggerRepository,
     PostsRepository,
@@ -181,7 +192,6 @@ const useCases = [
     LikesQueryRepository,
     BlogsQueryRepository,
     BloggerQueryRepository,
-    UsersQueryRepository,
     PostsQueryRepository,
     SecurityDevicesQueryRepositoryRepository,
     CommentsQueryRepository,

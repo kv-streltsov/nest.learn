@@ -7,30 +7,24 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../helpers/auth.guard';
 import { BindBlogWithUserUseCase } from './use-cases/bindBlogWithUserUseCase';
 import { CreateUserDto } from '../users/dto/create-users.dto';
-import { BloggerQueryRepository } from '../blogger/blogger.query.repository';
 import { SortType } from '../users/users.interface';
 import { CreateUserUseCase } from '../users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from '../users/use-cases/deleteUserUseCase';
 import { UsersQueryRepository } from '../users/users.query.repository';
-import { BanUserUseCase } from './use-cases/banUserUseCase';
+import { CreateUserSqlUseCase } from '../users/use-cases/createUserSqlUseCase';
 
 @Controller('sa')
 export class SuperAdminController {
   constructor(
-    private bindBlogWithUserUseCase: BindBlogWithUserUseCase,
-    private bloggerQueryRepository: BloggerQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
-    private createUserUseCase: CreateUserUseCase,
+    private createUserSqlUseCase: CreateUserSqlUseCase,
     private deleteUserUseCase: DeleteUserUseCase,
-    private banUserUseCase: BanUserUseCase,
   ) {}
 
   @Get(`/users`)
@@ -50,8 +44,7 @@ export class SuperAdminController {
   @Post(`/users`)
   @UseGuards(AuthGuard)
   async createUser(@Body() createUserDto: CreateUserDto) {
-    const createdUser = await this.createUserUseCase.execute(createUserDto);
-    return createdUser.createdUser;
+    return this.createUserSqlUseCase.execute(createUserDto);
   }
 
   @Delete(`/users/:userId`)
