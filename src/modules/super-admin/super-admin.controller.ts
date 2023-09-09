@@ -20,7 +20,6 @@ import { SortType } from '../users/users.interface';
 import { CreateUserUseCase } from '../users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from '../users/use-cases/deleteUserUseCase';
 import { UsersQueryRepository } from '../users/users.query.repository';
-import { BanUserDto } from '../security-devices/dto/ban-user.dto';
 import { BanUserUseCase } from './use-cases/banUserUseCase';
 
 @Controller('sa')
@@ -33,37 +32,6 @@ export class SuperAdminController {
     private deleteUserUseCase: DeleteUserUseCase,
     private banUserUseCase: BanUserUseCase,
   ) {}
-
-  // BLOGS
-  @Put(`/blogs/:blogId/bind-with-user/:userId`)
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  bindBlogWithUser(
-    @Param(`blogId`) blogId: string,
-    @Param(`userId`) userId: string,
-  ) {
-    return this.bindBlogWithUserUseCase.execute(blogId, userId);
-  }
-
-  @Get(`/blogs`)
-  @UseGuards(AuthGuard)
-  async getAllBlogs(@Query() query: any) {
-    return this.bloggerQueryRepository.getAllBlogs(
-      query?.pageNumber && Number(query.pageNumber),
-      query?.pageSize && Number(query.pageSize),
-      query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
-      query?.sortBy && query.sortBy,
-      query?.searchNameTerm && query.searchNameTerm,
-    );
-  }
-
-  // USERS
-  @Put(`/users/:userId/ban`)
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  banUser(@Param(`userId`) userId: string, @Body() banUserDto: BanUserDto) {
-    return this.banUserUseCase.execute(userId, banUserDto);
-  }
 
   @Get(`/users`)
   @UseGuards(AuthGuard)
@@ -92,4 +60,35 @@ export class SuperAdminController {
   deleteUser(@Param(`userId`) userId: string) {
     return this.deleteUserUseCase.execute(userId);
   }
+
+  // // BLOGS
+  // @Put(`/blogs/:blogId/bind-with-user/:userId`)
+  // @UseGuards(AuthGuard)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // bindBlogWithUser(
+  //   @Param(`blogId`) blogId: string,
+  //   @Param(`userId`) userId: string,
+  // ) {
+  //   return this.bindBlogWithUserUseCase.execute(blogId, userId);
+  // }
+  //
+  // @Get(`/blogs`)
+  // @UseGuards(AuthGuard)
+  // async getAllBlogs(@Query() query: any) {
+  //   return this.bloggerQueryRepository.getAllBlogs(
+  //     query?.pageNumber && Number(query.pageNumber),
+  //     query?.pageSize && Number(query.pageSize),
+  //     query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+  //     query?.sortBy && query.sortBy,
+  //     query?.searchNameTerm && query.searchNameTerm,
+  //   );
+  // }
+  //
+  // // USERS
+  // @Put(`/users/:userId/ban`)
+  // @UseGuards(AuthGuard)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // banUser(@Param(`userId`) userId: string, @Body() banUserDto: BanUserDto) {
+  //   return this.banUserUseCase.execute(userId, banUserDto);
+  // }
 }

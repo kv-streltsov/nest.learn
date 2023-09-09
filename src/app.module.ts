@@ -77,6 +77,7 @@ import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlo
 import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
 import { DeleteUserUseCase } from './modules/users/use-cases/deleteUserUseCase';
 import { BanUserUseCase } from './modules/super-admin/use-cases/banUserUseCase';
+import { TypeOrmModule } from '@nestjs/typeorm';
 config();
 const useCases = [
   CreateDeviceSessionUseCase,
@@ -104,6 +105,16 @@ const useCases = [
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: '3230sas',
+      database: 'learn.nest',
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
