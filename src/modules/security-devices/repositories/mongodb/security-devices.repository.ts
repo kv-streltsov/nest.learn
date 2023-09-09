@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SecurityDevices } from './security-devices.schena';
-import { JwtPayloadDto } from '../auth/strategies/refreshToken.strategy';
+import { SecurityDevices } from '../../security-devices.schena';
+import { JwtPayloadDto } from '../../../auth/strategies/refreshToken.strategy';
 
 @Injectable()
 export class SecurityDevicesRepository {

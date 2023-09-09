@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsersQueryRepository } from '../../users/users.query.repository';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersQueryRepository } from '../../../users/repositories/mongodb/users.query.repository';
+import { UsersRepository } from '../../../users/repositories/mongodb/users.repository';
 
 export type JwrPairDto = {
   accessToken: string;

@@ -9,10 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RefreshTokenGuard } from '../auth/strategies/refreshToken.guard';
-import { SecurityDevicesQueryRepositoryRepository } from './security-devices.query.repository';
-import { SecurityDevicesRepository } from './security-devices.repository';
+import { SecurityDevicesQueryRepositoryRepository } from './repositories/mongodb/security-devices.query.repository';
+import { SecurityDevicesRepository } from './repositories/mongodb/security-devices.repository';
 import { SecurityDevicesService } from './security-devices.service';
-import { LogoutAllDeviceSessionUseCase } from './use-cases/logoutAllDeviceSessionUseCase';
+import { LogoutAllDeviceSessionUseCase } from './use-cases/mongodb/logoutAllDeviceSessionUseCase';
 
 @Controller('security/devices')
 export class SecurityDevicesController {

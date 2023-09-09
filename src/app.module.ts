@@ -5,8 +5,8 @@ import { UsersController } from './modules/users/users.controller';
 import { UsersService } from './modules/users/users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Users, UsersSchema } from './modules/users/users.schema';
-import { UsersQueryRepository } from './modules/users/users.query.repository';
-import { UsersRepository } from './modules/users/users.repository';
+import { UsersQueryRepository } from './modules/users/repositories/mongodb/users.query.repository';
+import { UsersRepository } from './modules/users/repositories/mongodb/users.repository';
 import { BlogsController } from './modules/blogs/blogs.controller';
 import { BlogsService } from './modules/blogs/blogs.service';
 import { BlogsRepository } from './modules/blogs/blogs.repository';
@@ -27,19 +27,18 @@ import { Likes, LikesSchema } from './modules/likes/likes.schena';
 import { LikesQueryRepository } from './modules/likes/likes.query.repository';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './modules/auth/auth.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import {
   SecurityDevices,
   SecurityDevicesSchema,
 } from './modules/security-devices/security-devices.schena';
 import { SecurityDevicesService } from './modules/security-devices/security-devices.service';
-import { SecurityDevicesRepository } from './modules/security-devices/security-devices.repository';
+import { SecurityDevicesRepository } from './modules/security-devices/repositories/mongodb/security-devices.repository';
 import { AccessTokenStrategy } from './modules/auth/strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './modules/auth/strategies/refreshToken.strategy';
 import { LocalStrategy } from './modules/auth/strategies/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './modules/auth/auth.service';
-import { AuthRepository } from './modules/auth/auth.repository';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as process from 'process';
 import { EmailService } from './modules/email/email.service';
@@ -48,20 +47,20 @@ import { LikesService } from './modules/likes/likes.service';
 import { LikesRepository } from './modules/likes/likes.repository';
 import { CustomValidator } from './helpers/custom-validators/custom.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { SecurityDevicesQueryRepositoryRepository } from './modules/security-devices/security-devices.query.repository';
+import { SecurityDevicesQueryRepositoryRepository } from './modules/security-devices/repositories/mongodb/security-devices.query.repository';
 import { SecurityDevicesController } from './modules/security-devices/security-devices.controller';
-import { LoginUseCase } from './modules/auth/use-cases/loginUseCase';
-import { CreateDeviceSessionUseCase } from './modules/security-devices/use-cases/createDeviceSessionUseCase';
-import { RefreshTokenUseCase } from './modules/auth/use-cases/refreshTokenUseCase';
-import { LogoutDeviceSessionUseCase } from './modules/security-devices/use-cases/logoutDeviceSessionUseCase';
-import { LogoutUseCase } from './modules/auth/use-cases/logoutUseCase';
-import { RegistrationUseCase } from './modules/auth/use-cases/registrationUseCase';
-import { LogoutAllDeviceSessionUseCase } from './modules/security-devices/use-cases/logoutAllDeviceSessionUseCase';
-import { GetMeInfoUseCase } from './modules/auth/use-cases/getMeInfoUseCase';
-import { ConfirmationUserUseCase } from './modules/auth/use-cases/confirmationUseCase';
+import { LoginUseCase } from './modules/auth/use-cases/mongodb/loginUseCase';
+import { CreateDeviceSessionUseCase } from './modules/security-devices/use-cases/mongodb/createDeviceSessionUseCase';
+import { RefreshTokenUseCase } from './modules/auth/use-cases/mongodb/refreshTokenUseCase';
+import { LogoutDeviceSessionUseCase } from './modules/security-devices/use-cases/mongodb/logoutDeviceSessionUseCase';
+import { LogoutUseCase } from './modules/auth/use-cases/mongodb/logoutUseCase';
+import { RegistrationUseCase } from './modules/auth/use-cases/mongodb/registrationUseCase';
+import { LogoutAllDeviceSessionUseCase } from './modules/security-devices/use-cases/mongodb/logoutAllDeviceSessionUseCase';
+import { GetMeInfoUseCase } from './modules/auth/use-cases/mongodb/getMeInfoUseCase';
+import { ConfirmationUserUseCase } from './modules/auth/use-cases/mongodb/confirmationUseCase';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RegistrationEmailResendingUseCase } from './modules/auth/use-cases/registrationEmailResendingUseCase';
-import { ValidateUserUseCase } from './modules/auth/use-cases/validateUserUseCase';
+import { RegistrationEmailResendingUseCase } from './modules/auth/use-cases/mongodb/registrationEmailResendingUseCase';
+import { ValidateUserUseCase } from './modules/auth/use-cases/mongodb/validateUserUseCase';
 import { CreateBlogUseCase } from './modules/blogger/use-cases/createBlogUseCase';
 import { BloggerController } from './modules/blogger/blogger.controller';
 import { BloggerRepository } from './modules/blogger/blogger.repository';
@@ -74,18 +73,25 @@ import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePos
 import { DeletePostByIdUseCase } from './modules/posts/use-cases/delete-post-by-id-use-case.service';
 import { SuperAdminController } from './modules/super-admin/super-admin.controller';
 import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
-import { CreateUserUseCase } from './modules/users/use-cases/createUserUseCase';
-import { DeleteUserUseCase } from './modules/users/use-cases/deleteUserUseCase';
+import { CreateUserUseCase } from './modules/users/use-cases/mongodb/createUserUseCase';
+import { DeleteUserUseCase } from './modules/users/use-cases/mongodb/deleteUserUseCase';
 import { BanUserUseCase } from './modules/super-admin/use-cases/banUserUseCase';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersSqlRepository } from './modules/users/users.sql.repository';
+import { UsersSqlRepository } from './modules/users/repositories/postgresql/users.sql.repository';
 import { UserEntity } from './modules/users/user.entity';
-import { CreateUserSqlUseCase } from './modules/users/use-cases/createUserSqlUseCase';
+import { CreateUserSqlUseCase } from './modules/users/use-cases/postgresql/createUserSqlUseCase';
 import { UsersSqlService } from './modules/users/users.sql.service';
-import { UsersSqlQueryRepository } from './modules/users/users.sql.query.repository';
-import { DeleteUserSqlUseCase } from './modules/users/use-cases/deleteUserSqlUseCase';
+import { UsersSqlQueryRepository } from './modules/users/repositories/postgresql/users.sql.query.repository';
+import { DeleteUserSqlUseCase } from './modules/users/use-cases/postgresql/deleteUserSqlUseCase';
+import { RegistrationSqlUseCase } from './modules/auth/use-cases/postgresql/registrationSqlUseCase';
+import { SecurityDevicesEntity } from './modules/security-devices/security-devices.entity';
+import { LoginSqlUseCase } from './modules/auth/use-cases/postgresql/loginSqlUseCase';
+import { CreateDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
+import { SecurityDevicesSqlRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.repository';
 config();
 const useCases = [
+  LoginSqlUseCase,
+  RegistrationSqlUseCase,
   CreateUserSqlUseCase,
   DeleteUserSqlUseCase,
   CreateDeviceSessionUseCase,
@@ -109,6 +115,7 @@ const useCases = [
   CreateUserUseCase,
   DeleteUserUseCase,
   BanUserUseCase,
+  CreateDeviceSessionSqlUseCase,
 ];
 
 @Module({
@@ -123,7 +130,7 @@ const useCases = [
       autoLoadEntities: false,
       synchronize: false,
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, SecurityDevicesEntity]),
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
@@ -169,6 +176,7 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    SecurityDevicesSqlRepository,
     AppService,
     AuthService,
     BlogsService,
@@ -178,7 +186,6 @@ const useCases = [
     LikesService,
     BloggerService,
     SecurityDevicesService,
-    AuthRepository,
     UsersService,
     UsersQueryRepository,
     UsersRepository,

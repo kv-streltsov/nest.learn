@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SecurityDevicesRepository } from '../security-devices.repository';
-import { JwrPairDto } from '../../auth/auth.service';
+import { JwrPairDto } from '../../../auth/auth.service';
+import { SecurityDevicesSqlRepository } from '../../repositories/postgresql/security-devices.sql.repository';
 
 @Injectable()
-export class CreateDeviceSessionUseCase {
+export class CreateDeviceSessionSqlUseCase {
   constructor(
     private jwtService: JwtService,
-    private securityDevicesRepository: SecurityDevicesRepository,
+    private securityDevicesRepository: SecurityDevicesSqlRepository,
   ) {}
 
   async execute(jwtPair: JwrPairDto, user: any) {

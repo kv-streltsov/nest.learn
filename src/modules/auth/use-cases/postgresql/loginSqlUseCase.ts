@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateDeviceSessionUseCase } from '../../security-devices/use-cases/createDeviceSessionUseCase';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth.service';
+import { CreateDeviceSessionSqlUseCase } from '../../../security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
 
 export type JwrPairDto = {
   accessToken: string;
@@ -9,9 +9,9 @@ export type JwrPairDto = {
 };
 
 @Injectable()
-export class LoginUseCase {
+export class LoginSqlUseCase {
   constructor(
-    private createDeviceSessionUseCase: CreateDeviceSessionUseCase,
+    private createDeviceSessionUseCase: CreateDeviceSessionSqlUseCase,
     private authService: AuthService,
   ) {}
   async execute(request: any, response: Response): Promise<JwrPairDto> {

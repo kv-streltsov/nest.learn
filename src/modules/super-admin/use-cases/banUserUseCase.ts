@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BanUserDto } from '../../security-devices/dto/ban-user.dto';
-import { UsersRepository } from '../../users/users.repository';
-import { SecurityDevicesRepository } from '../../security-devices/security-devices.repository';
+import { UsersRepository } from '../../users/repositories/mongodb/users.repository';
+import { SecurityDevicesRepository } from '../../security-devices/repositories/mongodb/security-devices.repository';
 
 export interface BanUserInfo {
   isBanned: boolean;

@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-users.dto';
+import { CreateUserDto } from '../../dto/create-users.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { ModifiedUserDto } from '../dto/update-users.dto';
-import { UsersService } from '../users.service';
-import { UsersSqlRepository } from '../users.sql.repository';
-import { UsersSqlService } from '../users.sql.service';
-import { UsersSqlQueryRepository } from '../users.sql.query.repository';
+import { ModifiedUserDto } from '../../dto/update-users.dto';
+import { UsersSqlRepository } from '../../repositories/postgresql/users.sql.repository';
+import { UsersSqlService } from '../../users.sql.service';
+import { UsersSqlQueryRepository } from '../../repositories/postgresql/users.sql.query.repository';
 
 @Injectable()
 export class CreateUserSqlUseCase {
@@ -42,10 +41,13 @@ export class CreateUserSqlUseCase {
       createUserData.login,
     );
     return {
-      id: foundUser[0].id,
-      login: foundUser[0].login,
-      email: foundUser[0].email,
-      createdAt: foundUser[0].createdAt,
+      createdUser: {
+        id: foundUser[0].id.toString(),
+        login: foundUser[0].login,
+        email: foundUser[0].email,
+        createdAt: foundUser[0].createdAt,
+      },
+      uuid,
     };
   }
 }

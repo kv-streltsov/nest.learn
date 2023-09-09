@@ -7,10 +7,15 @@ import { Posts } from '../posts/posts.schena';
 import { Users } from '../users/users.schema';
 import { Likes } from '../likes/likes.schena';
 import { SecurityDevices } from '../security-devices/security-devices.schena';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from '../users/user.entity';
+import { Repository } from 'typeorm';
 
 @Controller('testing')
 export class TestingController {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly usersSqlRepository: Repository<UserEntity>,
     @InjectModel(Blogs.name) private blogsModel: Model<Blogs>,
     @InjectModel(Comments.name) private commentsModel: Model<Comments>,
     @InjectModel(Posts.name) private postsModel: Model<Posts>,
@@ -29,6 +34,7 @@ export class TestingController {
     await this.commentsModel.deleteMany({});
     await this.likesModel.deleteMany({});
     await this.securityDevicesModel.deleteMany({});
+    await this.usersSqlRepository.query(`DELETE FROM public.users`);
     return;
   }
 }

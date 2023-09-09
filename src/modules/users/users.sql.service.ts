@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-users.dto';
 import bcrypt from 'bcrypt';
-import { UsersSqlQueryRepository } from './users.sql.query.repository';
+import { UsersSqlQueryRepository } from './repositories/postgresql/users.sql.query.repository';
 
 @Injectable()
 export class UsersSqlService {

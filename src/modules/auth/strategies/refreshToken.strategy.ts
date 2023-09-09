@@ -2,9 +2,9 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersQueryRepository } from '../../users/users.query.repository';
+import { UsersQueryRepository } from '../../users/repositories/mongodb/users.query.repository';
 import * as process from 'process';
-import { SecurityDevicesQueryRepositoryRepository } from '../../security-devices/security-devices.query.repository';
+import { SecurityDevicesQueryRepositoryRepository } from '../../security-devices/repositories/mongodb/security-devices.query.repository';
 
 export interface JwtPayloadDto {
   login: string;

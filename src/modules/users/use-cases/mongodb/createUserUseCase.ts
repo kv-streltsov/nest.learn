@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-users.dto';
+import { CreateUserDto } from '../../dto/create-users.dto';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { ModifiedUserDto } from '../dto/update-users.dto';
-import { UsersRepository } from '../users.repository';
-import { UsersService } from '../users.service';
-import { UsersSqlRepository } from '../users.sql.repository';
+import { ModifiedUserDto } from '../../dto/update-users.dto';
+import { UsersRepository } from '../../repositories/mongodb/users.repository';
+import { UsersService } from '../../users.service';
+import { UsersSqlRepository } from '../../repositories/postgresql/users.sql.repository';
 
 @Injectable()
 export class CreateUserUseCase {

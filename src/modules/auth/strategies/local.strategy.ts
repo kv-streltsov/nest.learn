@@ -2,7 +2,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
-import { ValidateUserUseCase } from '../use-cases/validateUserUseCase';
+import { ValidateUserUseCase } from '../use-cases/mongodb/validateUserUseCase';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -25,10 +25,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!foundUser) {
       throw new UnauthorizedException();
     }
-    // // @ts-ignore
-    // if (foundUser.banInfo.isBanned == true) {
-    //   throw new UnauthorizedException();
-    // }
 
     return {
       login: foundUser.login,

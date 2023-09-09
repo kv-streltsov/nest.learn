@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Likes } from './likes.schena';
-import { UsersQueryRepository } from '../users/users.query.repository';
+import { UsersQueryRepository } from '../users/repositories/mongodb/users.query.repository';
 import { LikeStatusEnum } from './dto/create-like.dto';
 
 @Injectable()

@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Posts } from './posts.schena';
 import { BloggerQueryRepository } from '../blogger/blogger.query.repository';
-import { UsersQueryRepository } from '../users/users.query.repository';
+import { UsersQueryRepository } from '../users/repositories/mongodb/users.query.repository';
 
 @Injectable()
 export class PostsQueryRepository {

@@ -12,12 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UsersQueryRepository } from './users.query.repository';
+import { UsersQueryRepository } from './repositories/mongodb/users.query.repository';
 import { SortType } from './users.interface';
 import { CreateUserDto } from './dto/create-users.dto';
 import { AuthGuard } from '../../helpers/auth.guard';
-import { CreateUserUseCase } from './use-cases/createUserUseCase';
-import { DeleteUserUseCase } from './use-cases/deleteUserUseCase';
+import { CreateUserUseCase } from './use-cases/mongodb/createUserUseCase';
+import { DeleteUserUseCase } from './use-cases/mongodb/deleteUserUseCase';
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {

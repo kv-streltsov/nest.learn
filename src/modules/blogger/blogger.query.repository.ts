@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UsersQueryRepository } from '../users/users.query.repository';
+import { UsersQueryRepository } from '../users/repositories/mongodb/users.query.repository';
 import { Blogs } from '../blogs/blogs.schena';
 
 @Injectable()

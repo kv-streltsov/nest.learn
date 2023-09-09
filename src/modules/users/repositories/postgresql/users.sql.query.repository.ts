@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Users } from './users.schema';
+import { Users } from '../../users.schema';
 import { Model } from 'mongoose';
-import { SortBanStatus, SortType } from './users.interface';
+import { SortBanStatus, SortType } from '../../users.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
+import { UserEntity } from '../../user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class UsersSqlQueryRepository {
         searchLoginTerm,
       );
     const foundUsers = await this.usersSqlRepository.query(
-      `SELECT id, login, email,  "createdAt"
+      `SELECT CAST(id AS VARCHAR) AS id, login, email,  "createdAt"
                 FROM public.users
                 ${searchTerm}
                 ORDER BY "${sortBy}" ${sortDirectionString}`,

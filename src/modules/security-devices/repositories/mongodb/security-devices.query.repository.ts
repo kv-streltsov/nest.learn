@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SecurityDevices } from './security-devices.schena';
+import { SecurityDevices } from '../../security-devices.schena';
 
 @Injectable()
 export class SecurityDevicesQueryRepositoryRepository {

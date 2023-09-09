@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserRegistrationDto } from '../dto/create-auth.dto';
-import { EmailService } from '../../email/email.service';
-import { CreateUserUseCase } from '../../users/use-cases/createUserUseCase';
+import { UserRegistrationDto } from '../../dto/create-auth.dto';
+import { EmailService } from '../../../email/email.service';
+import { CreateUserUseCase } from '../../../users/use-cases/mongodb/createUserUseCase';
 
 @Injectable()
 export class RegistrationUseCase {

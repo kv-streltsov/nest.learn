@@ -22,20 +22,21 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { LoginUseCase } from './use-cases/loginUseCase';
-import { RefreshTokenUseCase } from './use-cases/refreshTokenUseCase';
-import { LogoutUseCase } from './use-cases/logoutUseCase';
-import { RegistrationUseCase } from './use-cases/registrationUseCase';
-import { GetMeInfoUseCase } from './use-cases/getMeInfoUseCase';
-import { ConfirmationUserUseCase } from './use-cases/confirmationUseCase';
-import { RegistrationEmailResendingUseCase } from './use-cases/registrationEmailResendingUseCase';
+import { LoginUseCase } from './use-cases/mongodb/loginUseCase';
+import { RefreshTokenUseCase } from './use-cases/mongodb/refreshTokenUseCase';
+import { LogoutUseCase } from './use-cases/mongodb/logoutUseCase';
+import { GetMeInfoUseCase } from './use-cases/mongodb/getMeInfoUseCase';
+import { ConfirmationUserUseCase } from './use-cases/mongodb/confirmationUseCase';
+import { RegistrationEmailResendingUseCase } from './use-cases/mongodb/registrationEmailResendingUseCase';
+import { RegistrationSqlUseCase } from './use-cases/postgresql/registrationSqlUseCase';
+import { LoginSqlUseCase } from './use-cases/postgresql/loginSqlUseCase';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private loginUseCase: LoginUseCase,
+    private loginUseCase: LoginSqlUseCase,
     private logoutUseCase: LogoutUseCase,
     private refreshTokenUseCase: RefreshTokenUseCase,
-    private registrationUseCase: RegistrationUseCase,
+    private registrationUseCase: RegistrationSqlUseCase,
     private getMeInfoUseCase: GetMeInfoUseCase,
     private confirmationUserUseCase: ConfirmationUserUseCase,
     private registrationEmailResendingUseCase: RegistrationEmailResendingUseCase,

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Users } from './users.schema';
+import { Users } from '../../users.schema';
 import { Model } from 'mongoose';
-import { SortBanStatus } from './users.interface';
+import { SortBanStatus } from '../../users.interface';
 
 @Injectable()
 export class UsersQueryRepository {

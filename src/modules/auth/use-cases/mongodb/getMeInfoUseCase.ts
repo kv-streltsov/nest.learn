@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersQueryRepository } from '../../users/users.query.repository';
+import { UsersQueryRepository } from '../../../users/repositories/mongodb/users.query.repository';
 
 @Injectable()
 export class GetMeInfoUseCase {
