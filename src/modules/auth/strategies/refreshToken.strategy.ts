@@ -5,6 +5,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersQueryRepository } from '../../users/repositories/mongodb/users.query.repository';
 import * as process from 'process';
 import { SecurityDevicesQueryRepositoryRepository } from '../../security-devices/repositories/mongodb/security-devices.query.repository';
+import { UsersSqlQueryRepository } from '../../users/repositories/postgresql/users.sql.query.repository';
+import { SecurityDevicesSqlQueryRepository } from '../../security-devices/repositories/postgresql/security-devices.sql.query.repository';
 
 export interface JwtPayloadDto {
   login: string;
@@ -23,8 +25,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
   'jwt-refresh',
 ) {
   constructor(
-    private usersQueryRepository: UsersQueryRepository,
-    private securityDevicesQueryRepositoryRepository: SecurityDevicesQueryRepositoryRepository,
+    private usersQueryRepository: UsersSqlQueryRepository,
+    private securityDevicesQueryRepositoryRepository: SecurityDevicesSqlQueryRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([

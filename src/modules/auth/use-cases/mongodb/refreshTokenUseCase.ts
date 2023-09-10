@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { CreateDeviceSessionUseCase } from '../../../security-devices/use-cases/mongodb/createDeviceSessionUseCase';
 import { AuthService } from '../../auth.service';
+import { CreateDeviceSessionSqlUseCase } from '../../../security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
 
 export type JwrPairDto = {
   accessToken: string;
@@ -13,7 +14,7 @@ export type JwrPairDto = {
 @Injectable()
 export class RefreshTokenUseCase {
   constructor(
-    private createDeviceSessionUseCase: CreateDeviceSessionUseCase,
+    private createDeviceSessionUseCase: CreateDeviceSessionSqlUseCase,
     private authService: AuthService,
   ) {}
   async execute(request: any, response: Response) {

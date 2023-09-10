@@ -12,19 +12,17 @@ export class SecurityDevicesSqlRepository {
   ) {}
 
   async createDeviceSessions(jwtPayload: JwtPayloadDto, user: any) {
-    console.log(user.userId, jwtPayload.deviceId);
     const foundSession = await this.securityDevicesModel.query(
       `SELECT "sessionId"
                 FROM public."securityDevices"
-                WHERE "userId" = $1`,
-      [user.userId],
+                WHERE "userId" = $1 AND "deviceId" = $2`,
+      [user.userId, jwtPayload.deviceId],
     );
     if (foundSession.length) {
-      console.log(123);
       await this.securityDevicesModel.query(
         `UPDATE public."securityDevices"
                 SET "sessionId"=$1,   ip=$2, issued=$3, expiration=$4
-                WHERE "userId"= $5 AND "deviceId" = $6;`,
+                WHERE "userId"= $5 AND "deviceId" = $6`,
         [
           jwtPayload.sessionId,
           user.ip,
@@ -34,7 +32,6 @@ export class SecurityDevicesSqlRepository {
           jwtPayload.deviceId,
         ],
       );
-
       return true;
     }
 
@@ -54,12 +51,15 @@ export class SecurityDevicesSqlRepository {
     );
     return true;
   }
-  // async deleteDeviceSession(user: any) {
-  //   return this.securityDevicesModel.deleteOne({
-  //     userId: user.userId,
-  //     deviceId: user.deviceId,
-  //   });
-  // }
+  async deleteDeviceSession(user: any) {
+    const deletedUser = await this.securityDevicesModel.query(
+      `
+            DELETE FROM public."securityDevices"
+                WHERE "userId"=$1 AND "deviceId"=$2;`,
+      [user.userId, user.deviceId],
+    );
+    return deletedUser[1];
+  }
   // async deleteDeviceSessionByDeviceId(deviceId: string, userId: string) {
   //   const foundSession = await this.securityDevicesModel.findOne({ deviceId });
   //   if (foundSession === null) {

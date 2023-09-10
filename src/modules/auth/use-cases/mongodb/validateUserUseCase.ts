@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { UsersSqlQueryRepository } from '../../../users/repositories/postgresql/users.sql.query.repository';
+import { UsersQueryRepository } from '../../../users/repositories/mongodb/users.query.repository';
 
 @Injectable()
 export class ValidateUserUseCase {

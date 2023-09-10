@@ -30,11 +30,12 @@ import { ConfirmationUserUseCase } from './use-cases/mongodb/confirmationUseCase
 import { RegistrationEmailResendingUseCase } from './use-cases/mongodb/registrationEmailResendingUseCase';
 import { RegistrationSqlUseCase } from './use-cases/postgresql/registrationSqlUseCase';
 import { LoginSqlUseCase } from './use-cases/postgresql/loginSqlUseCase';
+import { LogoutSqlUseCase } from './use-cases/postgresql/logoutSqlUseCase';
 @Controller('auth')
 export class AuthController {
   constructor(
     private loginUseCase: LoginSqlUseCase,
-    private logoutUseCase: LogoutUseCase,
+    private logoutUseCase: LogoutSqlUseCase,
     private refreshTokenUseCase: RefreshTokenUseCase,
     private registrationUseCase: RegistrationSqlUseCase,
     private getMeInfoUseCase: GetMeInfoUseCase,

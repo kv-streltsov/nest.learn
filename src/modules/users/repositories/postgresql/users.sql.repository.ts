@@ -25,6 +25,13 @@ export class UsersSqlRepository {
       ],
     );
   }
+  async updateConfirmationCode(code: string, pyload: any) {
+    return this.userSqlRepository.query(
+      `UPDATE public.users
+                SET confirmation = confirmation  || '{"code":"${pyload['confirmation.code']}", "isConfirm":"${pyload['confirmation.isConfirm']}"}' 
+                WHERE confirmation ->> 'code' = '${code}'`,
+    );
+  }
   deleteUser(userId: string) {
     return this.userSqlRepository.query(
       `DELETE FROM public.users

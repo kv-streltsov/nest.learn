@@ -88,8 +88,11 @@ import { SecurityDevicesEntity } from './modules/security-devices/security-devic
 import { LoginSqlUseCase } from './modules/auth/use-cases/postgresql/loginSqlUseCase';
 import { CreateDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
 import { SecurityDevicesSqlRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.repository';
+import { SecurityDevicesSqlQueryRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.query.repository';
+import { LogoutSqlUseCase } from './modules/auth/use-cases/postgresql/logoutSqlUseCase';
 config();
 const useCases = [
+  LogoutSqlUseCase,
   LoginSqlUseCase,
   RegistrationSqlUseCase,
   CreateUserSqlUseCase,
@@ -197,6 +200,7 @@ const useCases = [
     PostsRepository,
     LikesRepository,
     SecurityDevicesRepository,
+    SecurityDevicesSqlQueryRepository,
     CommentsRepository,
     LikesQueryRepository,
     BlogsQueryRepository,

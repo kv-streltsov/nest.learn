@@ -51,7 +51,13 @@ export class UsersSqlQueryRepository {
     };
   }
   async getUserById(userId: string) {
-    return this.usersModel.findOne({ id: userId }).lean();
+    const foundUser = await this.usersSqlRepository.query(
+      `SELECT id, login, email, "createdAt",  confirmation
+                FROM public.users 
+                WHERE id = $1`,
+      [userId],
+    );
+    return foundUser[0];
   }
   async getUserByLoginOrEmail(loginOrEmail: string) {
     const foundUser = await this.usersSqlRepository.query(
@@ -64,7 +70,14 @@ export class UsersSqlQueryRepository {
     return foundUser;
   }
   async getUserByConfirmationCode(code: string) {
-    return this.usersModel.findOne({ 'confirmation.code': code }).lean();
+    const foundUser = await this.usersSqlRepository.query(
+      `SELECT id, login, email, password, "createdAt", salt, confirmation
+        FROM public.users
+        WHERE confirmation ->> 'code' = $1`,
+      [code],
+    );
+    if (foundUser.length === 0) return null;
+    return foundUser[0];
   }
   private async paginationHandler(
     pageNumber: number,
