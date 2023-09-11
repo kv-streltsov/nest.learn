@@ -6,7 +6,6 @@ import { SortBanStatus, SortType } from '../../users.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../user.entity';
 import { Repository } from 'typeorm';
-
 @Injectable()
 export class UsersSqlQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
@@ -25,7 +24,7 @@ export class UsersSqlQueryRepository {
     searchEmailTerm: string | null = null,
     searchLoginTerm: string | null = null,
   ): Promise<any> {
-    const { countItems, sortDirectionString, searchTerm } =
+    const { countItems, sortDirectionString, searchTerm, count } =
       await this.paginationHandler(
         pageNumber,
         pageSize,
@@ -33,14 +32,16 @@ export class UsersSqlQueryRepository {
         searchEmailTerm,
         searchLoginTerm,
       );
+
     const foundUsers = await this.usersSqlRepository.query(
-      `SELECT CAST(id AS VARCHAR) AS id, login, email,  "createdAt"
+      `SELECT id, login, email,  "createdAt"
                 FROM public.users
                 ${searchTerm}
-                ORDER BY "${sortBy}" ${sortDirectionString}`,
+                ORDER BY "${sortBy}" ${
+        sortBy === 'createdAt' ? '' : 'COLLATE "C"'
+      } ${sortDirectionString}
+                LIMIT ${pageSize} OFFSET ${countItems}`,
     );
-
-    const count = foundUsers.length;
 
     return {
       pagesCount: Math.ceil(count / pageSize),
@@ -94,17 +95,28 @@ export class UsersSqlQueryRepository {
     if (searchEmailTerm === null && searchLoginTerm === null) {
       searchTerm = '';
     } else if (searchLoginTerm === null && searchEmailTerm !== null) {
-      searchTerm = `WHERE "email" LIKE '%${searchEmailTerm}%'`;
+      searchTerm = `WHERE "email" ILIKE '%${searchEmailTerm}%'`;
     } else if (searchEmailTerm === null && searchLoginTerm !== null) {
-      searchTerm = `WHERE "login" LIKE '%${searchLoginTerm}%'`;
+      searchTerm = `WHERE "login" ILIKE '%${searchLoginTerm}%'`;
     } else if (searchEmailTerm !== null && searchLoginTerm !== null) {
-      searchTerm = `WHERE "login" LIKE '%${searchLoginTerm}%' OR WHERE "email" LIKE '%${searchEmailTerm}%'`;
+      searchTerm = `WHERE "login" ILIKE '%${searchLoginTerm}%' OR "email" ILIKE '%${searchEmailTerm}%'`;
     }
+
+    const count: number = await this.usersSqlRepository
+      .query(
+        `SELECT COUNT(*) 
+                        FROM public.users
+                        ${searchTerm}`,
+      )
+      .then((data) => {
+        return parseInt(data[0].count);
+      });
 
     return {
       countItems,
       sortDirectionString,
       searchTerm,
+      count,
     };
   }
 }

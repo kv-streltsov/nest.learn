@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Users } from '../../users.schema';
 import { Model } from 'mongoose';
 import { SortBanStatus } from '../../users.interface';
-
 @Injectable()
 export class UsersQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';

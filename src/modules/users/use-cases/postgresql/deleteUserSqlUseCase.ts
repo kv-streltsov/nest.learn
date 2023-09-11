@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersSqlRepository } from '../../repositories/postgresql/users.sql.repository';
-
 @Injectable()
 export class DeleteUserSqlUseCase {
   constructor(private readonly usersSqlRepository: UsersSqlRepository) {}

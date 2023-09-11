@@ -16,7 +16,6 @@ import { SortType } from '../users/users.interface';
 import { CreateUserSqlUseCase } from '../users/use-cases/postgresql/createUserSqlUseCase';
 import { DeleteUserSqlUseCase } from '../users/use-cases/postgresql/deleteUserSqlUseCase';
 import { UsersSqlQueryRepository } from '../users/repositories/postgresql/users.sql.query.repository';
-
 @Controller('sa')
 export class SuperAdminController {
   constructor(

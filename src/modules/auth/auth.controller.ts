@@ -17,7 +17,6 @@ import {
   RegistrationEmailResendingDto,
   UserRegistrationDto,
 } from './dto/create-auth.dto';
-
 import { AuthGuard } from '@nestjs/passport';
 import { JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
