@@ -7,7 +7,6 @@ import * as process from 'process';
 import { SecurityDevicesQueryRepositoryRepository } from '../../security-devices/repositories/mongodb/security-devices.query.repository';
 import { UsersSqlQueryRepository } from '../../users/repositories/postgresql/users.sql.query.repository';
 import { SecurityDevicesSqlQueryRepository } from '../../security-devices/repositories/postgresql/security-devices.sql.query.repository';
-
 export interface JwtPayloadDto {
   login: string;
   email: string;

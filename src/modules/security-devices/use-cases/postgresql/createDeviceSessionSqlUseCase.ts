@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwrPairDto } from '../../../auth/auth.service';
 import { SecurityDevicesSqlRepository } from '../../repositories/postgresql/security-devices.sql.repository';
-
 @Injectable()
 export class CreateDeviceSessionSqlUseCase {
   constructor(

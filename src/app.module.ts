@@ -91,8 +91,14 @@ import { SecurityDevicesSqlRepository } from './modules/security-devices/reposit
 import { SecurityDevicesSqlQueryRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.query.repository';
 import { LogoutSqlUseCase } from './modules/auth/use-cases/postgresql/logoutSqlUseCase';
 import { RegistrationEmailResendingSqlUseCase } from './modules/auth/use-cases/postgresql/registrationEmailResendingSqlUseCase';
+import { RefreshTokenSqlUseCase } from './modules/auth/use-cases/postgresql/refreshTokenSqlUseCase';
+import { LogoutAllDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/logoutAllDeviceSessionSqlUseCase';
+import { LogoutDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/logoutDeviceSessionSqlUseCase';
 config();
 const useCases = [
+  LogoutDeviceSessionSqlUseCase,
+  LogoutAllDeviceSessionSqlUseCase,
+  RefreshTokenSqlUseCase,
   RegistrationEmailResendingSqlUseCase,
   LogoutSqlUseCase,
   LoginSqlUseCase,

@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtPayloadDto } from '../../../auth/strategies/refreshToken.strategy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SecurityDevicesEntity } from '../../security-devices.entity';
-
 @Injectable()
 export class SecurityDevicesSqlRepository {
   constructor(
@@ -60,27 +63,29 @@ export class SecurityDevicesSqlRepository {
     );
     return deletedUser[1];
   }
-  // async deleteDeviceSessionByDeviceId(deviceId: string, userId: string) {
-  //   const foundSession = await this.securityDevicesModel.findOne({ deviceId });
-  //   if (foundSession === null) {
-  //     throw new NotFoundException();
-  //   }
-  //   if (foundSession.userId !== userId) {
-  //     throw new ForbiddenException();
-  //   }
-  //   return this.securityDevicesModel.deleteOne({
-  //     deviceId: deviceId,
-  //   });
-  // }
+  async deleteDeviceSessionByDeviceId(deviceId: string, userId: string) {
+    const foundSession = await this.securityDevicesModel
+      .query(`SELECT  "deviceId", "userId"
+                    FROM public."securityDevices"
+                    WHERE "deviceId" = '${deviceId}'`);
+    if (!foundSession.length) {
+      throw new NotFoundException();
+    }
+    if (foundSession[0].userId !== userId) {
+      throw new ForbiddenException();
+    }
+    return this.securityDevicesModel.query(`DELETE FROM public."securityDevices"
+            WHERE "deviceId" = '${deviceId}';`);
+  }
   // async deleteAllDeviceSession(userId: string) {
   //   return this.securityDevicesModel.deleteMany({
   //     userId: userId,
   //   });
   // }
-  // async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {
-  //   return this.securityDevicesModel.deleteMany({
-  //     deviceId: { $ne: deviceId },
-  //     userId: userId,
-  //   });
-  // }
+  async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {
+    return this.securityDevicesModel.query(
+      `DELETE FROM public."securityDevices"
+            WHERE "deviceId" != '${deviceId}' AND "userId" = '${userId}';`,
+    );
+  }
 }

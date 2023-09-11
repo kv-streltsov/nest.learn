@@ -13,13 +13,16 @@ import { SecurityDevicesQueryRepositoryRepository } from './repositories/mongodb
 import { SecurityDevicesRepository } from './repositories/mongodb/security-devices.repository';
 import { SecurityDevicesService } from './security-devices.service';
 import { LogoutAllDeviceSessionUseCase } from './use-cases/mongodb/logoutAllDeviceSessionUseCase';
+import { SecurityDevicesSqlQueryRepository } from './repositories/postgresql/security-devices.sql.query.repository';
+import { LogoutAllDeviceSessionSqlUseCase } from './use-cases/postgresql/logoutAllDeviceSessionSqlUseCase';
+import { LogoutDeviceSessionSqlUseCase } from './use-cases/postgresql/logoutDeviceSessionSqlUseCase';
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(
-    private securityDevicesQueryRepositoryRepository: SecurityDevicesQueryRepositoryRepository,
-    private securityDevicesRepository: SecurityDevicesRepository,
+    private securityDevicesQueryRepositoryRepository: SecurityDevicesSqlQueryRepository,
+    private logoutDeviceSessionSqlUseCase: LogoutDeviceSessionSqlUseCase,
     private securityDevicesService: SecurityDevicesService,
-    private logoutAllDeviceSessionUseCase: LogoutAllDeviceSessionUseCase,
+    private logoutAllDeviceSessionUseCase: LogoutAllDeviceSessionSqlUseCase,
   ) {}
 
   @Get()
@@ -30,7 +33,6 @@ export class SecurityDevicesController {
       await this.securityDevicesQueryRepositoryRepository.findDeviceSessions(
         request.user.userId,
       );
-
     return foundSessions.map((session) => {
       return {
         ip: session.ip,
@@ -52,7 +54,7 @@ export class SecurityDevicesController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   terminateDeviceById(@Param(`id`) deviceId: string, @Request() request) {
-    return this.securityDevicesRepository.deleteDeviceSessionByDeviceId(
+    return this.logoutDeviceSessionSqlUseCase.execute(
       deviceId,
       request.user.userId,
     );

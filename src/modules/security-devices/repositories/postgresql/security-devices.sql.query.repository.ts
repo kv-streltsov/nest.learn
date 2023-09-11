@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { SecurityDevices } from '../../security-devices.schena';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SecurityDevicesEntity } from '../../security-devices.entity';
 import { Repository } from 'typeorm';
-
 @Injectable()
 export class SecurityDevicesSqlQueryRepository {
   constructor(
@@ -20,16 +16,19 @@ export class SecurityDevicesSqlQueryRepository {
                     WHERE "userId" = $1 AND "deviceId" = $2 AND "sessionId" = $3`,
       [userId, deviceId, sessionId],
     );
-
+    if (foundSession[0] === undefined) {
+      return null;
+    }
     return foundSession[0];
   }
 
-  // async findDeviceSessions(userId: string) {
-  //   return this.securityDevicesModel
-  //     .find({
-  //       userId: userId,
-  //     })
-  //     .select({ _id: 0, userId: 0, expiration: 0, __v: 0 })
-  //     .lean();
-  // }
+  async findDeviceSessions(userId: string) {
+    const foundDevices = await this.securityDevicesModel.query(
+      `SELECT  "deviceId", "userAgent" , ip, issued 
+                FROM public."securityDevices"
+                WHERE "userId" = $1`,
+      [userId],
+    );
+    return foundDevices;
+  }
 }

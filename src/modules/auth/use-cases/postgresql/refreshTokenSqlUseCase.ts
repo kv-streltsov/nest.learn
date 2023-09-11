@@ -12,7 +12,7 @@ export type JwrPairDto = {
 };
 
 @Injectable()
-export class RefreshTokenUseCase {
+export class RefreshTokenSqlUseCase {
   constructor(
     private createDeviceSessionUseCase: CreateDeviceSessionSqlUseCase,
     private authService: AuthService,
@@ -24,6 +24,7 @@ export class RefreshTokenUseCase {
     );
 
     await this.createDeviceSessionUseCase.execute(jwtPair, request.user);
+
     return {
       accessToken: jwtPair.accessToken,
     };
