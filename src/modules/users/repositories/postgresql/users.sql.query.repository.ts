@@ -68,7 +68,7 @@ export class UsersSqlQueryRepository {
       [loginOrEmail],
     );
     if (foundUser.length === 0) return null;
-    return foundUser;
+    return foundUser[0];
   }
   async getUserByConfirmationCode(code: string) {
     const foundUser = await this.usersSqlRepository.query(

@@ -13,7 +13,6 @@ import { SecurityDevicesQueryRepositoryRepository } from './repositories/mongodb
 import { SecurityDevicesRepository } from './repositories/mongodb/security-devices.repository';
 import { SecurityDevicesService } from './security-devices.service';
 import { LogoutAllDeviceSessionUseCase } from './use-cases/mongodb/logoutAllDeviceSessionUseCase';
-
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(

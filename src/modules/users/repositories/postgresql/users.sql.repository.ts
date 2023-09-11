@@ -3,7 +3,6 @@ import { ModifiedUserDto } from '../../dto/update-users.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../user.entity';
-
 @Injectable()
 export class UsersSqlRepository {
   constructor(
@@ -30,6 +29,13 @@ export class UsersSqlRepository {
       `UPDATE public.users
                 SET confirmation = confirmation  || '{"code":"${pyload['confirmation.code']}", "isConfirm":"${pyload['confirmation.isConfirm']}"}' 
                 WHERE confirmation ->> 'code' = '${code}'`,
+    );
+  }
+  async updateConfirmationCodeByEmail(email: string, uuid: string) {
+    return this.userSqlRepository.query(
+      `UPDATE public.users
+                SET confirmation = confirmation  || '{"code":"${uuid}"}' 
+                WHERE email = '${email}'`,
     );
   }
   deleteUser(userId: string) {

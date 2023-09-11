@@ -4,7 +4,6 @@ import { Users } from '../../users.schema';
 import { Model } from 'mongoose';
 import { ModifiedUserDto } from '../../dto/update-users.dto';
 import { BanUserInfo } from '../../../super-admin/use-cases/banUserUseCase';
-
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(Users.name) private userModel: Model<Users>) {}

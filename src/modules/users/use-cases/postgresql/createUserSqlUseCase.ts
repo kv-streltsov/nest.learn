@@ -6,7 +6,6 @@ import { ModifiedUserDto } from '../../dto/update-users.dto';
 import { UsersSqlRepository } from '../../repositories/postgresql/users.sql.repository';
 import { UsersSqlService } from '../../users.sql.service';
 import { UsersSqlQueryRepository } from '../../repositories/postgresql/users.sql.query.repository';
-
 @Injectable()
 export class CreateUserSqlUseCase {
   constructor(
@@ -42,10 +41,10 @@ export class CreateUserSqlUseCase {
     );
     return {
       createdUser: {
-        id: foundUser[0].id.toString(),
-        login: foundUser[0].login,
-        email: foundUser[0].email,
-        createdAt: foundUser[0].createdAt,
+        id: foundUser.id,
+        login: foundUser.login,
+        email: foundUser.email,
+        createdAt: foundUser.createdAt,
       },
       uuid,
     };

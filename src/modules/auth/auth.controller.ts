@@ -30,6 +30,7 @@ import { RegistrationEmailResendingUseCase } from './use-cases/mongodb/registrat
 import { RegistrationSqlUseCase } from './use-cases/postgresql/registrationSqlUseCase';
 import { LoginSqlUseCase } from './use-cases/postgresql/loginSqlUseCase';
 import { LogoutSqlUseCase } from './use-cases/postgresql/logoutSqlUseCase';
+import { RegistrationEmailResendingSqlUseCase } from './use-cases/postgresql/registrationEmailResendingSqlUseCase';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -39,7 +40,7 @@ export class AuthController {
     private registrationUseCase: RegistrationSqlUseCase,
     private getMeInfoUseCase: GetMeInfoUseCase,
     private confirmationUserUseCase: ConfirmationUserUseCase,
-    private registrationEmailResendingUseCase: RegistrationEmailResendingUseCase,
+    private registrationEmailResendingUseCase: RegistrationEmailResendingSqlUseCase,
   ) {}
 
   @Post(`password-recovery`)

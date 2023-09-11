@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { UsersSqlQueryRepository } from '../../../users/repositories/postgresql/users.sql.query.repository';
 import { UsersQueryRepository } from '../../../users/repositories/mongodb/users.query.repository';
-
 @Injectable()
 export class ValidateUserUseCase {
   constructor(private usersQueryRepository: UsersSqlQueryRepository) {}
@@ -13,10 +12,10 @@ export class ValidateUserUseCase {
     if (foundUser === null) {
       return null;
     }
-    const passwordHash: string = await bcrypt.hash(password, foundUser[0].salt);
-    if (passwordHash !== foundUser[0].password) {
+    const passwordHash: string = await bcrypt.hash(password, foundUser.salt);
+    if (passwordHash !== foundUser.password) {
       return false;
     }
-    return foundUser[0];
+    return foundUser;
   }
 }

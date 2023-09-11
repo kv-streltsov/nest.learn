@@ -90,8 +90,10 @@ import { CreateDeviceSessionSqlUseCase } from './modules/security-devices/use-ca
 import { SecurityDevicesSqlRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.repository';
 import { SecurityDevicesSqlQueryRepository } from './modules/security-devices/repositories/postgresql/security-devices.sql.query.repository';
 import { LogoutSqlUseCase } from './modules/auth/use-cases/postgresql/logoutSqlUseCase';
+import { RegistrationEmailResendingSqlUseCase } from './modules/auth/use-cases/postgresql/registrationEmailResendingSqlUseCase';
 config();
 const useCases = [
+  RegistrationEmailResendingSqlUseCase,
   LogoutSqlUseCase,
   LoginSqlUseCase,
   RegistrationSqlUseCase,

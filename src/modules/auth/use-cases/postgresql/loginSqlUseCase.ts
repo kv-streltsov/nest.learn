@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from '../../auth.service';
 import { CreateDeviceSessionSqlUseCase } from '../../../security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
-
 export type JwrPairDto = {
   accessToken: string;
   refreshToken: string;
