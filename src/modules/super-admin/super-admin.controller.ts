@@ -64,7 +64,7 @@ export class SuperAdminController {
   }
 
   /////////////////////////////////// BLOGS ///////////////////////////////////
-  @Get()
+  @Get(`/blogs`)
   async getAllBlogs(@Query() query: any) {
     return this.blogsQueryRepository.getAllBlogs(
       query?.pageSize && Number(query.pageSize),

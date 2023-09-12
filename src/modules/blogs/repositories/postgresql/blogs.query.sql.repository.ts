@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogsEntity } from '../../blogs.entity';
 import { Repository } from 'typeorm';
+import { SortType } from '../../../users/users.interface';
 
 @Injectable()
 export class BlogsQuerySqlRepository {
@@ -31,31 +32,22 @@ export class BlogsQuerySqlRepository {
     sortDirection: number,
     searchNameTerm: string | null = null,
   ) {
-    const { countItems, sortField } = await this.paginationHandler(
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    );
-    const findNameTerm = searchNameTerm
-      ? { name: { $regex: searchNameTerm, $options: 'i' } }
-      : {};
+    const { countItems, sortDirectionString, searchTerm, count } =
+      await this.paginationHandler(
+        pageNumber,
+        pageSize,
+        searchNameTerm,
+        sortDirection,
+      );
 
-    const count: number = await this.blogSqlRepository
-      .query(
-        `SELECT COUNT(*) 
-                        FROM public.users
-                        ${searchNameTerm}`,
-      )
-      .then((data) => {
-        return parseInt(data[0].count);
-      });
-
-    const blogs = await this.blogSqlRepository.query(
-      `SELECT id, login, email, password, "createdAt", salt, confirmation
-                FROM public.users
-                $1`,
-      [findNameTerm],
+    const foundBlogs = await this.blogSqlRepository.query(
+      `SELECT id, name, description, "websiteUrl", "createdAt","isMembership"
+                FROM public.blogs
+                ${searchTerm}
+                ORDER BY "${sortBy}" ${
+        sortBy === 'createdAt' || sortBy === 'id' ? '' : 'COLLATE "C"'
+      } ${sortDirectionString}
+                LIMIT ${pageSize} OFFSET ${countItems}`,
     );
 
     return {
@@ -63,7 +55,7 @@ export class BlogsQuerySqlRepository {
       page: pageNumber,
       pageSize,
       totalCount: count,
-      items: blogs,
+      items: foundBlogs,
     };
   }
   // async getBlogNameById(blogId: string) {
@@ -85,16 +77,32 @@ export class BlogsQuerySqlRepository {
   private async paginationHandler(
     pageNumber: number,
     pageSize: number,
-    sortBy: string,
-    sortDirection: number,
+    searchNameTerm: string | null,
+    sortDirection,
   ) {
     const countItems = (pageNumber - 1) * pageSize;
-    const sortField: any = {};
-    sortField[sortBy] = sortDirection;
+    const sortDirectionString = SortType[sortDirection];
+
+    let searchTerm: string;
+    !searchNameTerm
+      ? (searchTerm = ``)
+      : (searchTerm = `WHERE name ILIKE '%${searchNameTerm}%'`);
+
+    const count: number = await this.blogSqlRepository
+      .query(
+        `SELECT COUNT(*) 
+                        FROM public.blogs
+                        ${searchTerm}`,
+      )
+      .then((data) => {
+        return parseInt(data[0].count);
+      });
 
     return {
       countItems,
-      sortField,
+      sortDirectionString,
+      searchTerm,
+      count,
     };
   }
 }
