@@ -77,11 +77,6 @@ export class SecurityDevicesSqlRepository {
     return this.securityDevicesModel.query(`DELETE FROM public."securityDevices"
             WHERE "deviceId" = '${deviceId}';`);
   }
-  // async deleteAllDeviceSession(userId: string) {
-  //   return this.securityDevicesModel.deleteMany({
-  //     userId: userId,
-  //   });
-  // }
   async deleteAllDeviceSessionExcludeCurrent(userId: string, deviceId: string) {
     return this.securityDevicesModel.query(
       `DELETE FROM public."securityDevices"

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBlogDto, ICreateBlogModifiedDto } from './dto/create-blog.dto';
-import { BlogsRepository } from './blogs.repository';
+import { BlogsRepository } from './repositories/mongodb/blogs.repository';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -9,6 +9,7 @@ export class BlogsService {
   async createBlog(createBlogDto: CreateBlogDto) {
     const createData = {
       id: randomUUID(),
+      ownerId: null,
       createdAt: new Date().toISOString(),
       isMembership: false,
     };

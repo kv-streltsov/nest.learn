@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Users } from '../../users.schema';
-import { Model } from 'mongoose';
-import { SortBanStatus, SortType } from '../../users.interface';
+import { SortType } from '../../users.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../user.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +8,6 @@ export class UsersSqlQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
 
   constructor(
-    @InjectModel(Users.name) private usersModel: Model<Users>,
     @InjectRepository(UserEntity)
     private readonly usersSqlRepository: Repository<UserEntity>,
   ) {}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blogs } from './blogs.schena';
+import { Blogs } from '../../blogs.schena';
 import { Model } from 'mongoose';
 
 @Injectable()

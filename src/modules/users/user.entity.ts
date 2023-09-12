@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
 @Entity()
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -30,13 +29,13 @@ export class UserEntity {
 //
 // CREATE TABLE IF NOT EXISTS public.users
 // (
-//   id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-// login text COLLATE pg_catalog."default" NOT NULL,
+//   id uuid NOT NULL DEFAULT gen_random_uuid(),
+//   login text COLLATE pg_catalog."default" NOT NULL,
 //   email text COLLATE pg_catalog."default" NOT NULL,
 //   password text COLLATE pg_catalog."default" NOT NULL,
-//   "createdAt" timestamp with time zone NOT NULL,
+//   "createdAt" timestamp without time zone NOT NULL,
+//   confirmation jsonb NOT NULL,
 //   salt text COLLATE pg_catalog."default" NOT NULL,
-//   confirmation json NOT NULL,
 //   CONSTRAINT users_pkey PRIMARY KEY (id)
 // )
 //

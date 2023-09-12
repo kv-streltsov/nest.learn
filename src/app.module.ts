@@ -9,9 +9,9 @@ import { UsersQueryRepository } from './modules/users/repositories/mongodb/users
 import { UsersRepository } from './modules/users/repositories/mongodb/users.repository';
 import { BlogsController } from './modules/blogs/blogs.controller';
 import { BlogsService } from './modules/blogs/blogs.service';
-import { BlogsRepository } from './modules/blogs/blogs.repository';
+import { BlogsRepository } from './modules/blogs/repositories/mongodb/blogs.repository';
 import { Blogs, BlogsSchema } from './modules/blogs/blogs.schena';
-import { BlogsQueryRepository } from './modules/blogs/blogs.query.repository';
+import { BlogsQueryRepository } from './modules/blogs/repositories/mongodb/blogs.query.repository';
 import { PostsController } from './modules/posts/posts.controller';
 import { PostsService } from './modules/posts/posts.service';
 import { PostsRepository } from './modules/posts/posts.repository';
@@ -94,8 +94,17 @@ import { RegistrationEmailResendingSqlUseCase } from './modules/auth/use-cases/p
 import { RefreshTokenSqlUseCase } from './modules/auth/use-cases/postgresql/refreshTokenSqlUseCase';
 import { LogoutAllDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/logoutAllDeviceSessionSqlUseCase';
 import { LogoutDeviceSessionSqlUseCase } from './modules/security-devices/use-cases/postgresql/logoutDeviceSessionSqlUseCase';
+import { BlogsSqlRepository } from './modules/blogs/repositories/postgresql/blogs.sql.repository';
+import { BlogsEntity } from './modules/blogs/blogs.entity';
+import { CreateBlogSaSqlUseCase } from './modules/super-admin/use-cases/createBlogSqlUseCase';
+import { UpdateBlogSaSqlUseCase } from './modules/super-admin/use-cases/updateBlogSqlUseCase';
+import { BlogsQuerySqlRepository } from './modules/blogs/repositories/postgresql/blogs.query.sql.repository';
+import { DeleteBlogSaSqlUseCase } from './modules/super-admin/use-cases/deleteBlogSqlUseCase';
 config();
 const useCases = [
+  DeleteBlogSaSqlUseCase,
+  UpdateBlogSaSqlUseCase,
+  CreateBlogSaSqlUseCase,
   LogoutDeviceSessionSqlUseCase,
   LogoutAllDeviceSessionSqlUseCase,
   RefreshTokenSqlUseCase,
@@ -141,7 +150,7 @@ const useCases = [
       autoLoadEntities: false,
       synchronize: false,
     }),
-    TypeOrmModule.forFeature([UserEntity, SecurityDevicesEntity]),
+    TypeOrmModule.forFeature([UserEntity, SecurityDevicesEntity, BlogsEntity]),
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
@@ -187,6 +196,8 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    BlogsQuerySqlRepository,
+    BlogsSqlRepository,
     SecurityDevicesSqlRepository,
     AppService,
     AuthService,

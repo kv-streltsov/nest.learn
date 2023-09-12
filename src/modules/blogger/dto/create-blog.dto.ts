@@ -40,7 +40,7 @@ export class CreateBlogDto {
 }
 
 export interface ICreateBlogModifiedDto {
-  ownerId: string;
+  ownerId: string | null;
   id: string;
   createdAt: string;
   isMembership: boolean;

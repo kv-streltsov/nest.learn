@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ICreateModifiedPostDto, CreatePostDto } from './dto/create-post.dto';
 import { randomUUID } from 'crypto';
 import { PostsRepository } from './posts.repository';
-import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../blogs/repositories/mongodb/blogs.query.repository';
 
 @Injectable()
 export class PostsService {

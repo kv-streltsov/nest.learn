@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { BlogsService } from './blogs.service';
-import { BlogsQueryRepository } from './blogs.query.repository';
+import { BlogsQueryRepository } from './repositories/mongodb/blogs.query.repository';
 import { SortType } from '../users/users.interface';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { PostsService } from '../posts/posts.service';
@@ -46,11 +46,11 @@ export class BlogsController {
     );
   }
 
-  @UseGuards(AuthGuard)
-  @Post()
-  async createBlog(@Body() creatBlogDto: CreateBlogDto) {
-    return this.blogsService.createBlog(creatBlogDto);
-  }
+  // @UseGuards(AuthGuard)
+  // @Post()
+  // async createBlog(@Body() creatBlogDto: CreateBlogDto) {
+  //   return this.blogsService.createBlog(creatBlogDto);
+  // }
 
   @Get(`:id/posts`)
   async getAllPostsByBlogId(

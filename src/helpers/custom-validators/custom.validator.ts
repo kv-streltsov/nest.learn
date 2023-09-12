@@ -1,4 +1,4 @@
-import { BlogsQueryRepository } from '../../modules/blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../modules/blogs/repositories/mongodb/blogs.query.repository';
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,

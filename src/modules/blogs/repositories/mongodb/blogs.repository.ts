@@ -1,8 +1,8 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Blogs } from './blogs.schena';
+import { Blogs } from '../../blogs.schena';
 import { Injectable } from '@nestjs/common';
-import { CreateBlogDto, ICreateBlogModifiedDto } from './dto/create-blog.dto';
+import { CreateBlogDto, ICreateBlogModifiedDto } from '../../dto/create-blog.dto';
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blogs.name) private blogsModel: Model<Blogs>) {}
