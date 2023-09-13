@@ -75,6 +75,7 @@ export class SuperAdminController {
 
   /////////////////////////////////// BLOGS ///////////////////////////////////
   @Get(`/posts`)
+  @UseGuards(AuthGuard)
   async getAllPosts(@Query() query: any) {
     return this.blogsQueryRepository.getAllBlogs(
       query?.pageSize && Number(query.pageSize),
@@ -86,6 +87,7 @@ export class SuperAdminController {
   }
 
   @Get(`/blogs`)
+  @UseGuards(AuthGuard)
   async getAllBlogs(@Query() query: any) {
     return this.blogsQueryRepository.getAllBlogs(
       query?.pageSize && Number(query.pageSize),

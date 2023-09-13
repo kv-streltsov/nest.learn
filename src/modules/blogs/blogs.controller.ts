@@ -4,15 +4,9 @@ import {
   NotFoundException,
   Param,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from './blogs.service';
-import { BlogsQueryRepository } from './repositories/mongodb/blogs.query.repository';
 import { SortType } from '../users/users.interface';
-import { PostsQueryRepository } from '../posts/repositories/mongodb/posts.query.repository';
-import { PostsService } from '../posts/posts.service';
-import { LikesQueryRepository } from '../likes/likes.query.repository';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { BlogsQuerySqlRepository } from './repositories/postgresql/blogs.query.sql.repository';
 import { PostsQuerySqlRepository } from '../posts/repositories/postgresql/posts.query.sql.repository';
@@ -37,13 +31,25 @@ export class BlogsController {
 
   @Get(`:id/posts`)
   async getAllPostsByBlogId(@Param(`id`) blogId: string, @Query() query: any) {
-    return this.postsQueryRepository.getAllPostsByBlogId(
+    const foundPost = await this.postsQueryRepository.getAllPostsByBlogId(
       blogId,
       query?.pageNumber && Number(query.pageNumber),
       query?.pageSize && Number(query.pageSize),
       query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
       query?.sortBy && query.sortBy,
     );
+    const postsWithLikeInfo = foundPost.items.map((post) => {
+      post.extendedLikesInfo = {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      };
+
+      return post;
+    });
+    foundPost.items = postsWithLikeInfo;
+    return foundPost;
   }
 
   @Get(`:id`)

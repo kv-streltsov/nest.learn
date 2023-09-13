@@ -27,51 +27,35 @@ export class PostsQuerySqlRepository {
         WHERE id = $1`,
       [postId],
     );
-
-    if (!foundPost) return null;
+    if (!foundPost.length) return null;
     return foundPost[0];
   }
-  // async getAllPosts(
-  //   pageNumber = 1,
-  //   pageSize = 10,
-  //   sortDirection: number,
-  //   sortBy: string = this.DEFAULT_SORT_FIELD,
-  //   searchNameTerm: string | null = null,
-  // ) {
-  //   const { countItems, sortField } = this.paginationHandler(
-  //     pageNumber,
-  //     pageSize,
-  //     sortBy,
-  //     sortDirection,
-  //   );
-  //
-  //   const findNameTerm = searchNameTerm
-  //     ? { name: { $regex: searchNameTerm, $options: 'i' } }
-  //     : {};
-  //
-  //   const posts = await this.postsModel
-  //     .find(findNameTerm)
-  //     .select(this.PROJECTION)
-  //     .sort(sortField)
-  //     .skip(countItems)
-  //     .limit(pageSize)
-  //     .lean();
-  //
-  //   const filteredPosts = await Promise.all(
-  //     posts.map(async (post) => {
-  //       return await this.banFilter(post);
-  //     }),
-  //   );
-  //   const count: number = filteredPosts.filter(Boolean).length;
-  //
-  //   return {
-  //     pagesCount: Math.ceil(count / pageSize),
-  //     page: pageNumber,
-  //     pageSize,
-  //     totalCount: count,
-  //     items: filteredPosts.filter(Boolean),
-  //   };
-  // }
+  async getAllPosts(
+    pageSize = 10,
+    pageNumber = 1,
+    sortBy: string = this.DEFAULT_SORT_FIELD,
+    sortDirection: number,
+  ) {
+    const { countItems, sortDirectionString, count } =
+      await this.paginationHandler(pageNumber, pageSize, sortDirection, null);
+
+    const foundPosts = await this.postSqlRepository.query(
+      `SELECT *
+                FROM public.posts
+                ORDER BY "${sortBy}" ${
+        sortBy === 'createdAt' || sortBy === 'id' ? '' : 'COLLATE "C"'
+      } ${sortDirectionString}
+                LIMIT ${pageSize} OFFSET ${countItems}`,
+    );
+
+    return {
+      pagesCount: Math.ceil(count / pageSize),
+      page: pageNumber,
+      pageSize,
+      totalCount: count,
+      items: foundPosts,
+    };
+  }
   async getAllPostsByBlogId(
     blogId: string,
     pageNumber = 1,
@@ -110,16 +94,21 @@ export class PostsQuerySqlRepository {
     pageNumber: number,
     pageSize: number,
     sortDirection: number,
-    blogId: string,
+    blogId: string | null,
   ) {
     const countItems = (pageNumber - 1) * pageSize;
     const sortDirectionString = SortType[sortDirection];
+
+    let whereTerm = '';
+    blogId === null
+      ? (whereTerm = '')
+      : (whereTerm = `WHERE "blogId" = '${blogId}'`);
 
     const count: number = await this.postSqlRepository
       .query(
         `SELECT COUNT(*) 
                  FROM public.posts
-                 WHERE "blogId" = '${blogId}'`,
+                 ${whereTerm}`,
       )
       .then((data) => {
         return parseInt(data[0].count);

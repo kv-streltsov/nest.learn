@@ -14,7 +14,7 @@ export class BlogsQuerySqlRepository {
   ) {}
   async getBlogById(blogId: string) {
     const foundBlog = await this.blogSqlRepository.query(
-      `SELECT id, "ownerId", name, description, "websiteUrl", "isMembership", "createdAt"
+      `SELECT id, name, description, "websiteUrl", "isMembership", "createdAt"
                 FROM public.blogs
                 WHERE id = $1`,
       [blogId],

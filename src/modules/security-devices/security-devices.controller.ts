@@ -9,10 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RefreshTokenGuard } from '../auth/strategies/refreshToken.guard';
-import { SecurityDevicesQueryRepositoryRepository } from './repositories/mongodb/security-devices.query.repository';
-import { SecurityDevicesRepository } from './repositories/mongodb/security-devices.repository';
 import { SecurityDevicesService } from './security-devices.service';
-import { LogoutAllDeviceSessionUseCase } from './use-cases/mongodb/logoutAllDeviceSessionUseCase';
 import { SecurityDevicesSqlQueryRepository } from './repositories/postgresql/security-devices.sql.query.repository';
 import { LogoutAllDeviceSessionSqlUseCase } from './use-cases/postgresql/logoutAllDeviceSessionSqlUseCase';
 import { LogoutDeviceSessionSqlUseCase } from './use-cases/postgresql/logoutDeviceSessionSqlUseCase';
@@ -21,7 +18,6 @@ export class SecurityDevicesController {
   constructor(
     private securityDevicesQueryRepositoryRepository: SecurityDevicesSqlQueryRepository,
     private logoutDeviceSessionSqlUseCase: LogoutDeviceSessionSqlUseCase,
-    private securityDevicesService: SecurityDevicesService,
     private logoutAllDeviceSessionUseCase: LogoutAllDeviceSessionSqlUseCase,
   ) {}
 

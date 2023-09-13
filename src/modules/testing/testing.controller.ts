@@ -11,14 +11,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../users/user.entity';
 import { Repository } from 'typeorm';
 import { SecurityDevicesEntity } from '../security-devices/security-devices.entity';
-
+import { BlogsEntity } from '../blogs/blogs.entity';
+import { PostsEntity } from '../posts/posts.entity';
 @Controller('testing')
 export class TestingController {
   constructor(
+    ///// POSTGRESQL
+    @InjectRepository(PostsEntity)
+    private readonly postsDevicesSqlModel: Repository<PostsEntity>,
+
+    @InjectRepository(BlogsEntity)
+    private readonly blogsDevicesSqlModel: Repository<BlogsEntity>,
+
     @InjectRepository(SecurityDevicesEntity)
     private readonly securityDevicesSqlModel: Repository<SecurityDevicesEntity>,
+
     @InjectRepository(UserEntity)
     private readonly usersSqlRepository: Repository<UserEntity>,
+
+    ///// MONGODB
     @InjectModel(Blogs.name) private blogsModel: Model<Blogs>,
     @InjectModel(Comments.name) private commentsModel: Model<Comments>,
     @InjectModel(Posts.name) private postsModel: Model<Posts>,
@@ -38,10 +49,13 @@ export class TestingController {
     await this.likesModel.deleteMany({});
     await this.securityDevicesModel.deleteMany({});
 
+    await this.usersSqlRepository.query(`DELETE FROM public.users`);
     await this.securityDevicesSqlModel.query(
       `DELETE FROM public."securityDevices"`,
     );
-    await this.usersSqlRepository.query(`DELETE FROM public.users`);
+    await this.postsDevicesSqlModel.query(`DELETE FROM public.posts`);
+    await this.blogsDevicesSqlModel.query(`DELETE FROM public.blogs`);
+
     return;
   }
 }
