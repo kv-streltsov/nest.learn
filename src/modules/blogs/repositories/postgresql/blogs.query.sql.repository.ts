@@ -1,7 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blogs } from '../../blogs.schena';
-import { Model } from 'mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlogsEntity } from '../../blogs.entity';
 import { Repository } from 'typeorm';
@@ -58,22 +55,7 @@ export class BlogsQuerySqlRepository {
       items: foundBlogs,
     };
   }
-  // async getBlogNameById(blogId: string) {
-  //   const foundNameBlog = await this.blogsModel.findOne({ id: blogId }).select({
-  //     _id: 0,
-  //     id: 0,
-  //     description: 0,
-  //     createdAt: 0,
-  //     isMembership: 0,
-  //     __v: 0,
-  //     websiteUrl: 0,
-  //   });
-  //   if (foundNameBlog === null) {
-  //     return null;
-  //   }
-  //   return foundNameBlog.name;
-  // }
-  //
+
   private async paginationHandler(
     pageNumber: number,
     pageSize: number,

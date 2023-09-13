@@ -8,7 +8,7 @@ import {
   CreatePostInBlogDto,
 } from '../../posts/dto/create-post.dto';
 import { BloggerQueryRepository } from '../blogger.query.repository';
-import { PostsRepository } from '../../posts/posts.repository';
+import { PostsRepository } from '../../posts/repositories/mongodb/posts.repository';
 
 @Injectable()
 export class UpdatePostByBlogIdUseCase {

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CommentInputDto } from './dto/create-comment.dto';
-import { PostsQueryRepository } from '../posts/posts.query.repository';
+import { PostsQueryRepository } from '../posts/repositories/mongodb/posts.query.repository';
 import { CommentsRepository } from './comments.repository';
 import { LikesQueryRepository } from '../likes/likes.query.repository';
 import { randomUUID } from 'crypto';

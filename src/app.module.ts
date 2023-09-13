@@ -14,9 +14,9 @@ import { Blogs, BlogsSchema } from './modules/blogs/blogs.schena';
 import { BlogsQueryRepository } from './modules/blogs/repositories/mongodb/blogs.query.repository';
 import { PostsController } from './modules/posts/posts.controller';
 import { PostsService } from './modules/posts/posts.service';
-import { PostsRepository } from './modules/posts/posts.repository';
+import { PostsRepository } from './modules/posts/repositories/mongodb/posts.repository';
 import { Posts, PostsSchema } from './modules/posts/posts.schena';
-import { PostsQueryRepository } from './modules/posts/posts.query.repository';
+import { PostsQueryRepository } from './modules/posts/repositories/mongodb/posts.query.repository';
 import { CommentsController } from './modules/comments/comments.controller';
 import { CommentsService } from './modules/comments/comments.service';
 import { CommentsRepository } from './modules/comments/comments.repository';
@@ -100,8 +100,17 @@ import { CreateBlogSaSqlUseCase } from './modules/super-admin/use-cases/createBl
 import { UpdateBlogSaSqlUseCase } from './modules/super-admin/use-cases/updateBlogSqlUseCase';
 import { BlogsQuerySqlRepository } from './modules/blogs/repositories/postgresql/blogs.query.sql.repository';
 import { DeleteBlogSaSqlUseCase } from './modules/super-admin/use-cases/deleteBlogSqlUseCase';
+import { PostsSqlRepository } from './modules/posts/repositories/postgresql/posts.sql.repository';
+import { PostsQuerySqlRepository } from './modules/posts/repositories/postgresql/posts.query.sql.repository';
+import { CreatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/createPostByBlogIdSqlUseCase';
+import { PostsEntity } from './modules/posts/posts.entity';
+import { UpdatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/updatePostByBlogIdSqlUseCase';
+import { DeletePostByIdSqlUseCase } from './modules/super-admin/use-cases/deletePostByIdSqlUseCase';
 config();
 const useCases = [
+  DeletePostByIdSqlUseCase,
+  UpdatePostByBlogIdSqlUseCase,
+  CreatePostByBlogIdSqlUseCase,
   DeleteBlogSaSqlUseCase,
   UpdateBlogSaSqlUseCase,
   CreateBlogSaSqlUseCase,
@@ -150,7 +159,12 @@ const useCases = [
       autoLoadEntities: false,
       synchronize: false,
     }),
-    TypeOrmModule.forFeature([UserEntity, SecurityDevicesEntity, BlogsEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      SecurityDevicesEntity,
+      BlogsEntity,
+      PostsEntity,
+    ]),
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
@@ -196,6 +210,8 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    PostsSqlRepository,
+    PostsQuerySqlRepository,
     BlogsQuerySqlRepository,
     BlogsSqlRepository,
     SecurityDevicesSqlRepository,

@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
-import { PostsQueryRepository } from './posts.query.repository';
+import { PostsQueryRepository } from './repositories/mongodb/posts.query.repository';
 import { SortType } from '../users/users.interface';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { LikesQueryRepository } from '../likes/likes.query.repository';

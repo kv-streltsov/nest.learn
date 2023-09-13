@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { LikeStatusEnum } from './dto/create-like.dto';
-import { PostsQueryRepository } from '../posts/posts.query.repository';
+import { PostsQueryRepository } from '../posts/repositories/mongodb/posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 import { LikesQueryRepository } from './likes.query.repository';
 import { isLogLevelEnabled } from '@nestjs/common/services/utils';

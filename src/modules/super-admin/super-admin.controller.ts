@@ -5,11 +5,11 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../helpers/auth.guard';
@@ -23,6 +23,12 @@ import { CreateBlogSaSqlUseCase } from './use-cases/createBlogSqlUseCase';
 import { UpdateBlogSaSqlUseCase } from './use-cases/updateBlogSqlUseCase';
 import { DeleteBlogSaSqlUseCase } from './use-cases/deleteBlogSqlUseCase';
 import { BlogsQuerySqlRepository } from '../blogs/repositories/postgresql/blogs.query.sql.repository';
+import { CreatePostInBlogDto } from '../posts/dto/create-post.dto';
+import { CreatePostByBlogIdSqlUseCase } from './use-cases/createPostByBlogIdSqlUseCase';
+import { UpdatePostByBlogIdSqlUseCase } from './use-cases/updatePostByBlogIdSqlUseCase';
+import { DeletePostByIdSqlUseCase } from './use-cases/deletePostByIdSqlUseCase';
+import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
+import { PostsQuerySqlRepository } from '../posts/repositories/postgresql/posts.query.sql.repository';
 @Controller('sa')
 export class SuperAdminController {
   constructor(
@@ -33,6 +39,10 @@ export class SuperAdminController {
     private usersSqlQueryRepository: UsersSqlQueryRepository,
     private updateBlogSaSqlUseCase: UpdateBlogSaSqlUseCase,
     private deleteBlogSaSqlUseCase: DeleteBlogSaSqlUseCase,
+    private createPostByBlogIdSqlUseCase: CreatePostByBlogIdSqlUseCase,
+    private updatePostByBlogIdUseCase: UpdatePostByBlogIdSqlUseCase,
+    private deletePostByIdSqlUseCase: DeletePostByIdSqlUseCase,
+    private postsQueryRepository: PostsQuerySqlRepository,
   ) {}
 
   /////////////////////////////////// USERS ///////////////////////////////////
@@ -64,6 +74,17 @@ export class SuperAdminController {
   }
 
   /////////////////////////////////// BLOGS ///////////////////////////////////
+  @Get(`/posts`)
+  async getAllPosts(@Query() query: any) {
+    return this.blogsQueryRepository.getAllBlogs(
+      query?.pageSize && Number(query.pageSize),
+      query?.pageNumber && Number(query.pageNumber),
+      query?.sortBy && query.sortBy,
+      query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+      query?.searchNameTerm && query.searchNameTerm,
+    );
+  }
+
   @Get(`/blogs`)
   async getAllBlogs(@Query() query: any) {
     return this.blogsQueryRepository.getAllBlogs(
@@ -96,5 +117,56 @@ export class SuperAdminController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param(`id`) blogId: string) {
     return await this.deleteBlogSaSqlUseCase.execute(blogId);
+  }
+
+  /////////////////////////////////// POSTS ///////////////////////////////////
+
+  @Get(`/blogs/:id/posts`)
+  @UseGuards(AuthGuard)
+  async getAllPostsByBlogId(@Param(`id`) blogId: string, @Query() query: any) {
+    return await this.postsQueryRepository.getAllPostsByBlogId(
+      blogId,
+      query?.pageNumber && Number(query.pageNumber),
+      query?.pageSize && Number(query.pageSize),
+      query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+      query?.sortBy && query.sortBy,
+    );
+  }
+
+  @Post(`/blogs/:id/posts`)
+  @UseGuards(AuthGuard)
+  async createPostByBlogId(
+    @Param(`id`) blogId: string,
+    @Body() createPostInBlogDto: CreatePostInBlogDto,
+  ) {
+    return this.createPostByBlogIdSqlUseCase.execute(
+      blogId,
+      createPostInBlogDto,
+    );
+  }
+
+  @Put(`/blogs/:blogId/posts/:postId`)
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param(`blogId`) blogId: string,
+    @Param(`postId`) postId: string,
+    @Body() updatePostDto: CreatePostInBlogDto,
+  ) {
+    return await this.updatePostByBlogIdUseCase.execute(
+      blogId,
+      postId,
+      updatePostDto,
+    );
+  }
+
+  @Delete(`/blogs/:blogId/posts/:postId`)
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostById(
+    @Param(`blogId`) blogId: string,
+    @Param(`postId`) postId: string,
+  ) {
+    return await this.deletePostByIdSqlUseCase.execute(blogId, postId);
   }
 }

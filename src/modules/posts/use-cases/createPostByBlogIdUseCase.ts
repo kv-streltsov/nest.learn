@@ -6,7 +6,7 @@ import {
 import { randomUUID } from 'crypto';
 import { CreatePostDto, ICreateModifiedPostDto } from '../dto/create-post.dto';
 import { BloggerQueryRepository } from '../../blogger/blogger.query.repository';
-import { PostsRepository } from '../posts.repository';
+import { PostsRepository } from '../repositories/mongodb/posts.repository';
 
 @Injectable()
 export class CreatePostByBlogIdUseCase {

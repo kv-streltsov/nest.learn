@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersQueryRepository } from '../users/repositories/mongodb/users.query.repository';
 import { Blogs } from '../blogs/blogs.schena';
-
 @Injectable()
 export class BloggerQueryRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
