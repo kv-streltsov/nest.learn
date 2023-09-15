@@ -21,21 +21,18 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { LoginUseCase } from './use-cases/mongodb/loginUseCase';
 import { RefreshTokenUseCase } from './use-cases/mongodb/refreshTokenUseCase';
-import { LogoutUseCase } from './use-cases/mongodb/logoutUseCase';
 import { GetMeInfoUseCase } from './use-cases/mongodb/getMeInfoUseCase';
 import { ConfirmationUserUseCase } from './use-cases/mongodb/confirmationUseCase';
-import { RegistrationEmailResendingUseCase } from './use-cases/mongodb/registrationEmailResendingUseCase';
 import { RegistrationSqlUseCase } from './use-cases/postgresql/registrationSqlUseCase';
-import { LoginSqlUseCase } from './use-cases/postgresql/loginSqlUseCase';
-import { LogoutSqlUseCase } from './use-cases/postgresql/logoutSqlUseCase';
+import { LoginSqlUseCaseCommand } from './use-cases/postgresql/loginSqlUseCase';
+import { LogoutSqlUseCaseCommand } from './use-cases/postgresql/logoutSqlUseCase';
 import { RegistrationEmailResendingSqlUseCase } from './use-cases/postgresql/registrationEmailResendingSqlUseCase';
+import { CommandBus } from '@nestjs/cqrs';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private loginUseCase: LoginSqlUseCase,
-    private logoutUseCase: LogoutSqlUseCase,
+    private commandBus: CommandBus,
     private refreshTokenUseCase: RefreshTokenUseCase,
     private registrationUseCase: RegistrationSqlUseCase,
     private getMeInfoUseCase: GetMeInfoUseCase,
@@ -67,9 +64,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Request() request: any,
   ) {
-    const jwtPair: JwrPairDto = await this.loginUseCase.execute(
-      request,
-      response,
+    const jwtPair: JwrPairDto = await this.commandBus.execute(
+      new LoginSqlUseCaseCommand(request, response),
     );
 
     return {
@@ -123,7 +119,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Request() request: any) {
-    return this.logoutUseCase.execute(request.user);
+    return this.commandBus.execute(new LogoutSqlUseCaseCommand(request.user));
   }
 
   @Get(`me`)

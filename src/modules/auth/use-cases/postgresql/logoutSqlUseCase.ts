@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
 import { SecurityDevicesSqlRepository } from '../../../security-devices/repositories/postgresql/security-devices.sql.repository';
+import { CommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
+export class LogoutSqlUseCaseCommand {
+  constructor(public user: any) {}
+}
+@CommandHandler(LogoutSqlUseCaseCommand)
 export class LogoutSqlUseCase {
   constructor(
     private logoutDeviceSessionUseCase: SecurityDevicesSqlRepository,
   ) {}
-  async execute(user: any) {
-    return this.logoutDeviceSessionUseCase.deleteDeviceSession(user);
+  async execute(command: LogoutSqlUseCaseCommand) {
+    return this.logoutDeviceSessionUseCase.deleteDeviceSession(command.user);
   }
 }
