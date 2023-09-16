@@ -42,4 +42,4 @@ export class UserEntity {
 // TABLESPACE pg_default;
 //
 // ALTER TABLE IF EXISTS public.users
-// OWNER to postgres;
+// OWNER to postgresql;

@@ -17,7 +17,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './repositories/mongodb/posts.query.repository';
 import { SortType } from '../users/users.interface';
-import { CommentsQueryRepository } from '../comments/comments.query.repository';
+import { CommentsQueryRepository } from '../comments/repositories/mongodb/comments.query.repository';
 import { LikesQueryRepository } from '../likes/likes.query.repository';
 import { AuthGuard } from '../../helpers/auth.guard';
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
@@ -26,12 +26,15 @@ import { LikesService } from '../likes/likes.service';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CommentInputDto } from '../comments/dto/create-comment.dto';
 import { CommentsService } from '../comments/comments.service';
-import { DeletePostByIdUseCase } from './use-cases/delete-post-by-id-use-case.service';
+import { DeletePostByIdUseCase } from './use-cases/mongodb/delete-post-by-id-use-case.service';
 import { PostsQuerySqlRepository } from './repositories/postgresql/posts.query.sql.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateCommentInPostSqlUseCaseCommand } from '../comments/use-cases/postgresql/createCommentInPostSqlUseCase';
 @UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
   constructor(
+    private commandBus: CommandBus,
     private postsService: PostsService,
     private postsQueryRepository: PostsQuerySqlRepository,
     private commentsQueryRepository: CommentsQueryRepository,
@@ -86,6 +89,22 @@ export class PostsController {
     );
     return foundPosts;
   }
+
+  @Post(`/:id/comments`)
+  @UseGuards(AccessTokenGuard)
+  async createCommentByPostId(
+    @Param(`id`) postId: string,
+    @Body() commentDto: CommentInputDto,
+    @Request() request,
+  ) {
+    return this.commandBus.execute(
+      new CreateCommentInPostSqlUseCaseCommand(
+        commentDto,
+        postId,
+        request.user,
+      ),
+    );
+  }
   //
   // @Get(`:id/comments`)
   // async getCommentsByPostId(
@@ -117,59 +136,6 @@ export class PostsController {
   //     }),
   //   );
   //   return foundComments;
-  // }
-
-  //
-  // @Post()
-  // @UseGuards(AuthGuard)
-  // async createPost(@Body() createPostDto: CreatePostDto) {
-  //   const createdPost = await this.postsService.createPost(createPostDto);
-  //   const extendedLikesInfo =
-  //     await this.likesQueryRepository.getExtendedLikesInfo(
-  //       createdPost.id,
-  //       null,
-  //     );
-  //
-  //   return {
-  //     ...createdPost,
-  //     extendedLikesInfo,
-  //   };
-  // }
-  //
-  // @Post(`:id/comments`)
-  // @UseGuards(AccessTokenGuard)
-  // async createCommentInPost(
-  //   @Param(`id`) postId: string,
-  //   @Body() commentInputDto: CommentInputDto,
-  //   @Request() request: any,
-  // ) {
-  //   //TODO: не могу перенести логику поиска блога в сервис
-  //   const foundPost = await this.postsQueryRepository.getPostById(postId);
-  //   if (foundPost === null) {
-  //     throw new NotFoundException('Post not found');
-  //   }
-  //   return this.commentsService.createCommentInPost(
-  //     commentInputDto,
-  //     postId,
-  //     request.user,
-  //   );
-  // }
-
-  // @Put(`:id`)
-  // @UseGuards(AuthGuard)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async updatePost(
-  //   @Body() updatePostDto: CreatePostDto,
-  //   @Param(`id`) postId: string,
-  // ) {
-  //   const updatedPost = await this.postsService.updatePost(
-  //     postId,
-  //     updatePostDto,
-  //   );
-  //   if (!updatedPost) {
-  //     throw new NotFoundException('post not found');
-  //   }
-  //   return;
   // }
 
   // @Put(`:postId/like-status`)

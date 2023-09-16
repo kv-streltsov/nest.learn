@@ -19,15 +19,15 @@ import { Posts, PostsSchema } from './modules/posts/posts.schena';
 import { PostsQueryRepository } from './modules/posts/repositories/mongodb/posts.query.repository';
 import { CommentsController } from './modules/comments/comments.controller';
 import { CommentsService } from './modules/comments/comments.service';
-import { CommentsRepository } from './modules/comments/comments.repository';
-import { CommentsQueryRepository } from './modules/comments/comments.query.repository';
+import { CommentsRepository } from './modules/comments/repositories/mongodb/comments.repository';
+import { CommentsQueryRepository } from './modules/comments/repositories/mongodb/comments.query.repository';
 import { Comments, CommentsSchema } from './modules/comments/comments.schena';
 import { TestingController } from './modules/testing/testing.controller';
 import { Likes, LikesSchema } from './modules/likes/likes.schena';
 import { LikesQueryRepository } from './modules/likes/likes.query.repository';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './modules/auth/auth.controller';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import {
   SecurityDevices,
   SecurityDevicesSchema,
@@ -68,9 +68,9 @@ import { BloggerQueryRepository } from './modules/blogger/blogger.query.reposito
 import { BloggerService } from './modules/blogger/blogger.service';
 import { UpdateBlogUseCase } from './modules/blogger/use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './modules/blogger/use-cases/deleteBlogUseCase';
-import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/createPostByBlogIdUseCase';
+import { CreatePostByBlogIdUseCase } from './modules/posts/use-cases/mongodb/createPostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './modules/blogger/use-cases/updatePostByBlogIdUseCase';
-import { DeletePostByIdUseCase } from './modules/posts/use-cases/delete-post-by-id-use-case.service';
+import { DeletePostByIdUseCase } from './modules/posts/use-cases/mongodb/delete-post-by-id-use-case.service';
 import { SuperAdminController } from './modules/super-admin/super-admin.controller';
 import { BindBlogWithUserUseCase } from './modules/super-admin/use-cases/bindBlogWithUserUseCase';
 import { CreateUserUseCase } from './modules/users/use-cases/mongodb/createUserUseCase';
@@ -106,8 +106,20 @@ import { CreatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/cr
 import { PostsEntity } from './modules/posts/posts.entity';
 import { UpdatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/updatePostByBlogIdSqlUseCase';
 import { DeletePostByIdSqlUseCase } from './modules/super-admin/use-cases/deletePostByIdSqlUseCase';
+import {
+  ConfirmationUserSqlUseCase,
+  ConfirmationUserSqlUseCaseCommand,
+} from './modules/auth/use-cases/postgresql/confirmationSqlUseCase';
+import { GetMeInfoUseSqlCase } from './modules/auth/use-cases/postgresql/getMeInfoSqlUseCase';
+import { CommentsEntity } from './modules/comments/comments.entity';
+import { CreateCommentInPostSqlUseCase } from './modules/comments/use-cases/postgresql/createCommentInPostSqlUseCase';
+import { CommentsSqlRepository } from './modules/comments/repositories/postgresql/comments.sql.repository';
+import { LikesEntity } from './modules/likes/likes.entity';
 config();
 const useCases = [
+  CreateCommentInPostSqlUseCase,
+  GetMeInfoUseSqlCase,
+  ConfirmationUserSqlUseCase,
   DeletePostByIdSqlUseCase,
   UpdatePostByBlogIdSqlUseCase,
   CreatePostByBlogIdSqlUseCase,
@@ -164,6 +176,8 @@ const useCases = [
       SecurityDevicesEntity,
       BlogsEntity,
       PostsEntity,
+      CommentsEntity,
+      LikesEntity,
     ]),
     CqrsModule,
     ThrottlerModule.forRoot({
@@ -210,6 +224,7 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    CommentsSqlRepository,
     PostsSqlRepository,
     PostsQuerySqlRepository,
     BlogsQuerySqlRepository,

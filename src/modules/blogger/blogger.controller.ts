@@ -23,9 +23,9 @@ import { CreateBlogUseCase } from './use-cases/createBlogUseCase';
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
 import { UpdateBlogUseCase } from './use-cases/updateBlogUseCase';
 import { DeleteBlogUseCase } from './use-cases/deleteBlogUseCase';
-import { CreatePostByBlogIdUseCase } from '../posts/use-cases/createPostByBlogIdUseCase';
+import { CreatePostByBlogIdUseCase } from '../posts/use-cases/mongodb/createPostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './use-cases/updatePostByBlogIdUseCase';
-import { DeletePostByIdUseCase } from '../posts/use-cases/delete-post-by-id-use-case.service';
+import { DeletePostByIdUseCase } from '../posts/use-cases/mongodb/delete-post-by-id-use-case.service';
 @UseGuards(AuthGlobalGuard)
 @Controller('blogger/blogs')
 export class BloggerController {

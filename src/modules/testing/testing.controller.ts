@@ -13,21 +13,24 @@ import { Repository } from 'typeorm';
 import { SecurityDevicesEntity } from '../security-devices/security-devices.entity';
 import { BlogsEntity } from '../blogs/blogs.entity';
 import { PostsEntity } from '../posts/posts.entity';
+import { CommentsEntity } from '../comments/comments.entity';
+import { LikesEntity } from '../likes/likes.entity';
 @Controller('testing')
 export class TestingController {
   constructor(
     ///// POSTGRESQL
     @InjectRepository(PostsEntity)
-    private readonly postsDevicesSqlModel: Repository<PostsEntity>,
-
+    private readonly postsDevicesSqlRepository: Repository<PostsEntity>,
     @InjectRepository(BlogsEntity)
-    private readonly blogsDevicesSqlModel: Repository<BlogsEntity>,
-
+    private readonly blogsDevicesSqlRepository: Repository<BlogsEntity>,
     @InjectRepository(SecurityDevicesEntity)
-    private readonly securityDevicesSqlModel: Repository<SecurityDevicesEntity>,
-
+    private readonly securityDevicesSqlRepository: Repository<SecurityDevicesEntity>,
     @InjectRepository(UserEntity)
     private readonly usersSqlRepository: Repository<UserEntity>,
+    @InjectRepository(CommentsEntity)
+    private readonly commentsSqlRepository: Repository<CommentsEntity>,
+    @InjectRepository(LikesEntity)
+    private readonly likesSqlRepository: Repository<LikesEntity>,
 
     ///// MONGODB
     @InjectModel(Blogs.name) private blogsModel: Model<Blogs>,
@@ -49,12 +52,14 @@ export class TestingController {
     await this.likesModel.deleteMany({});
     await this.securityDevicesModel.deleteMany({});
 
-    await this.usersSqlRepository.query(`DELETE FROM public.users`);
-    await this.securityDevicesSqlModel.query(
+    await this.securityDevicesSqlRepository.query(
       `DELETE FROM public."securityDevices"`,
     );
-    await this.postsDevicesSqlModel.query(`DELETE FROM public.posts`);
-    await this.blogsDevicesSqlModel.query(`DELETE FROM public.blogs`);
+    await this.usersSqlRepository.query(`DELETE FROM public.users`);
+    await this.postsDevicesSqlRepository.query(`DELETE FROM public.posts`);
+    await this.blogsDevicesSqlRepository.query(`DELETE FROM public.blogs`);
+    await this.commentsSqlRepository.query(`DELETE FROM public.comments`);
+    await this.likesSqlRepository.query(`DELETE FROM public.likes`);
 
     return;
   }

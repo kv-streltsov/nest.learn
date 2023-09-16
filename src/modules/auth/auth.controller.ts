@@ -21,24 +21,17 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwrPairDto } from './auth.service';
 import { RefreshTokenGuard } from './strategies/refreshToken.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { RefreshTokenUseCase } from './use-cases/mongodb/refreshTokenUseCase';
-import { GetMeInfoUseCase } from './use-cases/mongodb/getMeInfoUseCase';
-import { ConfirmationUserUseCase } from './use-cases/mongodb/confirmationUseCase';
-import { RegistrationSqlUseCase } from './use-cases/postgresql/registrationSqlUseCase';
+import { RegistrationSqlUseCaseCommand } from './use-cases/postgresql/registrationSqlUseCase';
 import { LoginSqlUseCaseCommand } from './use-cases/postgresql/loginSqlUseCase';
 import { LogoutSqlUseCaseCommand } from './use-cases/postgresql/logoutSqlUseCase';
-import { RegistrationEmailResendingSqlUseCase } from './use-cases/postgresql/registrationEmailResendingSqlUseCase';
+import { RegistrationEmailResendingSqlUseCaseCommand } from './use-cases/postgresql/registrationEmailResendingSqlUseCase';
 import { CommandBus } from '@nestjs/cqrs';
+import { RefreshTokenSqlUseCaseCommand } from './use-cases/postgresql/refreshTokenSqlUseCase';
+import { ConfirmationUserSqlUseCaseCommand } from './use-cases/postgresql/confirmationSqlUseCase';
+import { GetMeInfoUseSqlCaseCommand } from './use-cases/postgresql/getMeInfoSqlUseCase';
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private commandBus: CommandBus,
-    private refreshTokenUseCase: RefreshTokenUseCase,
-    private registrationUseCase: RegistrationSqlUseCase,
-    private getMeInfoUseCase: GetMeInfoUseCase,
-    private confirmationUserUseCase: ConfirmationUserUseCase,
-    private registrationEmailResendingUseCase: RegistrationEmailResendingSqlUseCase,
-  ) {}
+  constructor(private commandBus: CommandBus) {}
 
   @Post(`password-recovery`)
   @UseGuards(ThrottlerGuard)
@@ -80,7 +73,9 @@ export class AuthController {
     @Request() request: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return this.refreshTokenUseCase.execute(request, response);
+    return this.commandBus.execute(
+      new RefreshTokenSqlUseCaseCommand(request, response),
+    );
   }
 
   @Post(`registration-confirmation`)
@@ -90,17 +85,20 @@ export class AuthController {
     @Body()
     registrationConfirmationCodeDto: RegistrationConfirmationCodeDto,
   ) {
-    await this.confirmationUserUseCase.execute(
-      registrationConfirmationCodeDto.code,
+    return this.commandBus.execute(
+      new ConfirmationUserSqlUseCaseCommand(
+        registrationConfirmationCodeDto.code,
+      ),
     );
-    return registrationConfirmationCodeDto;
   }
 
   @Post(`registration`)
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() userRegistrationDto: UserRegistrationDto) {
-    return this.registrationUseCase.execute(userRegistrationDto);
+    return this.commandBus.execute(
+      new RegistrationSqlUseCaseCommand(userRegistrationDto),
+    );
   }
 
   @Post(`registration-email-resending`)
@@ -110,8 +108,10 @@ export class AuthController {
     @Body()
     registrationEmailResendingDto: RegistrationEmailResendingDto,
   ) {
-    return await this.registrationEmailResendingUseCase.execute(
-      registrationEmailResendingDto.email,
+    return await this.commandBus.execute(
+      new RegistrationEmailResendingSqlUseCaseCommand(
+        registrationEmailResendingDto.email,
+      ),
     );
   }
 
@@ -126,6 +126,8 @@ export class AuthController {
   @UseGuards(AuthGuard(`jwt`))
   @HttpCode(HttpStatus.OK)
   async me(@Request() request: any) {
-    return await this.getMeInfoUseCase.execute(request.user.userId);
+    return await this.commandBus.execute(
+      new GetMeInfoUseSqlCaseCommand(request.user.userId),
+    );
   }
 }

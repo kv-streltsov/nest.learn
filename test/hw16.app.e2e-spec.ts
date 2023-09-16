@@ -38,6 +38,17 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
+  const userOne = {
+    id: null,
+    login: `userOne`,
+    email: 'userOne@one.com',
+    password: 'qewrqwer',
+    accessToken: null,
+  };
+  let firstBlogIdOwnUserOne: string;
+  let firstPostIdOwnUserOne: string;
+  let firstCommentIdOwnUserOne: string;
+
   it('/ (GET Hello World!)', () => {
     return request(app.getHttpServer())
       .get('/')
@@ -48,91 +59,148 @@ describe('AppController (e2e)', () => {
   it('DELETE ALL DATA', async () => {
     await request(app.getHttpServer()).delete('/testing/all-data').expect(204);
   }, 100000);
-  it('CREATE 12 USERS', async () => {
+  it('CREATE USER', async () => {
     // USER 1
     await request(app.getHttpServer())
       .post('/sa/users')
       .auth('admin', 'qwerty')
-      .send({ login: 'loSer', email: 'email2p@gg.om', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 2
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'log01', email: 'emai@gg.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 3
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'log02', email: 'email2p@g.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 4
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'uer15', email: 'emarrr1@gg.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 5
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'user01', email: 'email1p@gg.cm', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 6
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'user02', email: 'email1p@gg.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 7
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'user03', email: 'email1p@gg.cou', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 8
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'user05', email: 'email1p@gg.coi', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 9
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'usr-1-01', email: 'email3@gg.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 10
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'log03', email: 'emailp@g.com', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 11
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'vvv', email: 'ccc@xx.xxx', password: 'qewrqwer' })
-      .expect(201);
-
-    // USER 12
-    await request(app.getHttpServer())
-      .post('/sa/users')
-      .auth('admin', 'qwerty')
-      .send({ login: 'ccc', email: 'vvv@xx.xxx', password: 'qewrqwer' })
+      .send({
+        login: userOne.login,
+        email: userOne.email,
+        password: userOne.password,
+      })
       .expect(201);
   });
+  it('LOGIN USER', async () => {
+    // USER 1
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: userOne.email,
+        password: userOne.password,
+      })
+      .expect(200);
+    userOne.accessToken = response.body.accessToken;
+  });
 
-  /////////////////////////////    BLOGGER FLOW    /////////////////////////////////////////
+  /////////////////////////////    BLOG FLOW    /////////////////////////////////////////
+  it('CREATE BLOGS', async () => {
+    // USER 1
+    const newBlog = await request(app.getHttpServer())
+      .post(`/sa/blogs`)
+      .auth('admin', 'qwerty')
+      .send({
+        name: 'firstBlog',
+        description: 'firstBlog description',
+        websiteUrl: 'https://www.youtube.com/firstBlog',
+      })
+      .expect(201);
+    firstBlogIdOwnUserOne = newBlog.body.id;
+    // TO EQUAL FIRST BLOG
+    expect(newBlog.body).toEqual({
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      description: 'firstBlog description',
+      isMembership: false,
+      name: 'firstBlog',
+      websiteUrl: 'https://www.youtube.com/firstBlog',
+    });
+  });
+  /// POSTS
+  it('CREATE POST BY BLOG ID', async () => {
+    // CREATE THREE POSTS USER ONE
+    const newPost = await request(app.getHttpServer())
+      .post(`/sa/blogs/${firstBlogIdOwnUserOne}/posts`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 'firstPost title',
+        shortDescription: 'firstPost Description',
+        content: 'firstPost content',
+      })
+      .expect(201);
+    firstPostIdOwnUserOne = newPost.body.id;
+    expect(newPost.body).toEqual({
+      id: expect.any(String),
+      blogId: firstBlogIdOwnUserOne,
+      blogName: 'firstBlog',
+      title: 'firstPost title',
+      shortDescription: 'firstPost Description',
+      createdAt: expect.any(String),
+      content: 'firstPost content',
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    });
+
+    // ERRORS
+    const errorMessages = await request(app.getHttpServer())
+      .post(`/sa/blogs/${firstBlogIdOwnUserOne}/posts`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 1,
+        shortDescription:
+          'thirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost DescriptionthirdPost Description',
+      })
+      .expect(400);
+    expect(errorMessages.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'title',
+          message: 'title must be shorter than or equal to 30 characters',
+        },
+        {
+          field: 'shortDescription',
+          message:
+            'shortDescription must be shorter than or equal to 100 characters',
+        },
+        {
+          field: 'content',
+          message: 'content must be shorter than or equal to 1000 characters',
+        },
+      ],
+    });
+
+    await request(app.getHttpServer())
+      .post(`/sa/blogs/${firstBlogIdOwnUserOne}/posts`)
+      .send({
+        title: 'thirdPost title',
+        shortDescription: 'thirdPost Description',
+        content: 'thirdPost content',
+      })
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .post(`/sa/blogs/367eb779-deb2-483b-9015-059c5d8c5edc/posts`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 'thirdPost title',
+        shortDescription: 'thirdPost Description',
+        content: 'thirdPost content',
+      })
+      .expect(404);
+  });
+  /// COMMENTS
+  it('CREATE COMMENT BY POST ID', async () => {
+    // CREATE THREE POSTS USER ONE
+    const response = await request(app.getHttpServer())
+      .post(`/posts/${firstPostIdOwnUserOne}/comments`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        content: 'first comment in first post own user one',
+      })
+      .expect(201);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      entityId: expect.any(String),
+      commentatorInfo: {
+        userId: expect.any(String),
+        userLogin: 'userOne',
+      },
+      content: 'first comment in first post own user one',
+      createdAt: expect.any(String),
+    });
+  });
 });

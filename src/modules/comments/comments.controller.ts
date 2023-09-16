@@ -11,7 +11,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQueryRepository } from './comments.query.repository';
+import { CommentsQueryRepository } from './repositories/mongodb/comments.query.repository';
 import { LikeInputDto } from '../likes/dto/create-like.dto';
 import { CommentInputDto } from './dto/create-comment.dto';
 

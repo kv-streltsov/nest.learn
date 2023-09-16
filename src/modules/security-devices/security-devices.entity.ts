@@ -47,4 +47,4 @@ export class SecurityDevicesEntity {
 // TABLESPACE pg_default;
 //
 // ALTER TABLE IF EXISTS public."securityDevices"
-// OWNER to postgres;
+// OWNER to postgresql;

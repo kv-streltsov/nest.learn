@@ -1,29 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { CreateDeviceSessionUseCase } from '../../../security-devices/use-cases/mongodb/createDeviceSessionUseCase';
 import { AuthService } from '../../auth.service';
 import { CreateDeviceSessionSqlUseCase } from '../../../security-devices/use-cases/postgresql/createDeviceSessionSqlUseCase';
+import { CommandHandler } from '@nestjs/cqrs';
 
 export type JwrPairDto = {
   accessToken: string;
   refreshToken: string;
 };
 
-@Injectable()
+export class RefreshTokenSqlUseCaseCommand {
+  constructor(public request: any, public response: Response) {}
+}
+
+@CommandHandler(RefreshTokenSqlUseCaseCommand)
 export class RefreshTokenSqlUseCase {
   constructor(
     private createDeviceSessionUseCase: CreateDeviceSessionSqlUseCase,
     private authService: AuthService,
   ) {}
-  async execute(request: any, response: Response) {
+  async execute(command: RefreshTokenSqlUseCaseCommand) {
     const jwtPair: JwrPairDto = await this.authService.createJwtPair(
-      request,
-      response,
+      command.request,
+      command.response,
     );
 
-    await this.createDeviceSessionUseCase.execute(jwtPair, request.user);
+    await this.createDeviceSessionUseCase.execute(
+      jwtPair,
+      command.request.user,
+    );
 
     return {
       accessToken: jwtPair.accessToken,

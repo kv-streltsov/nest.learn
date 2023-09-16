@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Comments } from './comments.schena';
+import { Comments } from '../../comments.schena';
 
 @Injectable()
 export class CommentsRepository {
