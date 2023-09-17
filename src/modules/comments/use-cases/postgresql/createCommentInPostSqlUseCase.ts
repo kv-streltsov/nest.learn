@@ -2,6 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { CommentInputDto } from '../../dto/create-comment.dto';
 import { randomUUID } from 'crypto';
 import { CommentsSqlRepository } from '../../repositories/postgresql/comments.sql.repository';
+import { LikesQuerySqlRepository } from '../../../likes/repositories/postgresql/likes.query.sql.repository';
 
 export class CreateCommentInPostSqlUseCaseCommand {
   constructor(
@@ -12,7 +13,10 @@ export class CreateCommentInPostSqlUseCaseCommand {
 }
 @CommandHandler(CreateCommentInPostSqlUseCaseCommand)
 export class CreateCommentInPostSqlUseCase {
-  constructor(private commentsSqlRepository: CommentsSqlRepository) {}
+  constructor(
+    private commentsSqlRepository: CommentsSqlRepository,
+    private likesQuerySqlRepository: LikesQuerySqlRepository,
+  ) {}
   async execute(command: CreateCommentInPostSqlUseCaseCommand) {
     const commentDto = {
       id: randomUUID(),
@@ -25,7 +29,10 @@ export class CreateCommentInPostSqlUseCase {
       createdAt: new Date().toISOString(),
     };
     await this.commentsSqlRepository.createComment(commentDto);
-
+    const likesInfo = await this.likesQuerySqlRepository.getLike(
+      commentDto.id,
+      command.user.userId,
+    );
     return commentDto;
   }
 }

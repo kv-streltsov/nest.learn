@@ -16,7 +16,7 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { BloggerQueryRepository } from './blogger.query.repository';
 import { SortType } from '../users/users.interface';
 import { PostsQueryRepository } from '../posts/repositories/mongodb/posts.query.repository';
-import { LikesQueryRepository } from '../likes/likes.query.repository';
+import { LikesQueryRepository } from '../likes/repositories/mongodb/likes.query.repository';
 import { CreatePostInBlogDto } from '../posts/dto/create-post.dto';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
 import { CreateBlogUseCase } from './use-cases/createBlogUseCase';

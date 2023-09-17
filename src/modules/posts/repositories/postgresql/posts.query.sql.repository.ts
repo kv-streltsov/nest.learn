@@ -12,13 +12,11 @@ import { SortType } from '../../../users/users.interface';
 @Injectable()
 export class PostsQuerySqlRepository {
   private DEFAULT_SORT_FIELD = 'createdAt';
-  private PROJECTION = { _id: 0, __v: 0 };
   constructor(
     @InjectRepository(PostsEntity)
     private readonly postSqlRepository: Repository<PostsEntity>,
     @InjectModel(Posts.name) private postsModel: Model<Posts>,
     private blogsQueryRepository: BlogsQuerySqlRepository,
-    private usersQueryRepository: UsersQueryRepository,
   ) {}
   async getPostById(postId: string) {
     const foundPost = await this.postSqlRepository.query(

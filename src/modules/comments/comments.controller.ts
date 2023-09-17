@@ -16,18 +16,25 @@ import { LikeInputDto } from '../likes/dto/create-like.dto';
 import { CommentInputDto } from './dto/create-comment.dto';
 
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
-import { LikesService } from '../likes/likes.service';
 import { CommentsService } from './comments.service';
-import { LikesQueryRepository } from '../likes/likes.query.repository';
+import { LikesQueryRepository } from '../likes/repositories/mongodb/likes.query.repository';
 import { AuthGlobalGuard } from '../../helpers/authGlobal.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import {
+  CreateLikeStatusUseCase,
+  CreateLikeStatusUseCaseCommand,
+} from '../likes/use-cases/postgresql/createLikeStatusSqlUseCase';
+import { CreateCommentInPostSqlUseCaseCommand } from './use-cases/postgresql/createCommentInPostSqlUseCase';
+import { CommentsQuerySqlRepository } from './repositories/postgresql/comments.query.sql.repository';
+import { LikesQuerySqlRepository } from '../likes/repositories/postgresql/likes.query.sql.repository';
 @UseGuards(AuthGlobalGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(
-    private commentsQueryRepository: CommentsQueryRepository,
-    private likesService: LikesService,
+    private commandBus: CommandBus,
+    private commentsQueryRepository: CommentsQuerySqlRepository,
     private commentsService: CommentsService,
-    private likesQueryRepository: LikesQueryRepository,
+    private likesQueryRepository: LikesQuerySqlRepository,
   ) {}
 
   @Get(`:id`)
@@ -37,9 +44,7 @@ export class CommentsController {
       commentId,
     );
 
-    if (!foundComment) {
-      throw new NotFoundException(`comment not found`);
-    }
+    if (!foundComment) throw new NotFoundException(`comment not found`);
 
     const likeStatus = await this.likesQueryRepository.getExtendedLikesInfo(
       commentId,
@@ -47,39 +52,41 @@ export class CommentsController {
         ? null
         : req.headers.authGlobal.userId,
     );
-    return {
-      id: foundComment.id,
-      content: foundComment.content,
-      commentatorInfo: {
-        userId: foundComment.commentatorInfo.userId,
-        userLogin: foundComment.commentatorInfo.userLogin,
-      },
-      createdAt: foundComment.createdAt,
-      likesInfo: {
-        likesCount: likeStatus.likesCount,
-        dislikesCount: likeStatus.dislikesCount,
-        myStatus: likeStatus.myStatus,
-      },
-    };
+    // return {
+    //   id: foundComment.id,
+    //   content: foundComment.content,
+    //   commentatorInfo: {
+    //     userId: foundComment.commentatorInfo.userId,
+    //     userLogin: foundComment.commentatorInfo.userLogin,
+    //   },
+    //   createdAt: foundComment.createdAt,
+    //   likesInfo: {
+    //     likesCount: likeStatus.likesCount,
+    //     dislikesCount: likeStatus.dislikesCount,
+    //     myStatus: likeStatus.myStatus,
+    //   },
+    // };
   }
 
   @UseGuards(AccessTokenGuard)
   @Put(`:commentId/like-status`)
   @HttpCode(HttpStatus.NO_CONTENT)
-  putLikeStatusByCommentId(
+  async putLikeStatusByCommentId(
     @Param(`commentId`) commentId: string,
     @Body() likeInputDto: LikeInputDto,
-    @Request() req,
+    @Request() request,
   ) {
-    return this.likesService.createLikeStatus(
-      commentId,
-      req.user.userId,
-      likeInputDto.likeStatus,
+    return this.commandBus.execute(
+      new CreateLikeStatusUseCaseCommand(
+        commentId,
+        request.user.userId,
+        likeInputDto.likeStatus,
+      ),
     );
   }
 
-  @UseGuards(AccessTokenGuard)
   @Put(`:id`)
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   updateComment(
     @Param(`id`) commentId: string,
@@ -93,8 +100,8 @@ export class CommentsController {
     );
   }
 
-  @UseGuards(AccessTokenGuard)
   @Delete(`:id`)
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteCommentById(@Param(`id`) commentId: string, @Request() req) {
     return this.commentsService.deleteComment(commentId, req.user.userId);

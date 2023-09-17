@@ -18,7 +18,7 @@ import { PostsService } from './posts.service';
 import { PostsQueryRepository } from './repositories/mongodb/posts.query.repository';
 import { SortType } from '../users/users.interface';
 import { CommentsQueryRepository } from '../comments/repositories/mongodb/comments.query.repository';
-import { LikesQueryRepository } from '../likes/likes.query.repository';
+import { LikesQueryRepository } from '../likes/repositories/mongodb/likes.query.repository';
 import { AuthGuard } from '../../helpers/auth.guard';
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
 import { LikeInputDto } from '../likes/dto/create-like.dto';
@@ -30,7 +30,7 @@ import { DeletePostByIdUseCase } from './use-cases/mongodb/delete-post-by-id-use
 import { PostsQuerySqlRepository } from './repositories/postgresql/posts.query.sql.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentInPostSqlUseCaseCommand } from '../comments/use-cases/postgresql/createCommentInPostSqlUseCase';
-@UseGuards(AuthGlobalGuard)
+//@UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
   constructor(

@@ -3,11 +3,7 @@ import {
   ICreateModifiedPostDto,
   CreatePostInBlogDto,
 } from '../../dto/create-post.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Posts } from '../../posts.schena';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BlogsEntity } from '../../../blogs/blogs.entity';
 import { Repository } from 'typeorm';
 import { PostsEntity } from '../../posts.entity';
 

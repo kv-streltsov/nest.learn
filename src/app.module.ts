@@ -24,7 +24,7 @@ import { CommentsQueryRepository } from './modules/comments/repositories/mongodb
 import { Comments, CommentsSchema } from './modules/comments/comments.schena';
 import { TestingController } from './modules/testing/testing.controller';
 import { Likes, LikesSchema } from './modules/likes/likes.schena';
-import { LikesQueryRepository } from './modules/likes/likes.query.repository';
+import { LikesQueryRepository } from './modules/likes/repositories/mongodb/likes.query.repository';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './modules/auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -44,7 +44,7 @@ import * as process from 'process';
 import { EmailService } from './modules/email/email.service';
 import { config } from 'dotenv';
 import { LikesService } from './modules/likes/likes.service';
-import { LikesRepository } from './modules/likes/likes.repository';
+import { LikesRepository } from './modules/likes/repositories/mongodb/likes.repository';
 import { CustomValidator } from './helpers/custom-validators/custom.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SecurityDevicesQueryRepositoryRepository } from './modules/security-devices/repositories/mongodb/security-devices.query.repository';
@@ -106,15 +106,16 @@ import { CreatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/cr
 import { PostsEntity } from './modules/posts/posts.entity';
 import { UpdatePostByBlogIdSqlUseCase } from './modules/super-admin/use-cases/updatePostByBlogIdSqlUseCase';
 import { DeletePostByIdSqlUseCase } from './modules/super-admin/use-cases/deletePostByIdSqlUseCase';
-import {
-  ConfirmationUserSqlUseCase,
-  ConfirmationUserSqlUseCaseCommand,
-} from './modules/auth/use-cases/postgresql/confirmationSqlUseCase';
+import { ConfirmationUserSqlUseCase } from './modules/auth/use-cases/postgresql/confirmationSqlUseCase';
 import { GetMeInfoUseSqlCase } from './modules/auth/use-cases/postgresql/getMeInfoSqlUseCase';
 import { CommentsEntity } from './modules/comments/comments.entity';
 import { CreateCommentInPostSqlUseCase } from './modules/comments/use-cases/postgresql/createCommentInPostSqlUseCase';
 import { CommentsSqlRepository } from './modules/comments/repositories/postgresql/comments.sql.repository';
 import { LikesEntity } from './modules/likes/likes.entity';
+import { LikesQuerySqlRepository } from './modules/likes/repositories/postgresql/likes.query.sql.repository';
+import { LikesSqlRepository } from './modules/likes/repositories/postgresql/likes.sql.repository';
+import { CommentsQuerySqlRepository } from './modules/comments/repositories/postgresql/comments.query.sql.repository';
+import { CreateLikeStatusUseCase } from './modules/likes/use-cases/postgresql/createLikeStatusSqlUseCase';
 config();
 const useCases = [
   CreateCommentInPostSqlUseCase,
@@ -224,6 +225,10 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    CreateLikeStatusUseCase,
+    CommentsQuerySqlRepository,
+    LikesSqlRepository,
+    LikesQuerySqlRepository,
     CommentsSqlRepository,
     PostsSqlRepository,
     PostsQuerySqlRepository,

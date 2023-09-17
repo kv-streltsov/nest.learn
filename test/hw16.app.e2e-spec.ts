@@ -106,6 +106,18 @@ describe('AppController (e2e)', () => {
       websiteUrl: 'https://www.youtube.com/firstBlog',
     });
   });
+  it('PUT BLOG', async () => {
+    // UPDATE FIRST BLOG USER ONE
+    await request(app.getHttpServer())
+      .put(`/sa/blogs/${firstBlogIdOwnUserOne}`)
+      .auth('admin', 'qwerty')
+      .send({
+        name: 'updateBlog',
+        description: 'updateBlog description',
+        websiteUrl: 'https://www.youtube.com/updateBlog',
+      })
+      .expect(204);
+  });
   /// POSTS
   it('CREATE POST BY BLOG ID', async () => {
     // CREATE THREE POSTS USER ONE
@@ -122,7 +134,7 @@ describe('AppController (e2e)', () => {
     expect(newPost.body).toEqual({
       id: expect.any(String),
       blogId: firstBlogIdOwnUserOne,
-      blogName: 'firstBlog',
+      blogName: 'updateBlog',
       title: 'firstPost title',
       shortDescription: 'firstPost Description',
       createdAt: expect.any(String),
@@ -182,6 +194,39 @@ describe('AppController (e2e)', () => {
       })
       .expect(404);
   });
+  it('PUT POST', async () => {
+    // CREATE THREE POSTS USER ONE
+    await request(app.getHttpServer())
+      .put(`/sa/blogs/${firstBlogIdOwnUserOne}/posts/${firstPostIdOwnUserOne}`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 'firstPostUpdate title',
+        shortDescription: 'firstPostUpdate Description',
+        content: 'firstPostUpdate content',
+      })
+      .expect(204);
+
+    const response = await request(app.getHttpServer())
+      .get(`/posts/${firstPostIdOwnUserOne}`)
+      .auth('admin', 'qwerty')
+      .expect(200);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      blogId: expect.any(String),
+      title: 'firstPostUpdate title',
+      blogName: 'updateBlog',
+      shortDescription: 'firstPostUpdate Description',
+      content: 'firstPostUpdate content',
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    });
+  });
+
   /// COMMENTS
   it('CREATE COMMENT BY POST ID', async () => {
     // CREATE THREE POSTS USER ONE
@@ -192,6 +237,7 @@ describe('AppController (e2e)', () => {
         content: 'first comment in first post own user one',
       })
       .expect(201);
+    firstCommentIdOwnUserOne = response.body.id;
     expect(response.body).toEqual({
       id: expect.any(String),
       entityId: expect.any(String),
@@ -201,6 +247,72 @@ describe('AppController (e2e)', () => {
       },
       content: 'first comment in first post own user one',
       createdAt: expect.any(String),
+    });
+  });
+  /// LIKES
+  it('PUT LIKE IN COMMENT', async () => {
+    // CREATE THREE POSTS USER ONE
+    await request(app.getHttpServer())
+      .put(`/comments/${firstCommentIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        likeStatus: 'None',
+      })
+      .expect(204);
+    let response = await request(app.getHttpServer())
+      .get(`/comments/${firstCommentIdOwnUserOne}`)
+      .expect(200);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      content: 'first comment in first post own user one',
+      commentatorInfo: {
+        userId: expect.any(String),
+        userLogin: 'userOne',
+      },
+      createdAt: expect.any(String),
+      likesInfo: { likesCount: 0, dislikesCount: 0, myStatus: 'None' },
+    });
+    /// put and check like
+    await request(app.getHttpServer())
+      .put(`/comments/${firstCommentIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(204);
+    response = await request(app.getHttpServer())
+      .get(`/comments/${firstCommentIdOwnUserOne}`)
+      .expect(200);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      content: 'first comment in first post own user one',
+      commentatorInfo: {
+        userId: expect.any(String),
+        userLogin: 'userOne',
+      },
+      createdAt: expect.any(String),
+      likesInfo: { likesCount: 1, dislikesCount: 0, myStatus: 'Like' },
+    });
+    /// put and check dislike
+    await request(app.getHttpServer())
+      .put(`/comments/${firstCommentIdOwnUserOne}/like-status`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(204);
+    response = await request(app.getHttpServer())
+      .get(`/comments/${firstCommentIdOwnUserOne}`)
+      .expect(200);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      content: 'first comment in first post own user one',
+      commentatorInfo: {
+        userId: expect.any(String),
+        userLogin: 'userOne',
+      },
+      createdAt: expect.any(String),
+      likesInfo: { likesCount: 0, dislikesCount: 1, myStatus: 'Dislike' },
     });
   });
 });

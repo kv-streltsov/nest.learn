@@ -6,7 +6,7 @@ import {
 import { CommentInputDto } from './dto/create-comment.dto';
 import { PostsQueryRepository } from '../posts/repositories/mongodb/posts.query.repository';
 import { CommentsRepository } from './repositories/mongodb/comments.repository';
-import { LikesQueryRepository } from '../likes/likes.query.repository';
+import { LikesQueryRepository } from '../likes/repositories/mongodb/likes.query.repository';
 import { randomUUID } from 'crypto';
 import { CommentsQueryRepository } from './repositories/mongodb/comments.query.repository';
 

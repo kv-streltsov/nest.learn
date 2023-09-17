@@ -19,6 +19,8 @@ import { LikesEntity } from '../likes/likes.entity';
 export class TestingController {
   constructor(
     ///// POSTGRESQL
+    @InjectRepository(LikesEntity)
+    private readonly likesSqlRepository: Repository<LikesEntity>,
     @InjectRepository(PostsEntity)
     private readonly postsDevicesSqlRepository: Repository<PostsEntity>,
     @InjectRepository(BlogsEntity)
@@ -29,8 +31,6 @@ export class TestingController {
     private readonly usersSqlRepository: Repository<UserEntity>,
     @InjectRepository(CommentsEntity)
     private readonly commentsSqlRepository: Repository<CommentsEntity>,
-    @InjectRepository(LikesEntity)
-    private readonly likesSqlRepository: Repository<LikesEntity>,
 
     ///// MONGODB
     @InjectModel(Blogs.name) private blogsModel: Model<Blogs>,
@@ -55,11 +55,11 @@ export class TestingController {
     await this.securityDevicesSqlRepository.query(
       `DELETE FROM public."securityDevices"`,
     );
+    await this.likesSqlRepository.query(`DELETE FROM public.likes`);
     await this.usersSqlRepository.query(`DELETE FROM public.users`);
     await this.postsDevicesSqlRepository.query(`DELETE FROM public.posts`);
     await this.blogsDevicesSqlRepository.query(`DELETE FROM public.blogs`);
     await this.commentsSqlRepository.query(`DELETE FROM public.comments`);
-    await this.likesSqlRepository.query(`DELETE FROM public.likes`);
 
     return;
   }
