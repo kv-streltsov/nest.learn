@@ -28,6 +28,7 @@ import { CreateCommentInPostSqlUseCaseCommand } from './use-cases/postgresql/cre
 import { CommentsQuerySqlRepository } from './repositories/postgresql/comments.query.sql.repository';
 import { LikesQuerySqlRepository } from '../likes/repositories/postgresql/likes.query.sql.repository';
 import { isBlogExist } from '../../helpers/custom-validators/custom.validator';
+import { DeleteCommentByIdSqlUseCaseCommand } from './use-cases/postgresql/deleteCommentByIdSqlUseCase';
 @UseGuards(AuthGlobalGuard)
 @Controller('comments')
 export class CommentsController {
@@ -105,6 +106,8 @@ export class CommentsController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteCommentById(@Param(`id`) commentId: string, @Request() req) {
-    return this.commentsService.deleteComment(commentId, req.user.userId);
+    return this.commandBus.execute(
+      new DeleteCommentByIdSqlUseCaseCommand(commentId, req.user.userId),
+    );
   }
 }

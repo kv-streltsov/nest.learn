@@ -115,8 +115,10 @@ import { LikesQuerySqlRepository } from './modules/likes/repositories/postgresql
 import { LikesSqlRepository } from './modules/likes/repositories/postgresql/likes.sql.repository';
 import { CommentsQuerySqlRepository } from './modules/comments/repositories/postgresql/comments.query.sql.repository';
 import { CreateLikeStatusUseCase } from './modules/likes/use-cases/postgresql/createLikeStatusSqlUseCase';
+import { DeleteCommentByIdSqlUseCase } from './modules/comments/use-cases/postgresql/deleteCommentByIdSqlUseCase';
 config();
 const useCases = [
+  DeleteCommentByIdSqlUseCase,
   CreateCommentInPostSqlUseCase,
   GetMeInfoUseSqlCase,
   ConfirmationUserSqlUseCase,

@@ -66,17 +66,4 @@ export class CommentsService {
     }
     return this.commentsRepository.updateComment(commentId, content);
   }
-  async deleteComment(commentId: string, user: string) {
-    const foundComment = await this.commentsQueryRepository.getCommentById(
-      commentId,
-    );
-    if (foundComment === null) {
-      throw new NotFoundException();
-    }
-
-    if (foundComment.commentatorInfo.userId !== user) {
-      throw new ForbiddenException();
-    }
-    return this.commentsRepository.deleteComment(commentId);
-  }
 }

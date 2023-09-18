@@ -226,7 +226,6 @@ describe('AppController (e2e)', () => {
       },
     });
   });
-
   /// COMMENTS
   it('CREATE COMMENT BY POST ID', async () => {
     // CREATE THREE POSTS USER ONE
@@ -318,5 +317,17 @@ describe('AppController (e2e)', () => {
       createdAt: expect.any(String),
       likesInfo: { likesCount: 0, dislikesCount: 1, myStatus: 'None' },
     });
+  });
+  it('DELETE COMMENT BY ID', async () => {
+    // DELETE
+    await request(app.getHttpServer())
+      .delete(`/comments/${firstCommentIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(204);
+    /// ERROR
+    await request(app.getHttpServer())
+      .delete(`/comments/${firstCommentIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .expect(404);
   });
 });
