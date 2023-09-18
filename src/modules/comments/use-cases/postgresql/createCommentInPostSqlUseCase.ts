@@ -13,10 +13,7 @@ export class CreateCommentInPostSqlUseCaseCommand {
 }
 @CommandHandler(CreateCommentInPostSqlUseCaseCommand)
 export class CreateCommentInPostSqlUseCase {
-  constructor(
-    private commentsSqlRepository: CommentsSqlRepository,
-    private likesQuerySqlRepository: LikesQuerySqlRepository,
-  ) {}
+  constructor(private commentsSqlRepository: CommentsSqlRepository) {}
   async execute(command: CreateCommentInPostSqlUseCaseCommand) {
     const commentDto = {
       id: randomUUID(),
@@ -29,10 +26,21 @@ export class CreateCommentInPostSqlUseCase {
       createdAt: new Date().toISOString(),
     };
     await this.commentsSqlRepository.createComment(commentDto);
-    const likesInfo = await this.likesQuerySqlRepository.getLike(
-      commentDto.id,
-      command.user.userId,
-    );
-    return commentDto;
+
+    return {
+      id: commentDto.id,
+      entityId: commentDto.entityId,
+      commentatorInfo: {
+        userId: commentDto.commentatorInfo.userId,
+        userLogin: commentDto.commentatorInfo.userLogin,
+      },
+      content: commentDto.content,
+      createdAt: commentDto.createdAt,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    };
   }
 }
