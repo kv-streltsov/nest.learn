@@ -80,7 +80,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersSqlRepository } from './modules/users/repositories/postgresql/users.sql.repository';
 import { UserEntity } from './modules/users/user.entity';
 import { CreateUserSqlUseCase } from './modules/users/use-cases/postgresql/createUserSqlUseCase';
-import { UsersSqlService } from './modules/users/users.sql.service';
 import { UsersSqlQueryRepository } from './modules/users/repositories/postgresql/users.sql.query.repository';
 import { DeleteUserSqlUseCase } from './modules/users/use-cases/postgresql/deleteUserSqlUseCase';
 import { RegistrationSqlUseCase } from './modules/auth/use-cases/postgresql/registrationSqlUseCase';
@@ -247,7 +246,6 @@ const useCases = [
     UsersService,
     UsersQueryRepository,
     UsersRepository,
-    UsersSqlService,
     UsersSqlQueryRepository,
     UsersSqlRepository,
     BlogsRepository,

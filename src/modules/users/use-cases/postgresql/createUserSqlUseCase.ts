@@ -4,13 +4,13 @@ import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { ModifiedUserDto } from '../../dto/update-users.dto';
 import { UsersSqlRepository } from '../../repositories/postgresql/users.sql.repository';
-import { UsersSqlService } from '../../users.sql.service';
 import { UsersSqlQueryRepository } from '../../repositories/postgresql/users.sql.query.repository';
+import { UsersService } from '../../users.service';
 @Injectable()
 export class CreateUserSqlUseCase {
   constructor(
     private usersSqlRepository: UsersSqlRepository,
-    private usersSqlService: UsersSqlService,
+    private usersSqlService: UsersService,
     private usersSqlQueryRepository: UsersSqlQueryRepository,
   ) {}
   async execute(createUserDto: CreateUserDto, confirmAdmin = false) {
