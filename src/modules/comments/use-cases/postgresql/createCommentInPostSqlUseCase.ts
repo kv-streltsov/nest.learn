@@ -29,7 +29,6 @@ export class CreateCommentInPostSqlUseCase {
 
     return {
       id: commentDto.id,
-      entityId: commentDto.entityId,
       commentatorInfo: {
         userId: commentDto.commentatorInfo.userId,
         userLogin: commentDto.commentatorInfo.userLogin,

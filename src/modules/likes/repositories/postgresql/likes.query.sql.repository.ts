@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LikesEntity } from '../../likes.entity';
 import { Repository } from 'typeorm';
 import { UsersSqlQueryRepository } from '../../../users/repositories/postgresql/users.sql.query.repository';
-
+interface LikeCountInfo {
+  likesCount: number;
+  dislikesCount: number;
+}
 @Injectable()
 export class LikesQuerySqlRepository {
   constructor(
@@ -12,7 +15,7 @@ export class LikesQuerySqlRepository {
     private usersSqlQueryRepository: UsersSqlQueryRepository,
   ) {}
 
-  async getLike(entityId: string, userId: string | null) {
+  async getLike(entityId: string, userId: string) {
     const foundLike = await this.likesSqlRepository.query(
       `SELECT *
                 FROM public.likes 
@@ -27,6 +30,7 @@ export class LikesQuerySqlRepository {
     userId: string | null = null,
     newestLikeFlag = true,
   ) {
+    // get like count
     const likeCountInfo = await this.getLikeCount(entityId);
 
     // get newestLikes
@@ -55,9 +59,11 @@ export class LikesQuerySqlRepository {
       );
     }
 
-    const likeStatusCurrentUser = await this.getLike(entityId, userId);
+    // get likeStatusCurrentUser
+    let likeStatusCurrentUser: null | any = null;
+    if (userId) likeStatusCurrentUser = await this.getLike(entityId, userId);
 
-    if (newestLikeFlag) {
+    if (newestLikeFlag && userId) {
       return {
         likesCount: likeCountInfo.likesCount,
         dislikesCount: likeCountInfo.dislikesCount,
@@ -68,6 +74,7 @@ export class LikesQuerySqlRepository {
         newestLikes: newestLikesWithLogin,
       };
     }
+
     return {
       likesCount: likeCountInfo.likesCount,
       dislikesCount: likeCountInfo.dislikesCount,
@@ -81,7 +88,7 @@ export class LikesQuerySqlRepository {
       .query(
         `SELECT COUNT(*) 
                  FROM public.likes
-                 WHERE "entityId" = $1`,
+                 WHERE "entityId" = $1 AND status = 'Like'`,
         [entityId],
       )
       .then((data) => {
@@ -92,7 +99,7 @@ export class LikesQuerySqlRepository {
       .query(
         `SELECT COUNT(*) 
                  FROM public.likes
-                 WHERE "entityId" = $1`,
+                 WHERE "entityId" = $1 AND status = 'Dislike'`,
         [entityId],
       )
       .then((data) => {

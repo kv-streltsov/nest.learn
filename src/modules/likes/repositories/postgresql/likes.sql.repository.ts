@@ -38,8 +38,8 @@ export class LikesSqlRepository {
     return this.likesSqlRepository.query(
       `UPDATE public.likes
                 SET  status=$1, "addedAt"=$2
-                WHERE "userId"= $4 AND "entityId" = '$5'`,
-      [status, addedAt, userId, entityId],
+                WHERE "userId"= '${userId}' AND "entityId" = '${entityId}'`,
+      [status, addedAt],
     );
   }
 }

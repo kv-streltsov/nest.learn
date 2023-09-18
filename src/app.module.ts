@@ -182,7 +182,7 @@ const useCases = [
     CqrsModule,
     ThrottlerModule.forRoot({
       ttl: 10,
-      limit: 5,
+      limit: 500,
     }),
     MailerModule.forRoot({
       transport: {

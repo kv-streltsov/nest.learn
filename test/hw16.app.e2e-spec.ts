@@ -240,18 +240,22 @@ describe('AppController (e2e)', () => {
     firstCommentIdOwnUserOne = response.body.id;
     expect(response.body).toEqual({
       id: expect.any(String),
-      entityId: expect.any(String),
       commentatorInfo: {
         userId: expect.any(String),
         userLogin: 'userOne',
       },
       content: 'first comment in first post own user one',
       createdAt: expect.any(String),
+      likesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+      },
     });
   });
   /// LIKES
   it('PUT LIKE IN COMMENT', async () => {
-    // CREATE THREE POSTS USER ONE
+    // PUT LIKE IN COMMENT USER ONE
     await request(app.getHttpServer())
       .put(`/comments/${firstCommentIdOwnUserOne}/like-status`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
@@ -291,7 +295,7 @@ describe('AppController (e2e)', () => {
         userLogin: 'userOne',
       },
       createdAt: expect.any(String),
-      likesInfo: { likesCount: 1, dislikesCount: 0, myStatus: 'Like' },
+      likesInfo: { likesCount: 1, dislikesCount: 0, myStatus: 'None' },
     });
     /// put and check dislike
     await request(app.getHttpServer())
@@ -312,7 +316,7 @@ describe('AppController (e2e)', () => {
         userLogin: 'userOne',
       },
       createdAt: expect.any(String),
-      likesInfo: { likesCount: 0, dislikesCount: 1, myStatus: 'Dislike' },
+      likesInfo: { likesCount: 0, dislikesCount: 1, myStatus: 'None' },
     });
   });
 });

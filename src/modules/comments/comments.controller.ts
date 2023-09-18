@@ -27,6 +27,7 @@ import {
 import { CreateCommentInPostSqlUseCaseCommand } from './use-cases/postgresql/createCommentInPostSqlUseCase';
 import { CommentsQuerySqlRepository } from './repositories/postgresql/comments.query.sql.repository';
 import { LikesQuerySqlRepository } from '../likes/repositories/postgresql/likes.query.sql.repository';
+import { isBlogExist } from '../../helpers/custom-validators/custom.validator';
 @UseGuards(AuthGlobalGuard)
 @Controller('comments')
 export class CommentsController {
@@ -43,7 +44,6 @@ export class CommentsController {
     const foundComment = await this.commentsQueryRepository.getCommentById(
       commentId,
     );
-
     if (!foundComment) throw new NotFoundException(`comment not found`);
 
     const likeStatus = await this.likesQueryRepository.getExtendedLikesInfo(
@@ -51,21 +51,22 @@ export class CommentsController {
       req.headers.authGlobal === undefined
         ? null
         : req.headers.authGlobal.userId,
+      false,
     );
-    // return {
-    //   id: foundComment.id,
-    //   content: foundComment.content,
-    //   commentatorInfo: {
-    //     userId: foundComment.commentatorInfo.userId,
-    //     userLogin: foundComment.commentatorInfo.userLogin,
-    //   },
-    //   createdAt: foundComment.createdAt,
-    //   likesInfo: {
-    //     likesCount: likeStatus.likesCount,
-    //     dislikesCount: likeStatus.dislikesCount,
-    //     myStatus: likeStatus.myStatus,
-    //   },
-    // };
+    return {
+      id: foundComment.id,
+      content: foundComment.content,
+      commentatorInfo: {
+        userId: foundComment.commentatorInfo.userId,
+        userLogin: foundComment.commentatorInfo.userLogin,
+      },
+      createdAt: foundComment.createdAt,
+      likesInfo: {
+        likesCount: likeStatus.likesCount,
+        dislikesCount: likeStatus.dislikesCount,
+        myStatus: likeStatus.myStatus,
+      },
+    };
   }
 
   @UseGuards(AccessTokenGuard)
