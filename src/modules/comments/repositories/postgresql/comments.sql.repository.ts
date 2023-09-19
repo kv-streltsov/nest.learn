@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommentsEntity } from '../../comments.entity';
 import { Repository } from 'typeorm';
 import { LikesSqlRepository } from '../../../likes/repositories/postgresql/likes.sql.repository';
+import { CreatePostInBlogDto } from '../../../posts/dto/create-post.dto';
 
 @Injectable()
 export class CommentsSqlRepository {
@@ -31,6 +32,14 @@ export class CommentsSqlRepository {
       `DELETE FROM public.comments
                 WHERE id = $1`,
       [commentId],
+    );
+  }
+  async updateComment(commentId: string, content: string) {
+    return this.commentsSqlRepository.query(
+      `UPDATE public.comments
+                SET content=$1
+                WHERE id= $2`,
+      [content, commentId],
     );
   }
 }

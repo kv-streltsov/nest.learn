@@ -252,7 +252,7 @@ describe('AppController (e2e)', () => {
       },
     });
   });
-  /// LIKES
+
   it('PUT LIKE IN COMMENT', async () => {
     // PUT LIKE IN COMMENT USER ONE
     await request(app.getHttpServer())
@@ -317,6 +317,16 @@ describe('AppController (e2e)', () => {
       createdAt: expect.any(String),
       likesInfo: { likesCount: 0, dislikesCount: 1, myStatus: 'None' },
     });
+  });
+  it('PUT COMMENT', async () => {
+    // CREATE THREE POSTS USER ONE
+    await request(app.getHttpServer())
+      .put(`/comments/${firstCommentIdOwnUserOne}`)
+      .set('Authorization', `Bearer ${userOne.accessToken}`)
+      .send({
+        content: 'update comment in first post own user one',
+      })
+      .expect(204);
   });
   it('DELETE COMMENT BY ID', async () => {
     // DELETE

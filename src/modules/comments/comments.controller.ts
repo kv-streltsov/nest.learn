@@ -29,13 +29,13 @@ import { CommentsQuerySqlRepository } from './repositories/postgresql/comments.q
 import { LikesQuerySqlRepository } from '../likes/repositories/postgresql/likes.query.sql.repository';
 import { isBlogExist } from '../../helpers/custom-validators/custom.validator';
 import { DeleteCommentByIdSqlUseCaseCommand } from './use-cases/postgresql/deleteCommentByIdSqlUseCase';
+import { UpdateCommentSqlUseCaseCommand } from './use-cases/postgresql/updateCommenSqlUseCase';
 @UseGuards(AuthGlobalGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commandBus: CommandBus,
     private commentsQueryRepository: CommentsQuerySqlRepository,
-    private commentsService: CommentsService,
     private likesQueryRepository: LikesQuerySqlRepository,
   ) {}
 
@@ -95,10 +95,12 @@ export class CommentsController {
     @Body() commentInputDto: CommentInputDto,
     @Request() req,
   ) {
-    return this.commentsService.updateComment(
-      commentId,
-      commentInputDto.content,
-      req.user.userId,
+    return this.commandBus.execute(
+      new UpdateCommentSqlUseCaseCommand(
+        commentInputDto.content,
+        commentId,
+        req.user.userId,
+      ),
     );
   }
 
