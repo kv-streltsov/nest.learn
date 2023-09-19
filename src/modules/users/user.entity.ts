@@ -22,7 +22,6 @@ export class UserEntity {
   @Column({ default: true })
   confirmation: object;
 }
-// CREATE TABLE SCRIPT
 // -- Table: public.users
 //
 // -- DROP TABLE IF EXISTS public.users;
@@ -42,4 +41,4 @@ export class UserEntity {
 // TABLESPACE pg_default;
 //
 // ALTER TABLE IF EXISTS public.users
-// OWNER to postgresql;
+// OWNER to postgres;

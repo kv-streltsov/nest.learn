@@ -47,4 +47,4 @@ export class PostsEntity {
 // TABLESPACE pg_default;
 //
 // ALTER TABLE IF EXISTS public.posts
-// OWNER to postgresql;
+// OWNER to postgres;

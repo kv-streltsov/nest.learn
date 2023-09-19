@@ -31,20 +31,21 @@ export class SecurityDevicesEntity {
 // CREATE TABLE IF NOT EXISTS public."securityDevices"
 // (
 //   "sessionId" uuid NOT NULL,
-//   issued time with time zone,
-//   expiration time with time zone,
-//   "userId" integer,
-//   "deviceId" uuid,
+//   "deviceId" uuid NOT NULL,
 //   "userAgent" text COLLATE pg_catalog."default",
 //   ip text COLLATE pg_catalog."default",
+//   issued timestamp with time zone NOT NULL,
+//   expiration timestamp with time zone NOT NULL,
+//   "userId" uuid NOT NULL,
 //   CONSTRAINT "securityDevices_pkey" PRIMARY KEY ("sessionId"),
-//   CONSTRAINT "securityDevices-user" FOREIGN KEY ("userId")
+//   CONSTRAINT "user-devices" FOREIGN KEY ("userId")
 // REFERENCES public.users (id) MATCH SIMPLE
 // ON UPDATE NO ACTION
 // ON DELETE NO ACTION
+// NOT VALID
 // )
 //
 // TABLESPACE pg_default;
 //
 // ALTER TABLE IF EXISTS public."securityDevices"
-// OWNER to postgresql;
+// OWNER to postgres;
