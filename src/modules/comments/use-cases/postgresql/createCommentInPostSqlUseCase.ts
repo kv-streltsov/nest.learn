@@ -3,6 +3,8 @@ import { CommentInputDto } from '../../dto/create-comment.dto';
 import { randomUUID } from 'crypto';
 import { CommentsSqlRepository } from '../../repositories/postgresql/comments.sql.repository';
 import { LikesQuerySqlRepository } from '../../../likes/repositories/postgresql/likes.query.sql.repository';
+import {PostsQuerySqlRepository} from "../../../posts/repositories/postgresql/posts.query.sql.repository";
+import {NotFoundException} from "@nestjs/common";
 
 export class CreateCommentInPostSqlUseCaseCommand {
   constructor(
@@ -13,8 +15,11 @@ export class CreateCommentInPostSqlUseCaseCommand {
 }
 @CommandHandler(CreateCommentInPostSqlUseCaseCommand)
 export class CreateCommentInPostSqlUseCase {
-  constructor(private commentsSqlRepository: CommentsSqlRepository) {}
+  constructor(private commentsSqlRepository: CommentsSqlRepository,private postsQuerySqlRepository:PostsQuerySqlRepository) {}
   async execute(command: CreateCommentInPostSqlUseCaseCommand) {
+    const foundPost = await this.postsQuerySqlRepository.getPostById(command.postId)
+    if(!foundPost) throw new NotFoundException()
+
     const commentDto = {
       id: randomUUID(),
       entityId: command.postId,

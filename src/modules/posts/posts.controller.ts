@@ -32,7 +32,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentInPostSqlUseCaseCommand } from '../comments/use-cases/postgresql/createCommentInPostSqlUseCase';
 import {CommentsQuerySqlRepository} from "../comments/repositories/postgresql/comments.query.sql.repository";
 import {LikesQuerySqlRepository} from "../likes/repositories/postgresql/likes.query.sql.repository";
-//@UseGuards(AuthGlobalGuard)
+import {CreateLikeStatusUseCaseCommand} from "../likes/use-cases/postgresql/createLikeStatusSqlUseCase";
+@UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
   constructor(
@@ -142,25 +143,22 @@ export class PostsController {
 
 
 
-  // @Put(`:postId/like-status`)
-  // @UseGuards(AccessTokenGuard)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async putLikeStatusByPostId(
-  //   @Body() likeStatus: LikeInputDto,
-  //   @Param(`postId`) postId: string,
-  //   @Request() req,
-  // ) {
-  //   return this.likesService.createLikeStatus(
-  //     postId,
-  //     req.user.userId,
-  //     likeStatus.likeStatus,
-  //   );
-  // }
-  //
-  // @Delete(`:postId`)
-  // @UseGuards(AuthGuard)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async deletePostByBlogId(@Param(`postId`) postId: string) {
-  //   return await this.deletePostByBlogIdUseCase.execute(postId);
-  // }
+  @Put(`:postId/like-status`)
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async putLikeStatusByPostId(
+    @Body() likeStatus: LikeInputDto,
+    @Param(`postId`) postId: string,
+    @Request() request,
+  ) {
+    return this.commandBus.execute(new CreateLikeStatusUseCaseCommand(postId,request.user.userId,likeStatus.likeStatus))
+
+  }
+
+  @Delete(`:postId`)
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostByBlogId(@Param(`postId`) postId: string) {
+    return await this.deletePostByBlogIdUseCase.execute(postId);
+  }
 }

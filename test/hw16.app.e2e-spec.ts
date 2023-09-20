@@ -194,7 +194,7 @@ describe('AppController (e2e)', () => {
       .expect(404);
   });
   it('PUT POST', async () => {
-    // CREATE THREE POSTS USER ONE
+    // UPDATE POST
     await request(app.getHttpServer())
       .put(`/sa/blogs/${firstBlogIdOwnUserOne}/posts/${firstPostIdOwnUserOne}`)
       .auth('admin', 'qwerty')
@@ -209,6 +209,7 @@ describe('AppController (e2e)', () => {
       .get(`/posts/${firstPostIdOwnUserOne}`)
       .auth('admin', 'qwerty')
       .expect(200);
+    console.log(response.body)
     expect(response.body).toEqual({
       id: expect.any(String),
       blogId: expect.any(String),
@@ -227,7 +228,7 @@ describe('AppController (e2e)', () => {
   });
   /// COMMENTS
   it('CREATE COMMENT BY POST ID', async () => {
-    // CREATE THREE POSTS USER ONE
+    // CREATE COMMENT PBY POST ID
     const response = await request(app.getHttpServer())
       .post(`/posts/${firstPostIdOwnUserOne}/comments`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
@@ -250,6 +251,14 @@ describe('AppController (e2e)', () => {
         myStatus: 'None',
       },
     });
+    // ERROR
+     await request(app.getHttpServer())
+        .post(`/posts/${'9ce8c8a9-2521-468d-8d93-4b78ba831102'}/comments`)
+        .set('Authorization', `Bearer ${userOne.accessToken}`)
+        .send({
+          content: 'comment with bad uuid',
+        })
+        .expect(404);
   });
 
   it('PUT LIKE IN COMMENT', async () => {
@@ -372,7 +381,7 @@ describe('AppController (e2e)', () => {
         .send({
           content: 'first comment in first post own user one',
         })
-        .expect(201);
+        .expect(200);
     // GET -> "/posts/:postId/comments":
   });
 });

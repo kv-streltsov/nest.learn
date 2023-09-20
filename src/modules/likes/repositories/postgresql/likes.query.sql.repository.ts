@@ -22,7 +22,7 @@ export class LikesQuerySqlRepository {
                 WHERE "entityId" = '${entityId}' AND "userId" = '${userId}'`,
     );
     if (!foundLike.length) return null;
-    return foundLike;
+    return foundLike[0];
   }
 
   async getExtendedLikesInfo(
@@ -37,7 +37,7 @@ export class LikesQuerySqlRepository {
     let newestLikesWithLogin;
     if (newestLikeFlag) {
       const newestLikes = await this.likesSqlRepository.query(
-        `SELECT "userId"
+        `SELECT "userId","addedAt"
                  FROM public.likes
                  WHERE "entityId" = $1 AND "status" = 'Like'
                  ORDER BY "addedAt" DESC 
@@ -63,7 +63,7 @@ export class LikesQuerySqlRepository {
     let likeStatusCurrentUser: null | any = null;
     if (userId) likeStatusCurrentUser = await this.getLike(entityId, userId);
 
-    if (newestLikeFlag && userId) {
+    if (newestLikeFlag) {
       return {
         likesCount: likeCountInfo.likesCount,
         dislikesCount: likeCountInfo.dislikesCount,

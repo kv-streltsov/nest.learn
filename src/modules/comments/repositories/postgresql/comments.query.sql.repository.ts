@@ -45,7 +45,7 @@ export class CommentsQuerySqlRepository {
         sortDirection,
     );
     const comments = await this.commentsSqlRepository.query(
-        `SELECT *
+        `SELECT id,  content, "commentatorInfo", "createdAt"
         FROM public.comments
         WHERE "entityId" = '${postId}'
         ORDER BY "${sortBy}" ${
