@@ -10,14 +10,14 @@ import { UsersService } from '../../users.service';
 export class CreateUserSqlUseCase {
   constructor(
     private usersSqlRepository: UsersSqlRepository,
-    private usersSqlService: UsersService,
+    private usersService: UsersService,
     private usersSqlQueryRepository: UsersSqlQueryRepository,
   ) {}
   async execute(createUserDto: CreateUserDto, confirmAdmin = false) {
-    await this.usersSqlService.checkUserExist(createUserDto);
+    await this.usersService.checkUserExist(createUserDto);
 
     const salt: string = await bcrypt.genSalt(10);
-    const passwordHash: string = await this.usersSqlService.generateHash(
+    const passwordHash: string = await this.usersService.generateHash(
       createUserDto.password,
       salt,
     );

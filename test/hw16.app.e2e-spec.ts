@@ -85,7 +85,6 @@ describe('AppController (e2e)', () => {
 
   /////////////////////////////    BLOG FLOW    /////////////////////////////////////////
   it('CREATE BLOGS', async () => {
-    // USER 1
     const newBlog = await request(app.getHttpServer())
       .post(`/sa/blogs`)
       .auth('admin', 'qwerty')
@@ -339,5 +338,41 @@ describe('AppController (e2e)', () => {
       .delete(`/comments/${firstCommentIdOwnUserOne}`)
       .set('Authorization', `Bearer ${userOne.accessToken}`)
       .expect(404);
+  });
+  ///
+  it('CREATE BLOGS', async () => {
+    const newBlog = await request(app.getHttpServer())
+        .post(`/sa/blogs`)
+        .auth('admin', 'qwerty')
+        .send({
+          name: 'firstBlog',
+          description: 'firstBlog description',
+          websiteUrl: 'https://www.youtube.com/firstBlog',
+        })
+        .expect(201);
+    const newPost = await request(app.getHttpServer())
+        .post(`/sa/blogs/${newBlog.body.id}/posts`)
+        .auth('admin', 'qwerty')
+        .send({
+          title: 'firstPost title',
+          shortDescription: 'firstPost Description',
+          content: 'firstPost content',
+        })
+        .expect(201);
+    const newComment = await request(app.getHttpServer())
+        .post(`/posts/${newPost.body.id}/comments`)
+        .set('Authorization', `Bearer ${userOne.accessToken}`)
+        .send({
+          content: 'first comment in first post own user one',
+        })
+        .expect(201);
+    const  response= await request(app.getHttpServer())
+        .get(`/posts/${newPost.body.id}/comments`)
+        .set('Authorization', `Bearer ${userOne.accessToken}`)
+        .send({
+          content: 'first comment in first post own user one',
+        })
+        .expect(201);
+    // GET -> "/posts/:postId/comments":
   });
 });

@@ -2,9 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-users.dto';
 import bcrypt from 'bcrypt';
 import { UsersQueryRepository } from './repositories/mongodb/users.query.repository';
+import {UsersSqlQueryRepository} from "./repositories/postgresql/users.sql.query.repository";
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersQueryRepository: UsersQueryRepository) {}
+  constructor(private readonly usersQueryRepository: UsersSqlQueryRepository) {}
 
   public async generateHash(password: string, salt: string) {
     return await bcrypt.hash(password, salt);

@@ -30,6 +30,8 @@ import { DeletePostByIdUseCase } from './use-cases/mongodb/delete-post-by-id-use
 import { PostsQuerySqlRepository } from './repositories/postgresql/posts.query.sql.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentInPostSqlUseCaseCommand } from '../comments/use-cases/postgresql/createCommentInPostSqlUseCase';
+import {CommentsQuerySqlRepository} from "../comments/repositories/postgresql/comments.query.sql.repository";
+import {LikesQuerySqlRepository} from "../likes/repositories/postgresql/likes.query.sql.repository";
 //@UseGuards(AuthGlobalGuard)
 @Controller('posts')
 export class PostsController {
@@ -37,8 +39,8 @@ export class PostsController {
     private commandBus: CommandBus,
     private postsService: PostsService,
     private postsQueryRepository: PostsQuerySqlRepository,
-    private commentsQueryRepository: CommentsQueryRepository,
-    private likesQueryRepository: LikesQueryRepository,
+    private commentsQueryRepository: CommentsQuerySqlRepository,
+    private likesQueryRepository: LikesQuerySqlRepository,
     private likesService: LikesService,
     private commentsService: CommentsService,
     private deletePostByBlogIdUseCase: DeletePostByIdUseCase,
@@ -90,6 +92,38 @@ export class PostsController {
     return foundPosts;
   }
 
+  @Get(`:id/comments`)
+  async getCommentsByPostId(
+      @Param(`id`) postId: string,
+      @Query() query: any,
+      @Request() request: any,
+  ) {
+    const foundComments =
+        await this.commentsQueryRepository.getCommentsByPostId(
+            postId,
+            query?.pageNumber && Number(query.pageNumber),
+            query?.pageSize && Number(query.pageSize),
+            query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
+            query?.sortBy && query.sortBy,
+        );
+    foundComments.items = await Promise.all(
+        foundComments.items.map(async (comment: { id: string }): Promise<any> => {
+          const likesInfo = await this.likesQueryRepository.getExtendedLikesInfo(
+              comment.id,
+              request.headers.authGlobal === undefined
+                  ? null
+                  : request.headers.authGlobal.userId,
+              false,
+          );
+          return {
+            ...comment,
+            likesInfo,
+          };
+        }),
+    );
+    return foundComments;
+  }
+
   @Post(`/:id/comments`)
   @UseGuards(AccessTokenGuard)
   async createCommentByPostId(
@@ -105,38 +139,8 @@ export class PostsController {
       ),
     );
   }
-  //
-  // @Get(`:id/comments`)
-  // async getCommentsByPostId(
-  //   @Param(`id`) postId: string,
-  //   @Query() query: any,
-  //   @Request() request: any,
-  // ) {
-  //   const foundComments =
-  //     await this.commentsQueryRepository.getCommentsByPostId(
-  //       postId,
-  //       query?.pageNumber && Number(query.pageNumber),
-  //       query?.pageSize && Number(query.pageSize),
-  //       query?.sortDirection === 'asc' ? SortType.asc : SortType.desc,
-  //       query?.sortBy && query.sortBy,
-  //     );
-  //   foundComments.items = await Promise.all(
-  //     foundComments.items.map(async (comment: { id: string }): Promise<any> => {
-  //       const likesInfo = await this.likesQueryRepository.getExtendedLikesInfo(
-  //         comment.id,
-  //         request.headers.authGlobal === undefined
-  //           ? null
-  //           : request.headers.authGlobal.userId,
-  //         false,
-  //       );
-  //       return {
-  //         ...comment,
-  //         likesInfo,
-  //       };
-  //     }),
-  //   );
-  //   return foundComments;
-  // }
+
+
 
   // @Put(`:postId/like-status`)
   // @UseGuards(AccessTokenGuard)
