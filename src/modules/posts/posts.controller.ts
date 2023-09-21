@@ -68,7 +68,7 @@ export class PostsController {
   }
 
   @Get()
-  async getAllPosts(@Query() query: any, @Request() req) {
+  async getAllPosts(@Query() query: any, @Request() request) {
     const foundPosts = await this.postsQueryRepository.getAllPosts(
       query?.pageSize && Number(query.pageSize),
       query?.pageNumber && Number(query.pageNumber),
@@ -80,9 +80,9 @@ export class PostsController {
         const extendedLikesInfo =
           await this.likesQueryRepository.getExtendedLikesInfo(
             post.id,
-            req.headers.authGlobal === undefined
+              request.headers.authGlobal === undefined
               ? null
-              : req.headers.authGlobal.userId,
+              : request.headers.authGlobal.userId,
           );
         return {
           ...post,
