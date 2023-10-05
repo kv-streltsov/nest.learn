@@ -1,12 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {UserEntity} from "../users/user.entity";
+import {BlogsEntity} from "../blogs/blogs.entity";
 
 @Entity()
-export class PostsEntity {
+export class Posts {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ default: true })
-  blogId: string;
+
+  @OneToOne(() => BlogsEntity)
+  @JoinColumn()
+  blog: BlogsEntity
 
   @Column({ default: true })
   blogName: string;
@@ -23,6 +27,8 @@ export class PostsEntity {
   @Column({ default: true })
   createdAt: string;
 }
+
+export { Posts as PostsEntity }
 
 // -- Table: public.posts
 //

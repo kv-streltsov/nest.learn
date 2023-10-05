@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
-export class UserEntity {
+export class Users {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ default: true })
   login: string;
@@ -19,9 +19,13 @@ export class UserEntity {
   @Column({ default: true })
   salt: string;
 
-  @Column({ default: true })
-  confirmation: object;
+  @Column('simple-json', {nullable: true})
+  confirmation: {
+    code: string;
+    isConfirm: boolean;
+  };
 }
+export { Users as UserEntity }
 // -- Table: public.users
 //
 // -- DROP TABLE IF EXISTS public.users;

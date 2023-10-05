@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {UserEntity} from "../users/user.entity";
 
 @Entity()
-export class SecurityDevicesEntity {
+class SecurityDevices {
   @PrimaryGeneratedColumn()
   sessionId: string;
 
@@ -11,8 +12,7 @@ export class SecurityDevicesEntity {
   @Column({ default: true })
   expiration: string;
 
-  @Column({ default: true })
-  userId: number;
+
 
   @Column({ default: true })
   deviceId: string;
@@ -22,7 +22,15 @@ export class SecurityDevicesEntity {
 
   @Column({ default: true })
   ip: string;
+
+  // @Column({ default: true })
+  // userId: number;
+
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
+  user: UserEntity
 }
+export { SecurityDevices as SecurityDevicesEntity }
 
 // -- Table: public.securityDevices
 //

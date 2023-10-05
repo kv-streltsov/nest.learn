@@ -1,12 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {UserEntity} from "../users/user.entity";
 
 @Entity()
-export class BlogsEntity {
+class Blogs {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ default: true })
-  ownerId: number;
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
+  owner: UserEntity
 
   @Column({ default: true })
   name: string;
@@ -23,6 +25,7 @@ export class BlogsEntity {
   @Column({ default: true })
   isMembership: boolean;
 }
+export { Blogs as BlogsEntity }
 
 // -- Table: public.blogs
 //

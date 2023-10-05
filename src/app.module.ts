@@ -172,8 +172,8 @@ const useCases = [
       username: 'postgres',
       password: '3230sas',
       database: 'learn.nest',
-      autoLoadEntities: false,
-      synchronize: false,
+      autoLoadEntities: true,
+      synchronize: true,
     }),
     TypeOrmModule.forFeature([
       UserEntity,

@@ -1,20 +1,23 @@
-import { Column, Entity } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import { LikeStatusEnum } from './dto/create-like.dto';
+import {UserEntity} from "../users/user.entity";
 
 @Entity()
-export class LikesEntity {
-  @Column({ default: true })
+class Likes {
+  @PrimaryGeneratedColumn()
   entityId: string;
 
-  @Column({ default: true })
-  userId: string;
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
+  user: UserEntity
 
-  @Column({ type: 'enum', enum: LikeStatusEnum, default: true })
+  @Column({ type: 'enum', enum: LikeStatusEnum })
   status: string;
 
   @Column({ default: true })
   addedAt: string;
 }
+export { Likes as LikesEntity }
 // -- Table: public.likes
 //
 // -- DROP TABLE IF EXISTS public.likes;

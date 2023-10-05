@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class CommentsEntity {
+class Comments {
   @PrimaryGeneratedColumn()
   id: string;
 
@@ -11,7 +11,7 @@ export class CommentsEntity {
   @Column({ default: true })
   content: string;
 
-  @Column({ default: true })
+  @Column('simple-json',{ default: true })
   commentatorInfo: {
     userId: string;
     userLogin: string;
@@ -20,6 +20,7 @@ export class CommentsEntity {
   @Column({ default: true })
   createdAt: string;
 }
+export { Comments as CommentsEntity }
 // -- Table: public.comments
 //
 // -- DROP TABLE IF EXISTS public.comments;
