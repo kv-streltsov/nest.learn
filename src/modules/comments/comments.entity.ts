@@ -1,9 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
 class Comments {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @PrimaryColumn({type:"uuid"})
+  @Generated("uuid") id: string;
 
   @Column({ default: true })
   entityId: string;

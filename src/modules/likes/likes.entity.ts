@@ -1,11 +1,11 @@
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, Generated, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import { LikeStatusEnum } from './dto/create-like.dto';
 import {UserEntity} from "../users/user.entity";
 
 @Entity()
 class Likes {
-  @PrimaryGeneratedColumn()
-  entityId: string;
+  @PrimaryColumn({type:"uuid"})
+  @Generated("uuid") entityId: string;
 
   @OneToOne(() => UserEntity)
   @JoinColumn()

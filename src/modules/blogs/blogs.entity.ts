@@ -1,10 +1,10 @@
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, Generated, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import {UserEntity} from "../users/user.entity";
 
 @Entity()
 class Blogs {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @PrimaryColumn({type:"uuid"})
+  @Generated("uuid") id: string;
 
   @OneToOne(() => UserEntity)
   @JoinColumn()

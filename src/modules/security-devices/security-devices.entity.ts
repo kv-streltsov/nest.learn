@@ -1,18 +1,19 @@
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, Generated, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import {UserEntity} from "../users/user.entity";
 
 @Entity()
 class SecurityDevices {
-  @PrimaryGeneratedColumn()
-  sessionId: string;
+  @PrimaryColumn({type:"uuid"})
+  @Generated("uuid") sessionId: string;
+
+  // @PrimaryColumn()
+  // @Generated("uuid") id: string;
 
   @Column()
   issued: string;
 
   @Column({ default: true })
   expiration: string;
-
-
 
   @Column({ default: true })
   deviceId: string;
@@ -22,9 +23,6 @@ class SecurityDevices {
 
   @Column({ default: true })
   ip: string;
-
-  // @Column({ default: true })
-  // userId: number;
 
   @OneToOne(() => UserEntity)
   @JoinColumn()

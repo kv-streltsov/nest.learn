@@ -209,7 +209,6 @@ describe('AppController (e2e)', () => {
       .get(`/posts/${firstPostIdOwnUserOne}`)
       .auth('admin', 'qwerty')
       .expect(200);
-    console.log(response.body)
     expect(response.body).toEqual({
       id: expect.any(String),
       blogId: expect.any(String),

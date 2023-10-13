@@ -53,7 +53,7 @@ export class TestingController {
     await this.securityDevicesModel.deleteMany({});
 
     await this.securityDevicesSqlRepository.query(
-      `DELETE FROM public."securityDevices"`,
+      `DELETE FROM public."security_devices"`,
     );
     await this.likesSqlRepository.query(`DELETE FROM public.likes`);
     await this.usersSqlRepository.query(`DELETE FROM public.users`);

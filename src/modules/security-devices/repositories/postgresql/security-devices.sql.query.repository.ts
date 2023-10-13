@@ -12,7 +12,7 @@ export class SecurityDevicesSqlQueryRepository {
   async findDeviceSession(userId: string, deviceId: string, sessionId: string) {
     const foundSession = await this.securityDevicesModel.query(
       `SELECT *
-                    FROM public."securityDevices"
+                    FROM public."security_devices"
                     WHERE "userId" = $1 AND "deviceId" = $2 AND "sessionId" = $3`,
       [userId, deviceId, sessionId],
     );
@@ -25,7 +25,7 @@ export class SecurityDevicesSqlQueryRepository {
   async findDeviceSessions(userId: string) {
     const foundDevices = await this.securityDevicesModel.query(
       `SELECT  "deviceId", "userAgent" , ip, issued 
-                FROM public."securityDevices"
+                FROM public."security_devices"
                 WHERE "userId" = $1`,
       [userId],
     );
