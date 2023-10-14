@@ -58,7 +58,7 @@ export class CommentsController {
       id: foundComment.id,
       content: foundComment.content,
       commentatorInfo: {
-        userId: foundComment.commentatorInfo.userId,
+        userId: foundComment.commentatorInfo.userId.toString(),
         userLogin: foundComment.commentatorInfo.userLogin,
       },
       createdAt: foundComment.createdAt,

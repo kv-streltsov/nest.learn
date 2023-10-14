@@ -11,7 +11,9 @@ class Comments {
   @Column({ default: true })
   content: string;
 
-  @Column('simple-json',{ default: true })
+  @Column({
+    type: 'jsonb',
+  })
   commentatorInfo: {
     userId: string;
     userLogin: string;

@@ -16,6 +16,7 @@ export class LikesQuerySqlRepository {
   ) {}
 
   async getLike(entityId: string, userId: string) {
+    console.log(`get like`, userId)
     const foundLike = await this.likesSqlRepository.query(
       `SELECT *
                 FROM public.likes 
@@ -62,7 +63,6 @@ export class LikesQuerySqlRepository {
     // get likeStatusCurrentUser
     let likeStatusCurrentUser: null | any = null;
     if (userId) likeStatusCurrentUser = await this.getLike(entityId, userId);
-
     if (newestLikeFlag) {
       return {
         likesCount: likeCountInfo.likesCount,

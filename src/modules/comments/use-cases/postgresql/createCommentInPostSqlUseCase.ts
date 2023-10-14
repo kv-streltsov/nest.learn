@@ -35,7 +35,7 @@ export class CreateCommentInPostSqlUseCase {
     return {
       id: commentDto.id,
       commentatorInfo: {
-        userId: commentDto.commentatorInfo.userId,
+        userId: commentDto.commentatorInfo.userId.toString() ,
         userLogin: commentDto.commentatorInfo.userLogin,
       },
       content: commentDto.content,

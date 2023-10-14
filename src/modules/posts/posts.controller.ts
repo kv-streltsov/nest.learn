@@ -38,12 +38,9 @@ import {CreateLikeStatusUseCaseCommand} from "../likes/use-cases/postgresql/crea
 export class PostsController {
   constructor(
     private commandBus: CommandBus,
-    private postsService: PostsService,
     private postsQueryRepository: PostsQuerySqlRepository,
     private commentsQueryRepository: CommentsQuerySqlRepository,
     private likesQueryRepository: LikesQuerySqlRepository,
-    private likesService: LikesService,
-    private commentsService: CommentsService,
     private deletePostByBlogIdUseCase: DeletePostByIdUseCase,
   ) {}
 
