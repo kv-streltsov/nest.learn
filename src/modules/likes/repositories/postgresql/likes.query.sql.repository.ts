@@ -16,7 +16,6 @@ export class LikesQuerySqlRepository {
   ) {}
 
   async getLike(entityId: string, userId: string) {
-    console.log(`get like`, userId)
     const foundLike = await this.likesSqlRepository.query(
       `SELECT *
                 FROM public.likes 

@@ -17,13 +17,12 @@ export class PostsSqlRepository {
     return this.postSqlRepository.query(
       `
         INSERT INTO public.posts(
-            id,"blogId", title, "blogName", "shortDescription", content, "createdAt")
-             VALUES ( $1, $2, $3, $4, $5, $6,$7)`,
+            id,"blogId", title,  "shortDescription", content, "createdAt")
+             VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         createPostDto.id,
         createPostDto.blogId,
         createPostDto.title,
-        createPostDto.blogName,
         createPostDto.shortDescription,
         createPostDto.content,
         createPostDto.createdAt,

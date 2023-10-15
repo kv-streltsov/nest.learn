@@ -1,4 +1,13 @@
-import {Column, Entity, Generated, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
+import {
+  Column,
+  Entity,
+  Generated,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 import {UserEntity} from "../users/user.entity";
 import {BlogsEntity} from "../blogs/blogs.entity";
 
@@ -7,12 +16,9 @@ export class Posts {
   @PrimaryColumn({type:"uuid"})
   @Generated("uuid") id: string;
 
-  @OneToOne(() => BlogsEntity)
+  @ManyToOne(() => BlogsEntity)
   @JoinColumn()
   blog: BlogsEntity
-
-  @Column({ default: true })
-  blogName: string;
 
   @Column({ default: true })
   title: string;

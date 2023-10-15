@@ -1,4 +1,13 @@
-import {Column, Entity, Generated, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
+import {
+  Column,
+  Entity,
+  Generated,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 import {UserEntity} from "../users/user.entity";
 
 @Entity()
@@ -6,7 +15,7 @@ class Blogs {
   @PrimaryColumn({type:"uuid"})
   @Generated("uuid") id: string;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   owner: UserEntity
 

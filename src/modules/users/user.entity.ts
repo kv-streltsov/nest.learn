@@ -19,7 +19,7 @@ export class Users {
   @Column({ default: true })
   salt: string;
 
-  @Column('simple-json', {nullable: true})
+  @Column({type: 'jsonb'})
   confirmation: {
     code: string;
     isConfirm: boolean;

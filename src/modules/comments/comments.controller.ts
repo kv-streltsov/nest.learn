@@ -41,6 +41,7 @@ export class CommentsController {
 
   @Get(`:id`)
   @HttpCode(HttpStatus.OK)
+  // TODO: если прислать в auth что-то левое -> ошибка 500
   async getCommentById(@Param(`id`) commentId: string, @Request() req) {
     const foundComment = await this.commentsQueryRepository.getCommentById(
       commentId,

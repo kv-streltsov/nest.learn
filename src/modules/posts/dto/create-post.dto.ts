@@ -79,7 +79,6 @@ export class CreatePostInBlogDto {
 export interface ICreateModifiedPostDto {
   id: string;
   blogId: string;
-  blogName: string;
   title: string;
   shortDescription: string;
   content: string;

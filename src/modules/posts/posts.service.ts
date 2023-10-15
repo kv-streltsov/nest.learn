@@ -20,7 +20,6 @@ export class PostsService {
       id: randomUUID(),
       blogId: createPostDto.blogId,
       title: createPostDto.title,
-      blogName: foundBlogName,
       shortDescription: createPostDto.shortDescription,
       content: createPostDto.content,
       createdAt: new Date().toISOString(),

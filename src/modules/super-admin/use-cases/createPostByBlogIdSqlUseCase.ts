@@ -23,7 +23,6 @@ export class CreatePostByBlogIdSqlUseCase {
       id: randomUUID(),
       blogId: blogId,
       title: createPostDto.title,
-      blogName: foundBlog.name,
       shortDescription: createPostDto.shortDescription,
       content: createPostDto.content,
       createdAt: new Date().toISOString(),

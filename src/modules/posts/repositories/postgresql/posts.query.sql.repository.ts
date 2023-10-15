@@ -15,14 +15,15 @@ export class PostsQuerySqlRepository {
   constructor(
     @InjectRepository(PostsEntity)
     private readonly postSqlRepository: Repository<PostsEntity>,
-    @InjectModel(Posts.name) private postsModel: Model<Posts>,
     private blogsQueryRepository: BlogsQuerySqlRepository,
   ) {}
   async getPostById(postId: string) {
     const foundPost = await this.postSqlRepository.query(
-      `SELECT *
-        FROM public.posts
-        WHERE id = $1`,
+      `SELECT public.posts.id, title, "shortDescription", content, public.posts."createdAt", "blogId",public.blogs.name as "blogName"
+                FROM public.posts 
+                LEFT JOIN public.blogs
+                ON public.posts."blogId" = public.blogs.id
+                WHERE public.posts.id = $1`,
       [postId],
     );
     if (!foundPost.length) return null;
@@ -38,10 +39,12 @@ export class PostsQuerySqlRepository {
       await this.paginationHandler(pageNumber, pageSize, sortDirection, null);
 
     const foundPosts = await this.postSqlRepository.query(
-      `SELECT *
+      `SELECT public.posts.id, title, "shortDescription", content, public.posts."createdAt", "blogId",public.blogs.name as "blogName"
                 FROM public.posts
-                ORDER BY "${sortBy}" ${
-        sortBy === 'createdAt' || sortBy === 'id' ? '' : 'COLLATE "C"'
+                LEFT JOIN public.blogs
+                ON public.posts."blogId" = public.blogs.id                
+                ORDER BY public.posts."${sortBy}" ${
+                sortBy === 'public.posts.createdAt' || sortBy === 'public.posts.id' ? '' : 'COLLATE "C"'
       } ${sortDirectionString}
                 LIMIT ${pageSize} OFFSET ${countItems}`,
     );

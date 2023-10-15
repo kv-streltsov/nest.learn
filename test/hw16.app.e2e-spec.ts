@@ -225,6 +225,59 @@ describe('AppController (e2e)', () => {
       },
     });
   });
+  it('GET POST', async () => {
+    // GET POST BY ID
+    let response = await request(app.getHttpServer())
+        .get(`/posts/${firstPostIdOwnUserOne}`)
+        .auth('admin', 'qwerty')
+        .expect(200);
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      blogId: expect.any(String),
+      title: 'firstPostUpdate title',
+      blogName: 'updateBlog',
+      shortDescription: 'firstPostUpdate Description',
+      content: 'firstPostUpdate content',
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    });
+    // GET ALL POST
+    response = await request(app.getHttpServer())
+        .get(`/posts/`)
+        .auth('admin', 'qwerty')
+        .expect(200);
+
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 1,
+      "items": [
+        {
+          "id": expect.any(String),
+          "title": "firstPostUpdate title",
+          "blogName": 'updateBlog',
+          "shortDescription": "firstPostUpdate Description",
+          "content": "firstPostUpdate content",
+          "createdAt": expect.any(String),
+          "blogId": expect.any(String),
+          "extendedLikesInfo": {
+            "likesCount": 0,
+            "dislikesCount": 0,
+            "myStatus": "None",
+            "newestLikes": []
+          }
+        }
+      ]
+    });
+
+
+  });
   /// COMMENTS
   it('CREATE COMMENT BY POST ID', async () => {
     // CREATE COMMENT PBY POST ID
