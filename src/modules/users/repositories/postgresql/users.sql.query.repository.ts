@@ -30,7 +30,7 @@ export class UsersSqlQueryRepository {
       );
 
     const foundUsers = await this.usersSqlRepository.query(
-      `SELECT id, login, email,  "createdAt"
+      `SELECT CAST(id AS VARCHAR), login, email,  "createdAt"
                 FROM public.users
                 ${searchTerm}
                 ORDER BY "${sortBy}" ${

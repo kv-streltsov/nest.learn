@@ -61,7 +61,7 @@ describe('AppController (e2e)', () => {
   }, 100000);
   it('CREATE USER', async () => {
     // USER 1
-    await request(app.getHttpServer())
+    let response = await request(app.getHttpServer())
       .post('/sa/users')
       .auth('admin', 'qwerty')
       .send({
@@ -70,6 +70,31 @@ describe('AppController (e2e)', () => {
         password: userOne.password,
       })
       .expect(201);
+    expect(response.body).toEqual({
+      "id": expect.any(String),
+      "login": userOne.login,
+      "email": userOne.email,
+      "createdAt": expect.any(String)
+    })
+    // GET ALL USERS
+    response = await request(app.getHttpServer())
+        .get('/sa/users')
+        .auth('admin', 'qwerty')
+        .expect(200);
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 1,
+      "items": [
+        {
+          "id": expect.any(String),
+          "login": "userOne",
+          "email": "userOne@one.com",
+          "createdAt": expect.any(String)
+        }
+      ]
+    })
   });
   it('LOGIN USER', async () => {
     // USER 1
@@ -82,7 +107,63 @@ describe('AppController (e2e)', () => {
       .expect(200);
     userOne.accessToken = response.body.accessToken;
   });
-
+  /////////////////////////////    SUPER ADMIN FLOW    //////////////////////////////////
+  it('CREATE GET DELETE USER', async () => {
+    // USER 1
+    let response = await request(app.getHttpServer())
+        .post('/sa/users')
+        .auth('admin', 'qwerty')
+        .send({
+          login: 'dfv',
+          email: `evcrdf@344.com`,
+          password: `leqweqweqweqwq`,
+        })
+        .expect(201);
+    expect(response.body).toEqual({
+      "id": expect.any(String),
+      "login": 'dfv',
+      "email": `evcrdf@344.com`,
+      "createdAt": expect.any(String)
+    })
+    const testUserId = response.body.id
+    // GET ALL USERS
+    response = await request(app.getHttpServer())
+        .get('/sa/users')
+        .auth('admin', 'qwerty')
+        .expect(200);
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 2,
+      "items": [
+        {
+          "id": expect.any(String),
+          "login": "dfv",
+          "email": "evcrdf@344.com",
+          "createdAt": expect.any(String)
+        },
+        {
+          "id": expect.any(String),
+          "login": "userOne",
+          "email": "userOne@one.com",
+          "createdAt": expect.any(String)
+        }
+      ]
+    })
+    // LOGIN AND DELETE USER
+    await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          loginOrEmail: `dfv`,
+          password: `leqweqweqweqwq`,
+        })
+        .expect(200);
+     await request(app.getHttpServer())
+        .delete(`/sa/users/${testUserId}`)
+        .auth('admin', 'qwerty')
+        .expect(204);
+  });
   /////////////////////////////    BLOG FLOW    /////////////////////////////////////////
   it('CREATE BLOGS', async () => {
     const newBlog = await request(app.getHttpServer())

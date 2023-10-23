@@ -30,6 +30,7 @@ import { DeletePostByIdSqlUseCase } from './use-cases/deletePostByIdSqlUseCase';
 import { AccessTokenGuard } from '../auth/strategies/accessToken.guard';
 import { PostsQuerySqlRepository } from '../posts/repositories/postgresql/posts.query.sql.repository';
 @Controller('sa')
+//TODO: USE CASE TO BUS
 export class SuperAdminController {
   constructor(
     private blogsQueryRepository: BlogsQuerySqlRepository,

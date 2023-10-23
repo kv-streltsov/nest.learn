@@ -41,7 +41,7 @@ export class CreateUserSqlUseCase {
     );
     return {
       createdUser: {
-        id: foundUser.id,
+        id: foundUser.id.toString(),
         login: foundUser.login,
         email: foundUser.email,
         createdAt: foundUser.createdAt,
